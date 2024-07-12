@@ -7,7 +7,7 @@ import sequtils
 import tables
 
 proc generateRandomBelief(rng: var Rand, atomicProps: int): Formulae =
-  let possibleBeliefs = 1 shr atomicProps
+  let possibleBeliefs = 1 shl atomicProps
   toFormula(toBin(rng.rand(1..<possibleBeliefs), possibleBeliefs))
 
 proc generateInitialBeliefs(rng: var Rand, agents: int, atomicProps: int): seq[Formulae] =
