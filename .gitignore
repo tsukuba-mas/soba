@@ -1,7 +1,1 @@
-*
-!src/
-!*.nim
-!*.nims
-!belop_echo_chamber.nimble
-!LICENSE
-!README.md
+belop_echo_chamber
