@@ -1,14 +1,7 @@
 import ../types
 import sequtils
-import tables
-import sets
 import math
-
-proc getNeighborList(simulator: Simulator, id: int): seq[int] =
-  if simulator.graph.hasKey(id):
-    return simulator.graph[id].items.toSeq
-  else:
-    return @[]
+import utils
 
 proc opinionDynamics(simulator: Simulator, agent: Agent): Agent =
   let neighbors = simulator.getNeighborList(agent.id).mapIt(agent.opinion)
