@@ -28,6 +28,8 @@ proc randomGraphGenerator(rng: var Rand, vertices: int, edges: int): Table[int, 
   var allEdges = pairs(vs, vs).toSeq.filterIt(it[0] != it[1])
   rng.shuffle(allEdges)
   var graph = initTable[int, HashSet[int]]()
+  for v in 0..<vertices:
+    graph[v] = initHashSet[int]()
   for i in 0..<edges:
     let (u, v) = allEdges[i]
     graph[u].incl(v)
