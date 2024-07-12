@@ -18,9 +18,14 @@ proc generateInitialBeliefs(rng: var Rand, agents: int, atomicProps: int): seq[F
   rng.shuffle(belSeq)
   belSeq
 
+iterator pairs[S, T](xs: seq[S], ys: seq[T]): (S, T) =
+  for x in xs:
+    for y in ys:
+      yield (x, y)
+
 proc randomGraphGenerator(rng: var Rand, vertices: int, edges: int): Table[int, HashSet[int]] =
   let vs = (0..<vertices).toSeq
-  var allEdges = zip(vs, vs).filterIt(it[0] != it[1])
+  var allEdges = pairs(vs, vs).toSeq.filterIt(it[0] != it[1])
   rng.shuffle(allEdges)
   var graph = initTable[int, HashSet[int]]()
   for i in 0..<edges:
