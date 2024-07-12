@@ -1,4 +1,4 @@
-import types
+import ../types
 import sequtils
 import tables
 import sets
