@@ -21,3 +21,6 @@ type Simulator* = ref object
   agents*: seq[Agent]
   topic*: Formulae
   posts*: seq[Message]
+
+type FilterStrategy* {.pure.} = enum
+  all, obounded, bbounded, both
