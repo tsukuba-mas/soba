@@ -40,4 +40,9 @@ proc initilizeSimulator*(seed: int, agents: int, atomicProps: int, edges: int): 
   let initialBeliefs = rng.generateInitialBeliefs(agents, atomicProps)
   let allAgents = (0..<agents).toSeq.mapIt(Agent(id: it, belief: initialBeliefs[it], opinion: rng.rand(0.0..1.0)))
   let graph = rng.randomGraphGenerator(agents, edges)
-  Simulator(graph: graph, agents: allAgents, topic: rng.generateRandomBelief(atomicProps))
+  Simulator(
+    graph: graph, 
+    agents: allAgents, 
+    topic: rng.generateRandomBelief(atomicProps),
+    posts: @[],
+  )

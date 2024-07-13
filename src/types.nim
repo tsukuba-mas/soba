@@ -20,3 +20,4 @@ type Simulator* = ref object
   graph*: Table[int, HashSet[int]]
   agents*: seq[Agent]
   topic*: Formulae
+  posts*: seq[Message]
