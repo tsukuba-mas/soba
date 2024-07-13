@@ -24,3 +24,6 @@ type Simulator* = ref object
 
 type FilterStrategy* {.pure.} = enum
   all, obounded, bbounded, both
+
+type UpdatingStrategy* {.pure.} = enum
+  independent, badjust, oadjust, bcirc, ocirc
