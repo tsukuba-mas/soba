@@ -1,12 +1,12 @@
 import ../types
 import ../copyUtils
 import sequtils
-import math
+import stats
 import utils
 
 proc opinionDynamics(simulator: Simulator, agent: Agent): Agent =
   let neighbors = agent.postSelector(simulator.posts).mapIt(it.opinion)
-  let updatedOpinion = (agent.opinion + neighbors.sum) / (1 + neighbors.len).toFloat
+  let updatedOpinion = agent.mu * agent.opinion + (1.0 - agent.mu) * mean(neighbors)
   agent.updateOpinion(updatedOpinion)
 
 proc opinionDynamics*(simulator: Simulator): Simulator =
