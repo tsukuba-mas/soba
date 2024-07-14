@@ -1,10 +1,10 @@
 import ../types
 import intbrg
 import sequtils
-import sets
+import utils
 
 proc beliefRevisionGames(simulator: Simulator, agent: Agent): Agent =
-  let neighborBeliefs = agent.neighbors.toSeq.mapIt(simulator.agents[it].belief)
+  let neighborBeliefs = agent.postSelector(simulator.posts).mapIt(it.belief)
   let updatedBelief = r3(agent.belief, neighborBeliefs, hamming, sum)
   Agent(opinion: agent.opinion, belief: updatedBelief, id: agent.id)
 
