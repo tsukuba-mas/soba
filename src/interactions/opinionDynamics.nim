@@ -9,6 +9,6 @@ proc opinionDynamics(simulator: Simulator, agent: Agent): Agent =
   let updatedOpinion = (agent.opinion + neighbors.sum) / (1 + neighbors.len).toFloat
   agent.updateOpinion(updatedOpinion)
 
-proc opinionDynamics*(simulator: var Simulator) =
+proc opinionDynamics*(simulator: Simulator): Simulator =
   let updatedAgents = simulator.agents.mapIt(simulator.opinionDynamics(it))
-  simulator.agents = updatedAgents
+  simulator.updateAgents(updatedAgents)

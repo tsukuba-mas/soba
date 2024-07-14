@@ -1,8 +1,9 @@
 import ../types
+import ../copyUtils
 import options
 import sequtils
 
-proc registerPosts*(simulator: var Simulator, time: int) =
+proc registerPosts*(simulator: Simulator, time: int): Simulator =
   let currentPosts = simulator.agents.mapIt(
     Message(
       author: it.id,
@@ -13,4 +14,4 @@ proc registerPosts*(simulator: var Simulator, time: int) =
       repostedBy: none(int),
     )
   )
-  simulator.posts = concat(simulator.posts, currentPosts)
+  simulator.updatePosts(concat(simulator.posts, currentPosts))

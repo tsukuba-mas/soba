@@ -9,6 +9,6 @@ proc beliefRevisionGames(simulator: Simulator, agent: Agent): Agent =
   let updatedBelief = r3(agent.belief, neighborBeliefs, hamming, sum)
   agent.updateBelief(updatedBelief)
 
-proc beliefRevisionGames*(simulator: var Simulator) = 
+proc beliefRevisionGames*(simulator: Simulator): Simulator = 
   let updatedAgents = simulator.agents.mapIt(simulator.beliefRevisionGames(it))
-  simulator.agents = updatedAgents
+  simulator.updateAgents(updatedAgents)
