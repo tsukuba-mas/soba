@@ -48,6 +48,7 @@ proc initilizeSimulator*(seed: int, agents: int, atomicProps: int, edges: int): 
       neighbors: graph[it],
       filterStrategy: FilterStrategy.all,
       updatingStrategy: UpdatingStrategy.independent,
+      rewritingStrategy: RewritingStrategy.random,
       mu: 0.5,
     )
   )

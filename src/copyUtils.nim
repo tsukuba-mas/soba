@@ -16,6 +16,7 @@ proc copy(agent: Agent): Agent =
     neighbors: agent.neighbors,
     filterStrategy: agent.filterStrategy,
     updatingStrategy: agent.updatingStrategy,
+    rewritingStrategy: agent.rewritingStrategy,
     mu: agent.mu,
   )
 
