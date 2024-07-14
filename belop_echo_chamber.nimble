@@ -11,4 +11,4 @@ bin           = @["belop_echo_chamber"]
 # Dependencies
 
 requires "nim >= 2.0.0"
-requires "https://github.com/Azumabashi/intbrg@0.1.0"
+requires "https://github.com/Azumabashi/intbrg >= 0.1.0"
