@@ -2,16 +2,18 @@ import intbrg
 import sets
 import options
 
+type Opinion* = float
+
 type Agent* = ref object
   id*: int
   belief*: Formulae
-  opinion*: range[0.0..1.0]
+  opinion*: Opinion
   neighbors*: HashSet[int]
 
 type Message* = ref object
   author*: int
   belief*: Formulae
-  opinion*: range[0.0..1.0]
+  opinion*: Opinion
   postedAt*: int
   repostedBy*: Option[int]
   repostedAt*: Option[int]
