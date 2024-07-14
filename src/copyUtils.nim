@@ -1,6 +1,13 @@
 import types
 import intbrg
 
+proc copy(simulator: Simulator): Simulator =
+  Simulator(
+    agents: simulator.agents,
+    topic: simulator.topic,
+    posts: simulator.posts,
+  )
+
 proc copy(agent: Agent): Agent =
   Agent(
     id: agent.id,
@@ -20,3 +27,13 @@ proc updateBelief*(agent: Agent, belief: Formulae): Agent =
   var newAgent = agent.copy()
   newAgent.belief = belief
   newAgent
+
+proc updateAgents*(simulator: Simulator, agents: seq[Agent]): Simulator =
+  var newSimulator = simulator.copy()
+  newSimulator.agents = agents
+  newSimulator
+
+proc updatePosts*(simulator: Simulator, posts: seq[Message]): Simulator =
+  var newSimulator = simulator.copy()
+  newSimulator.posts = posts
+  newSimulator
