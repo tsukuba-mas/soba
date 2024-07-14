@@ -17,6 +17,7 @@ type Agent* = ref object
   neighbors*: HashSet[int]
   filterStrategy*: FilterStrategy
   updatingStrategy*: UpdatingStrategy
+  mu*: float  # Torelance threshold for opinion dynamics
 
 type Message* = ref object
   author*: int

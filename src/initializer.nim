@@ -46,6 +46,9 @@ proc initilizeSimulator*(seed: int, agents: int, atomicProps: int, edges: int): 
       belief: initialBeliefs[it], 
       opinion: rng.rand(0.0..1.0),
       neighbors: graph[it],
+      filterStrategy: FilterStrategy.all,
+      updatingStrategy: UpdatingStrategy.independent,
+      mu: 0.5,
     )
   )
   Simulator(

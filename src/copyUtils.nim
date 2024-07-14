@@ -16,6 +16,7 @@ proc copy(agent: Agent): Agent =
     neighbors: agent.neighbors,
     filterStrategy: agent.filterStrategy,
     updatingStrategy: agent.updatingStrategy,
+    mu: agent.mu,
   )
 
 proc updateOpinion*(agent: Agent, opinion: Opinion): Agent =
