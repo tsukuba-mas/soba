@@ -1,5 +1,4 @@
 import intbrg
-import tables
 import sets
 import options
 
@@ -7,6 +6,7 @@ type Agent* = ref object
   id*: int
   belief*: Formulae
   opinion*: range[0.0..1.0]
+  neighbors*: HashSet[int]
 
 type Message* = ref object
   author*: int
@@ -17,7 +17,6 @@ type Message* = ref object
   repostedAt*: Option[int]
 
 type Simulator* = ref object
-  graph*: Table[int, HashSet[int]]
   agents*: seq[Agent]
   topic*: Formulae
   posts*: seq[Message]

@@ -38,10 +38,16 @@ proc randomGraphGenerator(rng: var Rand, vertices: int, edges: int): Table[int, 
 proc initilizeSimulator*(seed: int, agents: int, atomicProps: int, edges: int): Simulator =
   var rng = initRand(seed)
   let initialBeliefs = rng.generateInitialBeliefs(agents, atomicProps)
-  let allAgents = (0..<agents).toSeq.mapIt(Agent(id: it, belief: initialBeliefs[it], opinion: rng.rand(0.0..1.0)))
   let graph = rng.randomGraphGenerator(agents, edges)
+  let allAgents = (0..<agents).toSeq.mapIt(
+    Agent(
+      id: it, 
+      belief: initialBeliefs[it], 
+      opinion: rng.rand(0.0..1.0),
+      neighbors: graph[it],
+    )
+  )
   Simulator(
-    graph: graph, 
     agents: allAgents, 
     topic: rng.generateRandomBelief(atomicProps),
     posts: @[],
