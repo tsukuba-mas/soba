@@ -1,5 +1,6 @@
 import ../types
 import ../distance
+import ../randomUtils
 import sequtils
 import sets
 import options
@@ -24,3 +25,9 @@ proc postSelector*(agent: Agent, posts: seq[Message]): seq[Message] =
       availablePosts.filterIt(
         distance(agent.opinion, it.opinion) <= eps and distance(agent.belief, it.belief) <= 1
       )
+
+proc takeN*[T](xs: seq[T], n: int): seq[T] =
+  var idx = initHashSet[int]()
+  while idx.len < n:
+    idx.incl(rand(0, xs.len - 1))
+  idx.toSeq.sorted.mapIt(xs[it])
