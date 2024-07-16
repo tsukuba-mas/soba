@@ -31,7 +31,10 @@ proc randomGraphGenerator(vertices: int, edges: int): Table[int, HashSet[int]] =
   for i in 0..<edges:
     let (u, v) = allEdges[i]
     graph[u].incl(v)
-  graph
+  if graph.keys.toSeq.allIt(graph[it].len > 0):
+    graph
+  else:
+    vertices.randomGraphGenerator(edges)
   
 proc initilizeSimulator*(agents: int, atomicProps: int, edges: int): Simulator =
   let initialBeliefs = generateInitialBeliefs(agents, atomicProps)
