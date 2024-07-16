@@ -2,9 +2,12 @@ import ../types
 import ../copyUtils
 import options
 import sequtils
+import sets
 
-proc registerPosts*(simulator: Simulator, time: int): Simulator =
-  let currentPosts = simulator.agents.mapIt(
+proc registerPosts*(simulator: Simulator, time: int, targets: HashSet[int]): Simulator =
+  let currentPosts = simulator.agents.filterIt(
+    targets.contains(it.id)
+  ).mapIt(
     Message(
       author: it.id,
       belief: it.belief,
