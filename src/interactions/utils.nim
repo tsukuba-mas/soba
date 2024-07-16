@@ -4,6 +4,7 @@ import ../randomUtils
 import sequtils
 import sets
 import options
+import algorithm
 
 const eps = 1e-5
 
