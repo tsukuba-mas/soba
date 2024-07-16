@@ -16,19 +16,20 @@ proc isRelatedToNeighbors(neighbors: HashSet[int], post: Message): bool =
 proc getTimeline*(agent: Agent, posts: seq[Message]): seq[Message] = 
   posts.filterIt(agent.neighbors.isRelatedToNeighbors(it))
 
-proc postSelector*(agent: Agent, posts: seq[Message]): seq[Message] =
-  let availablePosts = agent.getTimeline(posts)
-  result = case agent.filterStrategy
+proc isAcceptablePost*(agent: Agent, post: Message): bool =
+  result = 
+    case agent.filterStrategy
     of FilterStrategy.all:
-      availablePosts
+      true
     of FilterStrategy.obounded:
-      availablePosts.filterIt(distance(agent.opinion, it.opinion) <= eps)
+      distance(agent.opinion, agent.opinion) <= eps
     of FilterStrategy.bbounded:
-      availablePosts.filterIt(distance(agent.belief, it.belief) <= 1)
+      distance(agent.belief, agent.belief) <= 1
     of FilterStrategy.both:
-      availablePosts.filterIt(
-        distance(agent.opinion, it.opinion) <= eps and distance(agent.belief, it.belief) <= 1
-      )
+      distance(agent.opinion, agent.opinion) <= eps and distance(agent.belief, agent.belief) <= 1
+
+proc postSelector*(agent: Agent, posts: seq[Message]): seq[Message] =
+  agent.getTimeline(posts).filterIt(agent.isAcceptablePost(it))
 
 proc takeN*[T](xs: seq[T], n: int): seq[T] =
   var idx = initHashSet[int]()
