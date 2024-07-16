@@ -1,33 +1,30 @@
 import types
-import random
+import randomUtils
 import sets
 import intbrg
 import strutils
 import sequtils
 import tables
 
-proc generateRandomBelief(rng: var Rand, atomicProps: int): Formulae =
+proc generateRandomBelief(atomicProps: int): Formulae =
   let uniqueModels = 1 shl atomicProps
   let possibleBeliefs = 1 shl uniqueModels
-  toFormula(toBin(rng.rand(1..<possibleBeliefs), uniqueModels))
+  toFormula(toBin(rand(1, possibleBeliefs - 1), uniqueModels))
 
-proc generateInitialBeliefs(rng: var Rand, agents: int, atomicProps: int): seq[Formulae] =
+proc generateInitialBeliefs(agents: int, atomicProps: int): seq[Formulae] =
   var beliefs = initHashSet[Formulae]()
   while beliefs.len < agents:
-    beliefs.incl(rng.generateRandomBelief(atomicProps))
-  var belSeq = beliefs.toSeq
-  rng.shuffle(belSeq)
-  belSeq
+    beliefs.incl(generateRandomBelief(atomicProps))
+  beliefs.toSeq.shuffle()
 
 iterator pairs[S, T](xs: seq[S], ys: seq[T]): (S, T) =
   for x in xs:
     for y in ys:
       yield (x, y)
 
-proc randomGraphGenerator(rng: var Rand, vertices: int, edges: int): Table[int, HashSet[int]] =
+proc randomGraphGenerator(vertices: int, edges: int): Table[int, HashSet[int]] =
   let vs = (0..<vertices).toSeq
-  var allEdges = pairs(vs, vs).toSeq.filterIt(it[0] != it[1])
-  rng.shuffle(allEdges)
+  var allEdges = pairs(vs, vs).toSeq.filterIt(it[0] != it[1]).shuffle()
   var graph = initTable[int, HashSet[int]]()
   for v in 0..<vertices:
     graph[v] = initHashSet[int]()
@@ -36,15 +33,14 @@ proc randomGraphGenerator(rng: var Rand, vertices: int, edges: int): Table[int, 
     graph[u].incl(v)
   graph
   
-proc initilizeSimulator*(seed: int, agents: int, atomicProps: int, edges: int): Simulator =
-  var rng = initRand(seed)
-  let initialBeliefs = rng.generateInitialBeliefs(agents, atomicProps)
-  let graph = rng.randomGraphGenerator(agents, edges)
+proc initilizeSimulator*(agents: int, atomicProps: int, edges: int): Simulator =
+  let initialBeliefs = generateInitialBeliefs(agents, atomicProps)
+  let graph = randomGraphGenerator(agents, edges)
   let allAgents = (0..<agents).toSeq.mapIt(
     Agent(
       id: it, 
       belief: initialBeliefs[it], 
-      opinion: rng.rand(0.0..1.0),
+      opinion: rand(0.0, 1.0),
       neighbors: graph[it],
       filterStrategy: FilterStrategy.all,
       updatingStrategy: UpdatingStrategy.independent,
@@ -54,6 +50,6 @@ proc initilizeSimulator*(seed: int, agents: int, atomicProps: int, edges: int): 
   )
   Simulator(
     agents: allAgents, 
-    topic: rng.generateRandomBelief(atomicProps),
+    topic: generateRandomBelief(atomicProps),
     posts: @[],
   )
