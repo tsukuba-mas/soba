@@ -18,7 +18,7 @@ proc shuffle*[T](xs: seq[T]): seq[T] =
   ys
 
 proc takeN*[T](xs: seq[T], n: int): seq[T] =
-  var taken = initHashSet[int]()
-  while taken.len < n:
-    taken.incl(rand(0, xs.len - 1))
-  taken.toSeq.sorted.mapIt(xs[it])
+  var idx = initHashSet[int]()
+  while idx.len < n:
+    idx.incl(rand(0, xs.len - 1))
+  idx.toSeq.sorted.mapIt(xs[it])
