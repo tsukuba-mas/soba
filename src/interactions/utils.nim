@@ -13,8 +13,11 @@ proc isRelatedToNeighbors(neighbors: HashSet[int], post: Message): bool =
   let isRepostAuthor = post.repostedBy.isSome() and neighbors.contains(post.repostedBy.get())
   isInitialAuthor or isRepostAuthor
 
+proc getTimeline*(agent: Agent, posts: seq[Message]): seq[Message] = 
+  posts.filterIt(agent.neighbors.isRelatedToNeighbors(it))
+
 proc postSelector*(agent: Agent, posts: seq[Message]): seq[Message] =
-  let availablePosts = posts.filterIt(agent.neighbors.isRelatedToNeighbors(it))
+  let availablePosts = agent.getTimeline(posts)
   result = case agent.filterStrategy
     of FilterStrategy.all:
       availablePosts
