@@ -1,6 +1,7 @@
 import types
 import intbrg
 import sets
+import utils
 
 proc copy(simulator: Simulator): Simulator =
   Simulator(
@@ -42,12 +43,6 @@ proc updateAgents*(simulator: Simulator, agents: seq[Agent]): Simulator =
   var newSimulator = simulator.copy()
   newSimulator.agents = agents
   newSimulator
-
-proc tail[T](xs: seq[T], n: int): seq[T] = 
-  if xs.len <= n:
-    xs
-  else:
-    xs[(xs.len - n)..<xs.len]
 
 proc updatePosts*(simulator: Simulator, posts: seq[Message]): Simulator =
   var newSimulator = simulator.copy()
