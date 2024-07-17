@@ -31,8 +31,11 @@ proc isAcceptablePost*(agent: Agent, post: Message): bool =
 proc postSelector*(agent: Agent, posts: seq[Message]): seq[Message] =
   agent.getTimeline(posts).filterIt(agent.isAcceptablePost(it))
 
-proc takeN*[T](xs: seq[T], n: int): seq[T] =
-  var idx = initHashSet[int]()
-  while idx.len < n:
-    idx.incl(rand(0, xs.len - 1))
-  idx.toSeq.sorted.mapIt(xs[it])
+proc takeN*[T](xs: seq[T], n: int): Option[seq[T]] =
+  if xs.len < n:
+    none(seq[T])
+  else:
+    var idx = initHashSet[int]()
+    while idx.len < n:
+      idx.incl(rand(0, xs.len - 1))
+    some(idx.toSeq.sorted.mapIt(xs[it]))
