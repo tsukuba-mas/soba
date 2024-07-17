@@ -6,7 +6,7 @@ import sets
 import options
 import algorithm
 
-const eps = 1e-5
+const eps = 1e-1
 
 proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
   let isInitialAuthor = neighbors.contains(post.author)
@@ -22,11 +22,11 @@ proc isAcceptablePost*(agent: Agent, post: Message): bool =
     of FilterStrategy.all:
       true
     of FilterStrategy.obounded:
-      distance(agent.opinion, agent.opinion) <= eps
+      distance(agent.opinion, post.opinion) <= eps
     of FilterStrategy.bbounded:
-      distance(agent.belief, agent.belief) <= 1
+      distance(agent.belief, post.belief) <= 1
     of FilterStrategy.both:
-      distance(agent.opinion, agent.opinion) <= eps and distance(agent.belief, agent.belief) <= 1
+      distance(agent.opinion, post.opinion) <= eps and distance(agent.belief, post.belief) <= 1
 
 proc postSelector*(agent: Agent, posts: seq[Message]): seq[Message] =
   agent.getTimeline(posts).filterIt(agent.isAcceptablePost(it))
