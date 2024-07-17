@@ -13,7 +13,7 @@ proc recommendRandomly(simulator: Simulator, target: Agent): int =
   let notFollowes = (0..<simulator.agents.len).toSeq.filterIt(it.isNotFollowed(target.neighbors))
   notFollowes.takeN(1)[0]
 
-proc recommendUser*(simulator: Simulator, target: Agent): int =
+proc recommendUser(simulator: Simulator, target: Agent): int =
   result = 
     case target.rewritingStrategy
     of RewritingStrategy.random:
@@ -34,7 +34,7 @@ proc recommendUser*(simulator: Simulator, target: Agent): int =
       else:
         candidates.takeN(1)[0]
   
-proc updateNeighbors*(simulator: Simulator, agent: Agent): Agent =
+proc updateNeighbors(simulator: Simulator, agent: Agent): Agent =
   withProbability(agent.unfollowProb):
     let unfollowed = agent.neighbors.toSeq.takeN(1)[0]
     let newNeighbor = simulator.recommendUser(agent)
