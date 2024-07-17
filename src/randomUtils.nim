@@ -13,3 +13,7 @@ proc shuffle*[T](xs: seq[T]): seq[T] =
   var ys = xs
   rng.get.shuffle(ys)
   ys
+
+template withProbability*(prob: float, body: untyped): untyped =
+  if rand(0.0, 1.0) <= prob:
+    body
