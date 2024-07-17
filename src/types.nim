@@ -20,7 +20,7 @@ proc `==`*(x, y: Id): bool {.borrow.}
 proc `$`*(id: Id): string {.borrow.}
 proc toId*(x: int): Id = Id(x)
 
-type Agent* = ref object
+type Agent* = object
   id*: Id
   belief*: Formulae
   opinion*: Opinion
@@ -32,7 +32,7 @@ type Agent* = ref object
   repostProb*: float
   unfollowProb*: float
 
-type Message* = ref object
+type Message* = object
   author*: Id
   belief*: Formulae
   opinion*: Opinion
@@ -40,7 +40,7 @@ type Message* = ref object
   repostedBy*: Option[Id]
   repostedAt*: Option[int]
 
-type Simulator* = ref object
+type Simulator* = object
   agents*: seq[Agent]
   topic*: Formulae
   posts*: seq[Message]
