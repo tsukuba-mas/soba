@@ -18,6 +18,7 @@ proc copy(agent: Agent): Agent =
     updatingStrategy: agent.updatingStrategy,
     rewritingStrategy: agent.rewritingStrategy,
     mu: agent.mu,
+    repostProb: agent.repostProb,
   )
 
 proc updateOpinion*(agent: Agent, opinion: Opinion): Agent =

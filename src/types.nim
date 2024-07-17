@@ -22,6 +22,7 @@ type Agent* = ref object
   updatingStrategy*: UpdatingStrategy
   rewritingStrategy*: RewritingStrategy
   mu*: float  # Torelance threshold for opinion dynamics
+  repostProb*: float
 
 type Message* = ref object
   author*: int
