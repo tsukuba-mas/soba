@@ -22,12 +22,12 @@ iterator pairs[S, T](xs: seq[S], ys: seq[T]): (S, T) =
     for y in ys:
       yield (x, y)
 
-proc randomGraphGenerator(vertices: int, edges: int): Table[int, HashSet[int]] =
-  let vs = (0..<vertices).toSeq
+proc randomGraphGenerator(vertices: int, edges: int): Table[Id, HashSet[Id]] =
+  let vs = (0..<vertices).toSeq.map(toId)
   var allEdges = pairs(vs, vs).toSeq.filterIt(it[0] != it[1]).shuffle()
-  var graph = initTable[int, HashSet[int]]()
+  var graph = initTable[Id, HashSet[Id]]()
   for v in 0..<vertices:
-    graph[v] = initHashSet[int]()
+    graph[v.toId] = initHashSet[Id]()
   for i in 0..<edges:
     let (u, v) = allEdges[i]
     graph[u].incl(v)
@@ -41,10 +41,10 @@ proc initilizeSimulator*(agents: int, atomicProps: int, edges: int): Simulator =
   let graph = randomGraphGenerator(agents, edges)
   let allAgents = (0..<agents).toSeq.mapIt(
     Agent(
-      id: it, 
+      id: it.toId, 
       belief: initialBeliefs[it], 
       opinion: rand(0.0, 1.0),
-      neighbors: graph[it],
+      neighbors: graph[it.toId],
       filterStrategy: FilterStrategy.all,
       updatingStrategy: UpdatingStrategy.independent,
       rewritingStrategy: RewritingStrategy.random,

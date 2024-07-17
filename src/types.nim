@@ -1,6 +1,7 @@
 import intbrg
 import sets
 import options
+import hashes
 
 type Opinion* = float
 
@@ -13,11 +14,17 @@ type UpdatingStrategy* {.pure.} = enum
 type RewritingStrategy* {.pure.} = enum
   random, repost, recommendation
 
+type Id* = distinct int
+proc hash*(id: Id): Hash {.borrow.}
+proc `==`*(x, y: Id): bool {.borrow.}
+proc `$`*(id: Id): string {.borrow.}
+proc toId*(x: int): Id = Id(x)
+
 type Agent* = ref object
-  id*: int
+  id*: Id
   belief*: Formulae
   opinion*: Opinion
-  neighbors*: HashSet[int]
+  neighbors*: HashSet[Id]
   filterStrategy*: FilterStrategy
   updatingStrategy*: UpdatingStrategy
   rewritingStrategy*: RewritingStrategy
@@ -26,11 +33,11 @@ type Agent* = ref object
   unfollowProb*: float
 
 type Message* = ref object
-  author*: int
+  author*: Id
   belief*: Formulae
   opinion*: Opinion
   postedAt*: int
-  repostedBy*: Option[int]
+  repostedBy*: Option[Id]
   repostedAt*: Option[int]
 
 type Simulator* = ref object

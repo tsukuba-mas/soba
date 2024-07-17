@@ -12,7 +12,7 @@ proc opinionDynamics(simulator: Simulator, agent: Agent): Agent =
   let updatedOpinion = agent.mu * agent.opinion + (1.0 - agent.mu) * mean(neighbors)
   agent.updateOpinion(updatedOpinion)
 
-proc opinionDynamics*(simulator: Simulator, targets: HashSet[int]): Simulator =
+proc opinionDynamics*(simulator: Simulator, targets: HashSet[Id]): Simulator =
   let updatedAgents = simulator.agents.mapIt(
     if targets.contains(it.id): simulator.opinionDynamics(it) else: it
   )

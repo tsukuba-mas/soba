@@ -8,7 +8,7 @@ import algorithm
 
 const eps = 1e-5
 
-proc isRelatedToNeighbors(neighbors: HashSet[int], post: Message): bool =
+proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
   let isInitialAuthor = neighbors.contains(post.author)
   let isRepostAuthor = post.repostedBy.isSome() and neighbors.contains(post.repostedBy.get())
   isInitialAuthor or isRepostAuthor

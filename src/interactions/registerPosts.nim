@@ -26,10 +26,10 @@ proc generateNewPost(simulator: Simulator, agent: Agent, time: int): Message =
     opinion: agent.opinion,
     postedAt: time,
     repostedAt: none(int),
-    repostedBy: none(int),
+    repostedBy: none(Id),
   )
 
-proc registerPosts*(simulator: Simulator, time: int, targets: HashSet[int]): Simulator =
+proc registerPosts*(simulator: Simulator, time: int, targets: HashSet[Id]): Simulator =
   let currentPosts = simulator.agents.filterIt(
     targets.contains(it.id)
   ).mapIt(

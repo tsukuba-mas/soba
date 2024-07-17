@@ -6,14 +6,14 @@ import sequtils
 import sets
 import options
 
-proc isNotFollowed(agentId: int, neighbors: HashSet[int]): bool =
+proc isNotFollowed(agentId: Id, neighbors: HashSet[Id]): bool =
   not neighbors.contains(agentId)
 
-proc recommendRandomly(simulator: Simulator, target: Agent): Option[int] = 
-  let notFollowes = (0..<simulator.agents.len).toSeq.filterIt(it.isNotFollowed(target.neighbors))
+proc recommendRandomly(simulator: Simulator, target: Agent): Option[Id] = 
+  let notFollowes = (0..<simulator.agents.len).toSeq.map(toId).filterIt(it.isNotFollowed(target.neighbors))
   notFollowes.choose()
 
-proc recommendUser(simulator: Simulator, target: Agent): Option[int] =
+proc recommendUser(simulator: Simulator, target: Agent): Option[Id] =
   result = 
     case target.rewritingStrategy
     of RewritingStrategy.random:
@@ -43,7 +43,7 @@ proc updateNeighbors(simulator: Simulator, agent: Agent): Agent =
 
   return agent
 
-proc updateNeighbors*(simulator: Simulator, targets: HashSet[int]): Simulator =
+proc updateNeighbors*(simulator: Simulator, targets: HashSet[Id]): Simulator =
   let updatedAgents = simulator.agents.mapIt(
     if targets.contains(it.id): simulator.updateNeighbors(it) else: it
   )

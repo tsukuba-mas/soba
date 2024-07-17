@@ -12,7 +12,7 @@ proc beliefRevisionGames(simulator: Simulator, agent: Agent): Agent =
   let updatedBelief = r3(agent.belief, neighborBeliefs, hamming, sum)
   agent.updateBelief(updatedBelief)
 
-proc beliefRevisionGames*(simulator: Simulator, targets: HashSet[int]): Simulator = 
+proc beliefRevisionGames*(simulator: Simulator, targets: HashSet[Id]): Simulator = 
   let updatedAgents = simulator.agents.mapIt(
     if targets.contains(it.id): simulator.beliefRevisionGames(it) else: it
   )

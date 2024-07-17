@@ -32,7 +32,7 @@ proc updateBelief*(agent: Agent, belief: Formulae): Agent =
   newAgent.belief = belief
   newAgent
 
-proc updateNeighbors*(agent: Agent, removed: int, added: int): Agent =
+proc updateNeighbors*(agent: Agent, removed: Id, added: Id): Agent =
   var newAgent = agent.copy()
   newAgent.neighbors = newAgent.neighbors
   newAgent
