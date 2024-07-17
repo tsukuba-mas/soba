@@ -6,7 +6,7 @@ import utils
 import sets
 
 proc opinionDynamics(simulator: Simulator, agent: Agent): Agent =
-  let neighbors = agent.postSelector(simulator.posts).mapIt(it.opinion)
+  let neighbors = agent.postSelector(simulator.posts, simulator.screenSize).mapIt(it.opinion)
   if neighbors.len == 0:
     return agent
   let updatedOpinion = agent.mu * agent.opinion + (1.0 - agent.mu) * mean(neighbors)

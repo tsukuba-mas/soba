@@ -6,7 +6,7 @@ import utils
 import sets
 
 proc beliefRevisionGames(simulator: Simulator, agent: Agent): Agent =
-  let neighborBeliefs = agent.postSelector(simulator.posts).mapIt(it.belief)
+  let neighborBeliefs = agent.postSelector(simulator.posts, simulator.screenSize).mapIt(it.belief)
   if neighborBeliefs.len == 0:
     return agent
   let updatedBelief = r3(agent.belief, neighborBeliefs, hamming, sum)
