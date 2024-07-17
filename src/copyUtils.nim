@@ -1,5 +1,6 @@
 import types
 import intbrg
+import sets
 
 proc copy(simulator: Simulator): Simulator =
   Simulator(
@@ -34,7 +35,7 @@ proc updateBelief*(agent: Agent, belief: Formulae): Agent =
 
 proc updateNeighbors*(agent: Agent, removed: Id, added: Id): Agent =
   var newAgent = agent.copy()
-  newAgent.neighbors = newAgent.neighbors
+  newAgent.neighbors = newAgent.neighbors - toHashSet(@[removed]) + toHashSet(@[added])
   newAgent
 
 proc updateAgents*(simulator: Simulator, agents: seq[Agent]): Simulator =
