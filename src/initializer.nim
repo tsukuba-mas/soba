@@ -49,6 +49,8 @@ proc initilizeSimulator*(agents: int, atomicProps: int, edges: int): Simulator =
       updatingStrategy: UpdatingStrategy.independent,
       rewritingStrategy: RewritingStrategy.random,
       mu: 0.5,
+      unfollowProb: 0.5,
+      repostProb: 0.5,
     )
   )
   Simulator(
