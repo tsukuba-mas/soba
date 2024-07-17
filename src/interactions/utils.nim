@@ -1,6 +1,7 @@
 import ../types
 import ../distance
 import ../randomUtils
+import ../utils
 import sequtils
 import sets
 import options
@@ -13,8 +14,8 @@ proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
   let isRepostAuthor = post.repostedBy.isSome() and neighbors.contains(post.repostedBy.get())
   isInitialAuthor or isRepostAuthor
 
-proc getTimeline*(agent: Agent, posts: seq[Message]): seq[Message] = 
-  posts.filterIt(agent.neighbors.isRelatedToNeighbors(it))
+proc getTimeline*(agent: Agent, posts: seq[Message], messages: int): seq[Message] = 
+  posts.filterIt(agent.neighbors.isRelatedToNeighbors(it)).tail(messages)
 
 proc isAcceptablePost*(agent: Agent, post: Message): bool =
   result = 
@@ -28,8 +29,8 @@ proc isAcceptablePost*(agent: Agent, post: Message): bool =
     of FilterStrategy.both:
       distance(agent.opinion, post.opinion) <= eps and distance(agent.belief, post.belief) <= 1
 
-proc postSelector*(agent: Agent, posts: seq[Message]): seq[Message] =
-  agent.getTimeline(posts).filterIt(agent.isAcceptablePost(it))
+proc postSelector*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
+  agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))
 
 proc takeN*[T](xs: seq[T], n: int): Option[seq[T]] =
   if xs.len < n:

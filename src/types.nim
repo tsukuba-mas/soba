@@ -44,3 +44,4 @@ type Simulator* = ref object
   agents*: seq[Agent]
   topic*: Formulae
   posts*: seq[Message]
+  screenSize*: int

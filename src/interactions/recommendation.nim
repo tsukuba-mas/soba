@@ -19,14 +19,14 @@ proc recommendUser(simulator: Simulator, target: Agent): Option[Id] =
     of RewritingStrategy.random:
       simulator.recommendRandomly(target)
     of RewritingStrategy.repost:
-      let reposts = target.getTimeline(simulator.posts).filterIt(it.repostedBy.isSome)
+      let reposts = target.getTimeline(simulator.posts, simulator.screenSize).filterIt(it.repostedBy.isSome)
       let repostAuthors = reposts.mapIt(it.author)
       if repostAuthors.len == 0:
         simulator.recommendRandomly(target)
       else:
         repostAuthors.choose()
     of RewritingStrategy.recommendation:
-      let acceptablePosts = target.postSelector(simulator.posts)
+      let acceptablePosts = target.postSelector(simulator.posts, simulator.screenSize)
       let acceptablePostsAuthors = acceptablePosts.mapIt(it.author)
       let candidates = acceptablePostsAuthors.filterIt(it.isNotFollowed(target.neighbors))
       if candidates.len == 0:

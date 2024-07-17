@@ -8,6 +8,7 @@ proc copy(simulator: Simulator): Simulator =
     agents: simulator.agents,
     topic: simulator.topic,
     posts: simulator.posts,
+    screenSize: simulator.screenSize,
   )
 
 proc copy(agent: Agent): Agent =
