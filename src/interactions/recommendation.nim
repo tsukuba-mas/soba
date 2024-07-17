@@ -41,3 +41,9 @@ proc updateNeighbors*(simulator: Simulator, agent: Agent): Agent =
     return agent.updateNeighbors(unfollowed, newNeighbor)
 
   return agent
+
+proc updateNeighbors*(simulator: Simulator, targets: HashSet[int]): Simulator =
+  let updatedAgents = simulator.agents.mapIt(
+    if targets.contains(it.id): simulator.updateNeighbors(it) else: it
+  )
+  simulator.updateAgents(updatedAgents)
