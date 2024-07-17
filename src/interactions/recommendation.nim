@@ -9,11 +9,11 @@ import options
 proc isNotFollowed(agentId: int, neighbors: HashSet[int]): bool =
   not neighbors.contains(agentId)
 
-proc recommendRandomly(simulator: Simulator, target: Agent): int = 
+proc recommendRandomly(simulator: Simulator, target: Agent): Option[int] = 
   let notFollowes = (0..<simulator.agents.len).toSeq.filterIt(it.isNotFollowed(target.neighbors))
-  notFollowes.takeN(1)[0]
+  notFollowes.choose()
 
-proc recommendUser(simulator: Simulator, target: Agent): int =
+proc recommendUser(simulator: Simulator, target: Agent): Option[int] =
   result = 
     case target.rewritingStrategy
     of RewritingStrategy.random:
@@ -24,7 +24,7 @@ proc recommendUser(simulator: Simulator, target: Agent): int =
       if repostAuthors.len == 0:
         simulator.recommendRandomly(target)
       else:
-        repostAuthors.takeN(1)[0]
+        repostAuthors.choose()
     of RewritingStrategy.recommendation:
       let acceptablePosts = target.postSelector(simulator.posts)
       let acceptablePostsAuthors = acceptablePosts.mapIt(it.author)
@@ -32,13 +32,14 @@ proc recommendUser(simulator: Simulator, target: Agent): int =
       if candidates.len == 0:
         simulator.recommendRandomly(target)
       else:
-        candidates.takeN(1)[0]
+        candidates.choose()
   
 proc updateNeighbors(simulator: Simulator, agent: Agent): Agent =
   withProbability(agent.unfollowProb):
-    let unfollowed = agent.neighbors.toSeq.takeN(1)[0]
+    let unfollowed = agent.neighbors.toSeq.choose()
     let newNeighbor = simulator.recommendUser(agent)
-    return agent.updateNeighbors(unfollowed, newNeighbor)
+    if unfollowed.isSome() and newNeighbor.isSome():
+      return agent.updateNeighbors(unfollowed.get(), newNeighbor.get())
 
   return agent
 

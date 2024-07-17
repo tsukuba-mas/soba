@@ -39,3 +39,10 @@ proc takeN*[T](xs: seq[T], n: int): Option[seq[T]] =
     while idx.len < n:
       idx.incl(rand(0, xs.len - 1))
     some(idx.toSeq.sorted.mapIt(xs[it]))
+
+proc choose*[T](xs: seq[T]): Option[T] =
+  let taken = takeN(xs, 1)
+  if taken.isSome():
+    some(taken.get()[0])
+  else:
+    none(T)

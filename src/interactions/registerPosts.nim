@@ -9,13 +9,13 @@ import utils
 proc generateNewPost(simulator: Simulator, agent: Agent, time: int): Message =
   withProbability(agent.repostProb):
     let timelines = agent.postSelector(simulator.posts)
-    let reposted = timelines.takeN(1)
-    if reposted.len > 0:
+    let reposted = timelines.choose()
+    if reposted.isSome():
       return Message(
-        author: reposted[0].author,
-        belief: reposted[0].belief,
-        opinion: reposted[0].opinion,
-        postedAt: reposted[0].postedAt,
+        author: reposted.get.author,
+        belief: reposted.get.belief,
+        opinion: reposted.get.opinion,
+        postedAt: reposted.get.postedAt,
         repostedAt: some(time),
         repostedBy: some(agent.id),
       )
