@@ -23,6 +23,7 @@ type Agent* = ref object
   rewritingStrategy*: RewritingStrategy
   mu*: float  # Torelance threshold for opinion dynamics
   repostProb*: float
+  unfollowProb*: float
 
 type Message* = ref object
   author*: int

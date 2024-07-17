@@ -19,6 +19,7 @@ proc copy(agent: Agent): Agent =
     rewritingStrategy: agent.rewritingStrategy,
     mu: agent.mu,
     repostProb: agent.repostProb,
+    unfollowProb: agent.unfollowProb,
   )
 
 proc updateOpinion*(agent: Agent, opinion: Opinion): Agent =
@@ -29,6 +30,11 @@ proc updateOpinion*(agent: Agent, opinion: Opinion): Agent =
 proc updateBelief*(agent: Agent, belief: Formulae): Agent =
   var newAgent = agent.copy()
   newAgent.belief = belief
+  newAgent
+
+proc updateNeighbors*(agent: Agent, removed: int, added: int): Agent =
+  var newAgent = agent.copy()
+  newAgent.neighbors = newAgent.neighbors
   newAgent
 
 proc updateAgents*(simulator: Simulator, agents: seq[Agent]): Simulator =

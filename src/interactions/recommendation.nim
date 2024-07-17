@@ -1,4 +1,6 @@
 import ../types
+import ../randomUtils
+import ../copyUtils
 import utils
 import sequtils
 import sets
@@ -31,3 +33,11 @@ proc recommendUser*(simulator: Simulator, target: Agent): int =
         simulator.recommendRandomly(target)
       else:
         candidates.takeN(1)[0]
+  
+proc updateNeighbors*(simulator: Simulator, agent: Agent): Agent =
+  withProbability(agent.unfollowProb):
+    let unfollowed = agent.neighbors.toSeq.takeN(1)[0]
+    let newNeighbor = simulator.recommendUser(agent)
+    return agent.updateNeighbors(unfollowed, newNeighbor)
+
+  return agent
