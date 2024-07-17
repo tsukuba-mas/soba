@@ -10,7 +10,7 @@ proc isNotFollowed(agentId: Id, neighbors: HashSet[Id]): bool =
   not neighbors.contains(agentId)
 
 proc recommendRandomly(simulator: Simulator, target: Agent): Option[Id] = 
-  let notFollowes = (0..<simulator.agents.len).toSeq.map(toId).filterIt(it.isNotFollowed(target.neighbors))
+  let notFollowes = (0..<simulator.agents.len).toSeq.map(toId).filterIt(it != target.id and it.isNotFollowed(target.neighbors))
   notFollowes.choose()
 
 proc recommendUser(simulator: Simulator, target: Agent): Option[Id] =
