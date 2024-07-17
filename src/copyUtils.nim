@@ -42,7 +42,13 @@ proc updateAgents*(simulator: Simulator, agents: seq[Agent]): Simulator =
   newSimulator.agents = agents
   newSimulator
 
+proc tail[T](xs: seq[T], n: int): seq[T] = 
+  if xs.len <= n:
+    xs
+  else:
+    xs[(xs.len - n)..<xs.len]
+
 proc updatePosts*(simulator: Simulator, posts: seq[Message]): Simulator =
   var newSimulator = simulator.copy()
-  newSimulator.posts = posts
+  newSimulator.posts = posts.tail(newSimulator.agents.len)
   newSimulator
