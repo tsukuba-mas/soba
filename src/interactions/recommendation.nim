@@ -26,9 +26,8 @@ proc recommendUser(simulator: Simulator, target: Agent): Option[Id] =
       else:
         repostAuthors.choose()
     of RewritingStrategy.recommendation:
-      let acceptablePosts = target.getAcceptablePosts(simulator.posts, simulator.screenSize)
-      let acceptablePostsAuthors = acceptablePosts.mapIt(it.author)
-      let candidates = acceptablePostsAuthors.filterIt(it != target.id and it.isNotFollowed(target.neighbors))
+      let recommendedUsers = simulator.posts.filterIt(target.isAcceptablePost(it)).mapIt(it.author)
+      let candidates = recommendedUsers.filterIt(it != target.id and it.isNotFollowed(target.neighbors))
       if candidates.len == 0:
         simulator.recommendRandomly(target)
       else:
