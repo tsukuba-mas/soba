@@ -1,10 +1,12 @@
 import ../types
 import ../randomUtils
 import ../copyUtils
+import ../logger
 import utils
 import sequtils
 import sets
 import options
+import strformat
 
 proc isNotFollowed(agentId: Id, neighbors: HashSet[Id]): bool =
   not neighbors.contains(agentId)
@@ -39,17 +41,21 @@ proc getAuthorsOrRepostedUser(posts: seq[Message]): seq[Id] =
     else: it.author
   )
   
-proc updateNeighbors(simulator: Simulator, agent: Agent): Agent =
+proc updateNeighbors(simulator: Simulator, agent: Agent, tick: int): Agent =
   withProbability(agent.unfollowProb):
     let unfollowed = agent.getUnacceptablePosts(simulator.posts, simulator.screenSize).getAuthorsOrRepostedUser().choose()
     let newNeighbor = simulator.recommendUser(agent)
     if unfollowed.isSome() and newNeighbor.isSome():
+      simulator.verboseLogger(
+        fmt"NG {tick} {agent.id} removed {unfollowed.get()} followed {newNeighbor.get()}",
+        tick
+      )
       return agent.updateNeighbors(unfollowed.get(), newNeighbor.get())
 
   return agent
 
-proc updateNeighbors*(simulator: Simulator, targets: HashSet[Id]): Simulator =
+proc updateNeighbors*(simulator: Simulator, targets: HashSet[Id], time: int): Simulator =
   let updatedAgents = simulator.agents.mapIt(
-    if targets.contains(it.id): simulator.updateNeighbors(it) else: it
+    if targets.contains(it.id): simulator.updateNeighbors(it, time) else: it
   )
   simulator.updateAgents(updatedAgents)

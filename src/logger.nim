@@ -7,6 +7,7 @@ import sets
 
 let beliefHist = "belhist.csv"
 let ophist = "ophist.csv"
+let verbose = "verbose.txt"
 var dirname = ""
 
 proc getBeliefHistPath(): string = dirname & "/" & beliefHist
@@ -34,6 +35,13 @@ proc graphLogger(simulator: Simulator, tick: int) =
   for agent in simulator.agents:
     for next in agent.neighbors:
       saveTo.appendToFile($agent.id & "," & $next, tick)
+
+proc verboseLogger*(simulator: Simulator, content: string, tick: int) = 
+  appendToFile(
+    dirname & "/" & verbose,
+    content,
+    tick
+  )
 
 proc log*(simulator: Simulator, tick: int) =
   let beliefs = simulator.agents.mapIt($(it.belief)).join(",")

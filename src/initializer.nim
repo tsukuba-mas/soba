@@ -58,4 +58,5 @@ proc initilizeSimulator*(agents: int, atomicProps: int, edges: int): Simulator =
     topic: generateRandomBelief(atomicProps),
     posts: @[],
     screenSize: 10,
+    verbose: true,
   )

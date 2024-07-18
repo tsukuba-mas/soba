@@ -25,8 +25,8 @@ simulator.log(0)
 for time in 1..5000:
   # Interactions
   let targets = chooseTargets(agents).get().toHashSet()
-  simulator = simulator.opinionDynamics(targets)
-#  simulator = simulator.beliefRevisionGames(targets)
-  simulator = simulator.updateNeighbors(targets)
+  simulator = simulator.opinionDynamics(targets, time)
+#  simulator = simulator.beliefRevisionGames(targets, time)
+  simulator = simulator.updateNeighbors(targets, time)
   simulator = simulator.registerPosts(time, targets)
   simulator.log(time)

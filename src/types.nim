@@ -45,3 +45,4 @@ type Simulator* = object
   topic*: Formulae
   posts*: seq[Message]
   screenSize*: int
+  verbose*: bool
