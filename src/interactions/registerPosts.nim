@@ -8,7 +8,7 @@ import utils
 
 proc generateNewPost(simulator: Simulator, agent: Agent, time: int): Message =
   withProbability(agent.repostProb):
-    let timelines = agent.postSelector(simulator.posts, simulator.screenSize)
+    let timelines = agent.getAcceptablePosts(simulator.posts, simulator.screenSize)
     let reposted = timelines.choose()
     if reposted.isSome():
       return Message(

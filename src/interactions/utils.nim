@@ -29,7 +29,7 @@ proc isAcceptablePost*(agent: Agent, post: Message): bool =
     of FilterStrategy.both:
       distance(agent.opinion, post.opinion) <= eps and distance(agent.belief, post.belief) <= 1
 
-proc postSelector*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
+proc getAcceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))
 
 proc takeN*[T](xs: seq[T], n: int): Option[seq[T]] =
