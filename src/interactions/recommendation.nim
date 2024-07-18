@@ -34,9 +34,15 @@ proc recommendUser(simulator: Simulator, target: Agent): Option[Id] =
       else:
         candidates.choose()
   
+proc getAuthorsOrRepostedUser(posts: seq[Message]): seq[Id] =
+  posts.mapIt(
+    if it.repostedBy.isSome(): it.repostedBy.get()
+    else: it.author
+  )
+  
 proc updateNeighbors(simulator: Simulator, agent: Agent): Agent =
   withProbability(agent.unfollowProb):
-    let unfollowed = agent.neighbors.toSeq.choose()
+    let unfollowed = agent.getUnacceptablePosts(simulator.posts, simulator.screenSize).getAuthorsOrRepostedUser().choose()
     let newNeighbor = simulator.recommendUser(agent)
     if unfollowed.isSome() and newNeighbor.isSome():
       return agent.updateNeighbors(unfollowed.get(), newNeighbor.get())
