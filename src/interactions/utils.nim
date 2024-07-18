@@ -32,6 +32,9 @@ proc isAcceptablePost*(agent: Agent, post: Message): bool =
 proc getAcceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))
 
+proc getUnacceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
+  agent.getTimeline(posts, messages).filterIt(not agent.isAcceptablePost(it))
+
 proc takeN*[T](xs: seq[T], n: int): Option[seq[T]] =
   if xs.len < n:
     none(seq[T])
