@@ -36,9 +36,11 @@ proc randomGraphGenerator(vertices: int, edges: int): Table[Id, HashSet[Id]] =
   else:
     vertices.randomGraphGenerator(edges)
   
-proc initilizeSimulator*(agents: int, atomicProps: int, edges: int, options: CommandLineArgs): Simulator =
+proc initilizeSimulator*(options: CommandLineArgs): Simulator =
+  let agents = options.n
+  let atomicProps = 3
   let initialBeliefs = generateInitialBeliefs(agents, atomicProps)
-  let graph = randomGraphGenerator(agents, edges)
+  let graph = randomGraphGenerator(agents, options.follow)
   let allAgents = (0..<agents).toSeq.mapIt(
     Agent(
       id: it.toId, 
@@ -60,5 +62,5 @@ proc initilizeSimulator*(agents: int, atomicProps: int, edges: int, options: Com
     topic: generateRandomBelief(atomicProps),
     posts: @[],
     screenSize: 10,
-    verbose: true,
+    verbose: options.verbose,
   )

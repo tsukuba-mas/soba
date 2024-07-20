@@ -22,7 +22,7 @@ let parsedOptions = parseArguments()
 initRand(parsedOptions.seed)
 initLogger(parsedOptions.dir)
 initializeThresholds(parsedOptions.epsilon, parsedOptions.delta)
-var simulator = initilizeSimulator(parsedOptions.n, 3, parsedOptions.follow, parsedOptions)
+var simulator = initilizeSimulator(parsedOptions)
 for agent in simulator.agents:
   echo agent.neighbors
 simulator.log(0)
