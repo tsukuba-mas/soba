@@ -7,16 +7,11 @@ import interactions/chooseTargets
 import interactions/recommendation
 import interactions/relaxDissonance
 import interactions/utils
-import sequtils
-import intbrg
-import strformat
 import sets
 import randomUtils
 import logger
 import options
 import argumentParser
-
-proc `$`(p: Message): string = fmt"Message({p.author},{p.opinion},{p.belief})"
 
 let parsedOptions = parseArguments()
 initRand(parsedOptions.seed)
