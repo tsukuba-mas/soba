@@ -21,6 +21,7 @@ proc copy(agent: Agent): Agent =
     filterStrategy: agent.filterStrategy,
     updatingStrategy: agent.updatingStrategy,
     rewritingStrategy: agent.rewritingStrategy,
+    values: agent.values,
     mu: agent.mu,
     repostProb: agent.repostProb,
     unfollowProb: agent.unfollowProb,

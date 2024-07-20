@@ -28,6 +28,7 @@ type Agent* = object
   filterStrategy*: FilterStrategy
   updatingStrategy*: UpdatingStrategy
   rewritingStrategy*: RewritingStrategy
+  values*: seq[float]
   mu*: float  # Torelance threshold for opinion dynamics
   repostProb*: float
   unfollowProb*: float
