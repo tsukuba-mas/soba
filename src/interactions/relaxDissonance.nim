@@ -6,6 +6,8 @@ import utils
 import intbrg
 import stats
 import options
+import ../logger
+import strformat
 
 proc getBeliefBasedOpinion(belief: Formulae, values: seq[float], topic: Formulae): float =
   let merged = revision(belief, @[topic])
@@ -16,6 +18,10 @@ proc getBeliefBasedOpinion(agent: Agent, topic: Formulae): float =
 
 proc opinionFormation(simulator: Simulator, agent: Agent, tick: int): Agent =
   let newOpinion = agent.opinion * agent.alpha + (1.0 - agent.alpha) * agent.getBeliefBasedOpinion(simulator.topic)
+  simulator.verboseLogger(
+    fmt"OF {tick} {agent.id} {agent.opinion} -> {newOpinion}",
+    tick
+  )
   agent.updateOpinion(newOpinion)
 
 proc opinionFormation*(simulator: Simulator, targets: HashSet[Id], tick: int): Simulator =
@@ -39,7 +45,12 @@ proc beliefAlignment(simulator: Simulator, agent: Agent, tick: int): Agent =
       currentCandidates.add(phi)
 
   # choose one of the optimal one randomly
-  agent.updateBelief(currentCandidates.choose().get)
+  let updatedBelief = currentCandidates.choose().get
+  simulator.verboseLogger(
+    fmt"BA {tick} {agent.id} {agent.belief} -> {updatedBelief}",
+    tick
+  )
+  agent.updateBelief(updatedBelief)
 
 proc beliefAlignment*(simulator: Simulator, targets: HashSet[Id], tick: int): Simulator =
   let updatedAgents = simulator.agents.mapIt(
