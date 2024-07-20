@@ -49,6 +49,7 @@ proc initilizeSimulator*(agents: int, atomicProps: int, edges: int): Simulator =
       updatingStrategy: UpdatingStrategy.independent,
       rewritingStrategy: RewritingStrategy.random,
       mu: 0.5,
+      alpha: 0.5,
       unfollowProb: 0.5,
       repostProb: 0.5,
       values: (15..0).toSeq.mapIt(it.toFloat / 15.0),

@@ -23,6 +23,7 @@ proc copy(agent: Agent): Agent =
     rewritingStrategy: agent.rewritingStrategy,
     values: agent.values,
     mu: agent.mu,
+    alpha: agent.alpha,
     repostProb: agent.repostProb,
     unfollowProb: agent.unfollowProb,
   )
