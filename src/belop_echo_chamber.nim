@@ -13,19 +13,20 @@ import sets
 import randomUtils
 import logger
 import options
+import argumentParser
 
 proc `$`(p: Message): string = fmt"Message({p.author},{p.opinion},{p.belief})"
 
-initRand(42)
-initLogger("test_")
-const agents = 100
-var simulator = initilizeSimulator(agents, 3, 400)
+let parsedOptions = parseArguments()
+initRand(parsedOptions.seed)
+initLogger(parsedOptions.dir)
+var simulator = initilizeSimulator(parsedOptions.n, 3, parsedOptions.follow)
 for agent in simulator.agents:
   echo agent.neighbors
 simulator.log(0)
-for time in 1..500:
+for time in 1..parsedOptions.tick:
   # Interactions
-  let targets = chooseTargets(agents).get().toHashSet()
+  let targets = chooseTargets(parsedOptions.n).get().toHashSet()
   simulator = simulator.opinionDynamics(targets, time)
   simulator = simulator.beliefRevisionGames(targets, time)
 #  simulator = simulator.opinionFormation(targets, time)

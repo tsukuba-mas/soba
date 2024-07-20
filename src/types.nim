@@ -48,3 +48,14 @@ type Simulator* = object
   posts*: seq[Message]
   screenSize*: int
   verbose*: bool
+
+type CommandLineArgs* = object
+  seed*: int
+  dir*: string
+  n*: int
+  follow*: int
+  tick*: int
+  filter*: FilterStrategy
+  update*: UpdatingStrategy
+  rewriting*: RewritingStrategy
+  verbose*: bool
