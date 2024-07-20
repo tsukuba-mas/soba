@@ -4,6 +4,12 @@ import strutils
 import sequtils
 import algorithm
 
+proc parseValue(path: string): seq[float] =
+  var f = open(path)
+  defer:
+    f.close()
+  f.readAll().split("\n").map(parseFloat)
+
 proc parseArguments*(): CommandLineArgs =
   var p = initOptParser()
   var options = CommandLineArgs(
@@ -56,8 +62,7 @@ proc parseArguments*(): CommandLineArgs =
       of "repostProb", "rp":
         options.repostProb = p.val.parseFloat
       of "values", "v":
-        # ToDo
-        discard
+        options.values = p.val.parseValue
       else:
         discard
     of cmdArgument:
