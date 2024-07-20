@@ -10,9 +10,11 @@ import algorithm
 const eps = 1e-1
 
 proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
-  let isInitialAuthor = neighbors.contains(post.author)
-  let isRepostAuthor = post.repostedBy.isSome() and neighbors.contains(post.repostedBy.get())
-  isInitialAuthor or isRepostAuthor
+  result = 
+    if post.repostedBy.isSome():
+      neighbors.contains(post.repostedBy.get())
+    else:
+      neighbors.contains(post.author)
 
 proc getTimeline*(agent: Agent, posts: seq[Message], messages: int): seq[Message] = 
   posts.filterIt(agent.neighbors.isRelatedToNeighbors(it)).tail(messages)
