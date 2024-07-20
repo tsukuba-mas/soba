@@ -38,7 +38,7 @@ proc randomGraphGenerator(vertices: int, edges: int): Table[Id, HashSet[Id]] =
   
 proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   let agents = options.n
-  let atomicProps = 3
+  let atomicProps = options.atomicProps
   let initialBeliefs = generateInitialBeliefs(agents, atomicProps)
   let graph = randomGraphGenerator(agents, options.follow)
   let allAgents = (0..<agents).toSeq.mapIt(
@@ -61,6 +61,6 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
     agents: allAgents, 
     topic: generateRandomBelief(atomicProps),
     posts: @[],
-    screenSize: 10,
+    screenSize: options.screenSize,
     verbose: options.verbose,
   )

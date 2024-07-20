@@ -66,3 +66,5 @@ type CommandLineArgs* = object
   values*: seq[float]
   epsilon*: float
   delta*: int
+  atomicProps*: int
+  screenSize*: int
