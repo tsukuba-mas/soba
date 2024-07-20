@@ -8,7 +8,12 @@ import options
 import algorithm
 import intbrg
 
-const eps = 1e-1
+var eps = none(float)
+var delta = none(int)
+
+proc initializeThresholds*(epsVal: float, deltaVal: int) =
+  eps = some(epsVal)
+  delta = some(deltaVal)
 
 proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
   result = 
@@ -26,11 +31,11 @@ proc isAcceptablePost*(agent: Agent, post: Message): bool =
     of FilterStrategy.all:
       true
     of FilterStrategy.obounded:
-      distance(agent.opinion, post.opinion) <= eps
+      distance(agent.opinion, post.opinion) <= eps.get()
     of FilterStrategy.bbounded:
-      distance(agent.belief, post.belief) <= 1
+      distance(agent.belief, post.belief) <= delta.get()
     of FilterStrategy.both:
-      distance(agent.opinion, post.opinion) <= eps and distance(agent.belief, post.belief) <= 1
+      distance(agent.opinion, post.opinion) <= eps.get() and distance(agent.belief, post.belief) <= delta.get()
 
 proc getAcceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))

@@ -64,3 +64,5 @@ type CommandLineArgs* = object
   unfollowProb*: float
   repostProb*: float
   values*: seq[float]
+  epsilon*: float
+  delta*: int

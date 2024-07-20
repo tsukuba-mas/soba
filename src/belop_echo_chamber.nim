@@ -6,6 +6,7 @@ import interactions/registerPosts
 import interactions/chooseTargets
 import interactions/recommendation
 import interactions/relaxDissonance
+import interactions/utils
 import sequtils
 import intbrg
 import strformat
@@ -20,6 +21,7 @@ proc `$`(p: Message): string = fmt"Message({p.author},{p.opinion},{p.belief})"
 let parsedOptions = parseArguments()
 initRand(parsedOptions.seed)
 initLogger(parsedOptions.dir)
+initializeThresholds(parsedOptions.epsilon, parsedOptions.delta)
 var simulator = initilizeSimulator(parsedOptions.n, 3, parsedOptions.follow)
 for agent in simulator.agents:
   echo agent.neighbors

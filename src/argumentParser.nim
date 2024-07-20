@@ -27,6 +27,8 @@ proc parseArguments*(): CommandLineArgs =
     unfollowProb: 0.5,
     repostProb: 0.5,
     values: (0..7).toSeq.reversed.mapIt(it.toFloat / 7.0),
+    epsilon: 0.5,
+    delta: 4,
   )
 
   while true:
@@ -63,6 +65,10 @@ proc parseArguments*(): CommandLineArgs =
         options.repostProb = p.val.parseFloat
       of "values", "v":
         options.values = p.val.parseValue
+      of "epsilon":
+        options.epsilon = p.val.parseFloat
+      of "delta":
+        options.delta = p.val.parseInt
       else:
         discard
     of cmdArgument:
