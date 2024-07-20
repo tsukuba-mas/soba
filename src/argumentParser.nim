@@ -1,6 +1,8 @@
 import parseopt
 import types
 import strutils
+import sequtils
+import algorithm
 
 proc parseArguments*(): CommandLineArgs =
   var p = initOptParser()
@@ -14,6 +16,11 @@ proc parseArguments*(): CommandLineArgs =
     update: UpdatingStrategy.independent,
     rewriting: RewritingStrategy.random,
     verbose: false,
+    mu: 0.5,
+    alpha: 0.5,
+    unfollowProb: 0.5,
+    repostProb: 0.5,
+    values: (0..7).toSeq.reversed.mapIt(it.toFloat / 7.0),
   )
 
   while true:
@@ -34,12 +41,23 @@ proc parseArguments*(): CommandLineArgs =
         options.tick = p.val.parseInt
       of "filter", "fs":
         options.filter = parseEnum[FilterStrategy](p.val)
-      of "update", "u":
+      of "update", "us":
         options.update = parseEnum[UpdatingStrategy](p.val)
-      of "rewriting", "r":
+      of "rewriting", "rs":
         options.rewriting = parseEnum[RewritingStrategy](p.val)
-      of "verbose", "v":
+      of "verbose":
         options.verbose = true
+      of "mu":
+        options.mu = p.val.parseFloat
+      of "alpha":
+        options.alpha = p.val.parseFloat
+      of "unfollowProb", "up":
+        options.unfollowProb = p.val.parseFloat
+      of "repostProb", "rp":
+        options.repostProb = p.val.parseFloat
+      of "values", "v":
+        # ToDo
+        discard
       else:
         discard
     of cmdArgument:

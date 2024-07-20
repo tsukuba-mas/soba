@@ -5,7 +5,6 @@ import intbrg
 import strutils
 import sequtils
 import tables
-import algorithm
 
 proc generateRandomBelief(atomicProps: int): Formulae =
   let uniqueModels = 1 shl atomicProps
@@ -37,7 +36,7 @@ proc randomGraphGenerator(vertices: int, edges: int): Table[Id, HashSet[Id]] =
   else:
     vertices.randomGraphGenerator(edges)
   
-proc initilizeSimulator*(agents: int, atomicProps: int, edges: int): Simulator =
+proc initilizeSimulator*(agents: int, atomicProps: int, edges: int, options: CommandLineArgs): Simulator =
   let initialBeliefs = generateInitialBeliefs(agents, atomicProps)
   let graph = randomGraphGenerator(agents, edges)
   let allAgents = (0..<agents).toSeq.mapIt(
@@ -46,14 +45,14 @@ proc initilizeSimulator*(agents: int, atomicProps: int, edges: int): Simulator =
       belief: initialBeliefs[it], 
       opinion: rand(0.0, 1.0),
       neighbors: graph[it.toId],
-      filterStrategy: FilterStrategy.obounded,
-      updatingStrategy: UpdatingStrategy.independent,
-      rewritingStrategy: RewritingStrategy.random,
-      mu: 0.5,
-      alpha: 0.5,
-      unfollowProb: 0.5,
-      repostProb: 0.5,
-      values: (0..7).toSeq.reversed.mapIt(it.toFloat / 7.0),
+      filterStrategy: options.filter,
+      updatingStrategy: options.update,
+      rewritingStrategy: options.rewriting,
+      mu: options.mu,
+      alpha: options.alpha,
+      unfollowProb: options.unfollowProb,
+      repostProb: options.repostProb,
+      values: options.values,
     )
   )
   Simulator(

@@ -59,3 +59,8 @@ type CommandLineArgs* = object
   update*: UpdatingStrategy
   rewriting*: RewritingStrategy
   verbose*: bool
+  mu*: float
+  alpha*: float
+  unfollowProb*: float
+  repostProb*: float
+  values*: seq[float]
