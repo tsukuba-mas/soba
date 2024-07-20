@@ -6,6 +6,7 @@ import sequtils
 import sets
 import options
 import algorithm
+import intbrg
 
 const eps = 1e-1
 
@@ -52,3 +53,9 @@ proc choose*[T](xs: seq[T]): Option[T] =
     some(taken.get()[0])
   else:
     none(T)
+
+proc revision*(self: Formulae, others: seq[Formulae]): Formulae = 
+  if others.len == 0:
+    self
+  else:
+    r3(self, others, hamming, sum)

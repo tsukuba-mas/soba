@@ -5,6 +5,7 @@ import interactions/brg
 import interactions/registerPosts
 import interactions/chooseTargets
 import interactions/recommendation
+import interactions/relaxDissonance
 import sequtils
 import intbrg
 import strformat
@@ -16,17 +17,19 @@ import options
 proc `$`(p: Message): string = fmt"Message({p.author},{p.opinion},{p.belief})"
 
 initRand(42)
-initLogger("test")
+initLogger("test_")
 const agents = 100
-var simulator = initilizeSimulator(agents, 4, 400)
+var simulator = initilizeSimulator(agents, 3, 400)
 for agent in simulator.agents:
   echo agent.neighbors
 simulator.log(0)
-for time in 1..5000:
+for time in 1..500:
   # Interactions
   let targets = chooseTargets(agents).get().toHashSet()
   simulator = simulator.opinionDynamics(targets, time)
   simulator = simulator.beliefRevisionGames(targets, time)
+#  simulator = simulator.opinionFormation(targets, time)
+  simulator = simulator.beliefAlignment(targets, time)
   simulator = simulator.updateNeighbors(targets, time)
   simulator = simulator.registerPosts(time, targets)
   simulator.log(time)

@@ -9,9 +9,7 @@ import strformat
 
 proc beliefRevisionGames(simulator: Simulator, agent: Agent, tick: int): Agent =
   let neighborBeliefs = agent.getAcceptablePosts(simulator.posts, simulator.screenSize).mapIt(it.belief)
-  if neighborBeliefs.len == 0:
-    return agent
-  let updatedBelief = r3(agent.belief, neighborBeliefs, hamming, sum)
+  let updatedBelief = revision(agent.belief, neighborBeliefs)
   simulator.verboseLogger(
     fmt"BR {tick} {agent.id} {agent.belief} -> {updatedBelief}",
     tick

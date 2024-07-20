@@ -8,7 +8,7 @@ import stats
 import options
 
 proc getBeliefBasedOpinion(belief: Formulae, values: seq[float], topic: Formulae): float =
-  let merged = r3(belief, @[topic], hamming, sum)
+  let merged = revision(belief, @[topic])
   zip($merged, values).mapIt(if it[0] == '1': it[1] else: 0.0).mean()
 
 proc getBeliefBasedOpinion(agent: Agent, topic: Formulae): float =
@@ -26,10 +26,11 @@ proc opinionFormation*(simulator: Simulator, targets: HashSet[Id], tick: int): S
   simulator.updateAgents(updatedAgents)
 
 proc beliefAlignment(simulator: Simulator, agent: Agent, tick: int): Agent =
-  let bitWidth = simulator.topic.getBitWidth()
   var maxError = high(float)
   var currentCandidates: seq[Formulae] = @[]
-  for phi in allFormulae(bitWidth):
+  for phi in allFormulae(3):
+    if (not phi).isTautology():
+      continue
     let diff = abs(agent.opinion - getBeliefBasedOpinion(phi, agent.values, simulator.topic))
     if diff < maxError:
       maxError = diff

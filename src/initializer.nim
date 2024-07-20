@@ -5,6 +5,7 @@ import intbrg
 import strutils
 import sequtils
 import tables
+import algorithm
 
 proc generateRandomBelief(atomicProps: int): Formulae =
   let uniqueModels = 1 shl atomicProps
@@ -52,7 +53,7 @@ proc initilizeSimulator*(agents: int, atomicProps: int, edges: int): Simulator =
       alpha: 0.5,
       unfollowProb: 0.5,
       repostProb: 0.5,
-      values: (15..0).toSeq.mapIt(it.toFloat / 15.0),
+      values: (0..7).toSeq.reversed.mapIt(it.toFloat / 7.0),
     )
   )
   Simulator(
