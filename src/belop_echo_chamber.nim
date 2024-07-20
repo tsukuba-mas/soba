@@ -23,8 +23,7 @@ initRand(parsedOptions.seed)
 initLogger(parsedOptions.dir)
 initializeThresholds(parsedOptions.epsilon, parsedOptions.delta)
 var simulator = initilizeSimulator(parsedOptions)
-for agent in simulator.agents:
-  echo agent.neighbors
+
 simulator.log(0)
 for time in 1..parsedOptions.tick:
   # Interactions
