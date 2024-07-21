@@ -18,7 +18,7 @@ proc beliefRevisionGames(agent: Agent, acceptablePosts: seq[Message], tick: int)
 
 proc beliefRevisionGames*(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], tick: int): Simulator = 
   let updatedAgents = simulator.agents.mapIt(
-    if evaluatedPosts.hasKey(it.id): it.beliefRevisionGames(evaluatedPosts.acceptables, tick) 
+    if evaluatedPosts.hasKey(it.id): it.beliefRevisionGames(evaluatedPosts[it.id].acceptables, tick) 
     else: it
   )
   simulator.updateAgents(updatedAgents)
