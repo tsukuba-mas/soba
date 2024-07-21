@@ -25,13 +25,6 @@ proc opinionFormation(agent: Agent, topic: Formulae, tick: int): Agent =
   )
   agent.updateOpinion(newOpinion)
 
-proc opinionFormation(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], tick: int): Simulator =
-  let updatedAgents = simulator.agents.mapIt(
-    if evaluatedPosts.hasKey(it.id): it.opinionFormation(simulator.topic, tick)
-    else: it
-  )
-  simulator.updateAgents(updatedAgents)
-
 proc beliefAlignment(agent: Agent, topic: Formulae, tick: int): Agent =
   var maxError = high(float)
   var currentCandidates: seq[Formulae] = @[]
@@ -52,13 +45,6 @@ proc beliefAlignment(agent: Agent, topic: Formulae, tick: int): Agent =
     tick
   )
   agent.updateBelief(updatedBelief)
-
-proc beliefAlignment(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], tick: int): Simulator =
-  let updatedAgents = simulator.agents.mapIt(
-    if evaluatedPosts.hasKey(it.id): it.beliefAlignment(simulator.topic, tick)
-    else: it
-  )
-  simulator.updateAgents(updatedAgents)
 
 proc relaxDissonance*(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], tick: int): Simulator =
   let updatedAgents = simulator.agents.mapIt(
