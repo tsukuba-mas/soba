@@ -12,7 +12,7 @@ type UpdatingStrategy* {.pure.} = enum
   independent, badjust, oadjust, bcirc, ocirc
 
 type RewritingStrategy* {.pure.} = enum
-  random, repost, recommendation
+  none, random, repost, recommendation
 
 type Id* = distinct int
 proc hash*(id: Id): Hash {.borrow.}

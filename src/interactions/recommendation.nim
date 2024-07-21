@@ -19,6 +19,8 @@ proc recommendRandomly(target: Agent, agentNum: int): Option[Id] =
 proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: int): Option[Id] =
   result = 
     case target.rewritingStrategy
+    of RewritingStrategy.none:
+      none(Id)
     of RewritingStrategy.random:
       target.recommendRandomly(agentNum)
     of RewritingStrategy.repost:

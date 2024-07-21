@@ -20,7 +20,7 @@ proc parseArguments*(): CommandLineArgs =
     tick: 100,
     filter: FilterStrategy.all,
     update: UpdatingStrategy.independent,
-    rewriting: RewritingStrategy.random,
+    rewriting: RewritingStrategy.none,
     verbose: false,
     mu: 0.5,
     alpha: 0.5,
