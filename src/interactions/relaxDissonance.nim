@@ -48,18 +48,21 @@ proc beliefAlignment(agent: Agent, topic: Formulae, tick: int): Agent =
 
 proc relaxDissonance*(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], tick: int): Simulator =
   let updatedAgents = simulator.agents.mapIt(
-    case it.updatingStrategy
-    of UpdatingStrategy.independent:
+    if evaluatedPosts.hasKey(it.id):
+      case it.updatingStrategy
+      of UpdatingStrategy.independent:
+        it
+      of UpdatingStrategy.badjust:
+        it.beliefAlignment(simulator.topic, tick)
+      of UpdatingStrategy.oadjust:
+        it.opinionFormation(simulator.topic, tick)
+      of UpdatingStrategy.bcirc:
+        let tmp = it.beliefAlignment(simulator.topic, tick)
+        tmp.opinionFormation(simulator.topic, tick)
+      of UpdatingStrategy.ocirc:
+        let tmp = it.opinionFormation(simulator.topic, tick)
+        tmp.beliefAlignment(simulator.topic, tick)
+    else:
       it
-    of UpdatingStrategy.badjust:
-      it.beliefAlignment(simulator.topic, tick)
-    of UpdatingStrategy.oadjust:
-      it.opinionFormation(simulator.topic, tick)
-    of UpdatingStrategy.bcirc:
-      let tmp = it.beliefAlignment(simulator.topic, tick)
-      tmp.opinionFormation(simulator.topic, tick)
-    of UpdatingStrategy.ocirc:
-      let tmp = it.opinionFormation(simulator.topic, tick)
-      tmp.beliefAlignment(simulator.topic, tick)
   )
   simulator.updateAgents(updatedAgents)
