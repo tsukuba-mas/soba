@@ -8,6 +8,7 @@ import stats
 import options
 import ../logger
 import strformat
+import tables
 
 proc getBeliefBasedOpinion(belief: Formulae, values: seq[float], topic: Formulae): float =
   let merged = revision(belief, @[topic])
@@ -24,9 +25,9 @@ proc opinionFormation(simulator: Simulator, agent: Agent, tick: int): Agent =
   )
   agent.updateOpinion(newOpinion)
 
-proc opinionFormation*(simulator: Simulator, targets: HashSet[Id], tick: int): Simulator =
+proc opinionFormation*(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], tick: int): Simulator =
   let updatedAgents = simulator.agents.mapIt(
-    if targets.contains(it.id): simulator.opinionFormation(it, tick)
+    if evaluatedPosts.hasKey(it.id): simulator.opinionFormation(it, tick)
     else: it
   )
   simulator.updateAgents(updatedAgents)
@@ -52,9 +53,9 @@ proc beliefAlignment(simulator: Simulator, agent: Agent, tick: int): Agent =
   )
   agent.updateBelief(updatedBelief)
 
-proc beliefAlignment*(simulator: Simulator, targets: HashSet[Id], tick: int): Simulator =
+proc beliefAlignment*(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], tick: int): Simulator =
   let updatedAgents = simulator.agents.mapIt(
-    if targets.contains(it.id): simulator.beliefAlignment(it, tick)
+    if evaluatedPosts.hasKey(it.id): simulator.beliefAlignment(it, tick)
     else: it
   )
   simulator.updateAgents(updatedAgents)

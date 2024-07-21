@@ -3,12 +3,11 @@ import ../copyUtils
 import ../logger
 import sequtils
 import stats
-import utils
-import sets
+import tables
 import strformat
 
-proc opinionDynamics(simulator: Simulator, agent: Agent, tick: int): Agent =
-  let neighbors = agent.getAcceptablePosts(simulator.posts, simulator.screenSize).mapIt(it.opinion)
+proc opinionDynamics(agent: Agent, acceptablePosts: seq[Message], tick: int): Agent =
+  let neighbors = acceptablePosts.mapIt(it.opinion)
   if neighbors.len == 0:
     return agent
   let updatedOpinion = agent.mu * agent.opinion + (1.0 - agent.mu) * mean(neighbors)
@@ -18,8 +17,9 @@ proc opinionDynamics(simulator: Simulator, agent: Agent, tick: int): Agent =
   )
   agent.updateOpinion(updatedOpinion)
 
-proc opinionDynamics*(simulator: Simulator, targets: HashSet[Id], tick: int): Simulator =
+proc opinionDynamics*(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], tick: int): Simulator =
   let updatedAgents = simulator.agents.mapIt(
-    if targets.contains(it.id): simulator.opinionDynamics(it, tick) else: it
+    if evaluatedPosts.hasKey(it.id): it.opinionDynamics(evaluatedPosts[it.id].acceptables, tick) 
+    else: it
   )
   simulator.updateAgents(updatedAgents)

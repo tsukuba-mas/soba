@@ -4,11 +4,11 @@ import ../logger
 import intbrg
 import sequtils
 import utils
-import sets
+import tables
 import strformat
 
-proc beliefRevisionGames(simulator: Simulator, agent: Agent, tick: int): Agent =
-  let neighborBeliefs = agent.getAcceptablePosts(simulator.posts, simulator.screenSize).mapIt(it.belief)
+proc beliefRevisionGames(agent: Agent, acceptablePosts: seq[Message], tick: int): Agent =
+  let neighborBeliefs = acceptablePosts.mapIt(it.belief)
   let updatedBelief = revision(agent.belief, neighborBeliefs)
   simulator.verboseLogger(
     fmt"BR {tick} {agent.id} {agent.belief} -> {updatedBelief}",
@@ -16,8 +16,9 @@ proc beliefRevisionGames(simulator: Simulator, agent: Agent, tick: int): Agent =
   )
   agent.updateBelief(updatedBelief)
 
-proc beliefRevisionGames*(simulator: Simulator, targets: HashSet[Id], tick: int): Simulator = 
+proc beliefRevisionGames*(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], tick: int): Simulator = 
   let updatedAgents = simulator.agents.mapIt(
-    if targets.contains(it.id): simulator.beliefRevisionGames(it, tick) else: it
+    if evaluatedPosts.hasKey(it.id): it.beliefRevisionGames(evaluatedPosts.acceptables, tick) 
+    else: it
   )
   simulator.updateAgents(updatedAgents)

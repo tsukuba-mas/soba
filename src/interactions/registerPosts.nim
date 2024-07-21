@@ -7,10 +7,11 @@ import ../randomUtils
 import utils
 import ../logger
 import strformat
+import tables
 
-proc generateNewPost(simulator: Simulator, agent: Agent, time: int): Message =
+proc generateNewPost(agent: Agent, evaluatedPosts: EvaluatedTimeline, time: int): Message =
   withProbability(agent.repostProb):
-    let timelines = agent.getAcceptablePosts(simulator.posts, simulator.screenSize)
+    let timelines = evaluatedPosts.acceptables
     let reposted = timelines.choose()
     if reposted.isSome():
       let repost = Message(
@@ -41,10 +42,10 @@ proc generateNewPost(simulator: Simulator, agent: Agent, time: int): Message =
   )
   return post
 
-proc registerPosts*(simulator: Simulator, time: int, targets: HashSet[Id]): Simulator =
+proc registerPosts*(simulator: Simulator, time: int, evaluatedPosts: Table[Id, EvaluatedTimeline]): Simulator =
   let currentPosts = simulator.agents.filterIt(
-    targets.contains(it.id)
+    evaluatedPosts.hasKey(it.id)
   ).mapIt(
-    simulator.generateNewPost(it, time)
+    it.generateNewPost(evaluatedPosts[it.id], time)
   )
   simulator.updatePosts(concat(simulator.posts, currentPosts))
