@@ -28,5 +28,5 @@ for time in 1..parsedOptions.tick:
   simulator = simulator.beliefRevisionGames(evaluatedPosts, time)
   simulator = simulator.relaxDissonance(evaluatedPosts, time)
   simulator = simulator.updateNeighbors(evaluatedPosts, time)
-  simulator = simulator.registerPosts(time, evaluatedPosts)
+  simulator = simulator.registerPosts(evaluatedPosts, time)
   simulator.log(time)

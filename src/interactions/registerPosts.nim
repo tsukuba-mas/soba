@@ -42,7 +42,7 @@ proc generateNewPost(agent: Agent, evaluatedPosts: EvaluatedTimeline, time: int)
   )
   return post
 
-proc registerPosts*(simulator: Simulator, time: int, evaluatedPosts: Table[Id, EvaluatedTimeline]): Simulator =
+proc registerPosts*(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], time: int): Simulator =
   let currentPosts = simulator.agents.filterIt(
     evaluatedPosts.hasKey(it.id)
   ).mapIt(
