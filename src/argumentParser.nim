@@ -1,4 +1,4 @@
-import parseopt
+import argparse
 import types
 import strutils
 import sequtils
@@ -11,71 +11,51 @@ proc parseValue(path: string): seq[float] =
   f.readAll().split("\n").map(parseFloat)
 
 proc parseArguments*(): CommandLineArgs =
-  var p = initOptParser()
-  var options = CommandLineArgs(
-    seed: 42,
-    dir: "test",
-    n: 100,
-    follow: 400,
-    tick: 100,
-    filter: FilterStrategy.all,
-    update: UpdatingStrategy.independent,
-    rewriting: RewritingStrategy.none,
-    verbose: false,
-    mu: 0.5,
-    alpha: 0.5,
-    unfollowProb: 0.5,
-    repostProb: 0.5,
-    values: (0..7).toSeq.reversed.mapIt(it.toFloat / 7.0),
-    epsilon: 0.5,
-    delta: 4,
-    atomicProps: 3,
-    screenSize: 10,
-  )
-
-  while true:
-    p.next()
-    case p.kind
-    of cmdEnd: break
-    of cmdShortOption, cmdLongOption:
-      case p.key
-      of "seed", "s":
-        options.seed = p.val.parseInt
-      of "dir", "d":
-        options.dir = p.val
-      of "n", "agents":
-        options.n = p.val.parseInt
-      of "follow", "f":
-        options.follow = p.val.parseInt
-      of "tick", "t":
-        options.tick = p.val.parseInt
-      of "filter", "fs":
-        options.filter = parseEnum[FilterStrategy](p.val)
-      of "update", "us":
-        options.update = parseEnum[UpdatingStrategy](p.val)
-      of "rewriting", "rs":
-        options.rewriting = parseEnum[RewritingStrategy](p.val)
-      of "verbose":
-        options.verbose = true
-      of "mu":
-        options.mu = p.val.parseFloat
-      of "alpha":
-        options.alpha = p.val.parseFloat
-      of "unfollowProb", "up":
-        options.unfollowProb = p.val.parseFloat
-      of "repostProb", "rp":
-        options.repostProb = p.val.parseFloat
-      of "values", "v":
-        options.values = p.val.parseValue
-      of "epsilon":
-        options.epsilon = p.val.parseFloat
-      of "delta":
-        options.delta = p.val.parseInt
-      of "screenSize", "l":
-        options.screenSize = p.val.parseInt
-      else:
-        discard
-    of cmdArgument:
-      discard
+  var p = newParser:
+    help("echo chamber simulator based on opinion dynamics and belief revision")
+    option("-s", "--seed", help="seed", default=some("42"))
+    option("-d", "--dir", help="directory to save files", default=some("out"))
+    option("-a", "--agents", help="the number of agents", default=some("100"))
+    option("-f", "--follow", help="the number of follows (i.e., edges)", default=some("400"))
+    option("-t", "--tick", help="the number of iterations", default=some("100"))
+    option("--fs", "--filter", help="filter strategy", default=some("all"))
+    option("--us", "--updating", help="updating strategy", default=some("independent"))
+    option("--rs", "--rewriting", help="rewriting strategy", default=some("none"))
+    option("--mu", help="parameter in opinion dynamics", default=some("0.5"))
+    option("--alpha", help="parameter in opinion formation", default=some("0.5"))
+    option("--up", "--unfollow", help="probability of unfollowing agents", default=some("0.5"))
+    option("--rp", "--repost", help="probability of reposting", default=some("0.5"))
+    option("-v", "--values", help="path to cultural values")
+    option("--epsilon", help="threshold for opinions", default=some("0.01"))
+    option("--delta", help="threshold for beliefs", default=some("4"))
+    option("-l", "--screen", help="set screen size", default=some("10"))
+    flag("--verbose", help="verbose mode")
   
-  options
+  try:
+    let parsed = p.parse()
+    return CommandLineArgs(
+      seed: parsed.seed.parseInt,
+      dir: parsed.dir,
+      n: parsed.agents.parseInt,
+      follow: parsed.follow.parseInt,
+      tick: parsed.tick.parseInt,
+      filter: parseEnum[FilterStrategy](parsed.filter),
+      update: parseEnum[UpdatingStrategy](parsed.updating),
+      rewriting: parseEnum[RewritingStrategy](parsed.rewriting),
+      verbose: parsed.verbose,
+      mu: parsed.mu.parseFloat,
+      alpha: parsed.alpha.parseFloat,
+      unfollowProb: parsed.unfollow.parseFloat,
+      repostProb: parsed.repost.parseFloat,
+      values: 
+        if parsed.values.len == 0: (0..7).toSeq.reversed.mapIt(it.toFloat / 7.0) 
+        else: parsed.values.parseValue,
+      epsilon: parsed.epsilon.parseFloat,
+      delta: parsed.delta.parseInt,
+      atomicProps: 3,
+      screenSize: parsed.screen.parseInt,
+    )
+  except ShortCircuit as err:
+    # show help message
+    echo err.help
+    quit(0)
