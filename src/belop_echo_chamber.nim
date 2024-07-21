@@ -7,7 +7,6 @@ import interactions/chooseTargets
 import interactions/recommendation
 import interactions/relaxDissonance
 import interactions/utils
-import sets
 import randomUtils
 import logger
 import options
@@ -23,11 +22,11 @@ var simulator = initilizeSimulator(parsedOptions)
 simulator.log(0)
 for time in 1..parsedOptions.tick:
   # Interactions
-  let targets = chooseTargets(parsedOptions.n).get().toHashSet()
-  let evaluatedPosts = targets.toSeq.mapIt(simulator.agents[int(it)]).readTimeline(simulator.posts, simulator.screenSize)
+  let targets = chooseTargets(parsedOptions.n).get()
+  let evaluatedPosts = targets.mapIt(simulator.agents[int(it)]).readTimeline(simulator.posts, simulator.screenSize)
   simulator = simulator.opinionDynamics(evaluatedPosts, time)
   simulator = simulator.beliefRevisionGames(evaluatedPosts, time)
   simulator = simulator.relaxDissonance(evaluatedPosts, time)
-  simulator = simulator.updateNeighbors(targets, time)
-  simulator = simulator.registerPosts(time, targets)
+  simulator = simulator.updateNeighbors(evaluatedPosts, time)
+  simulator = simulator.registerPosts(time, evaluatedPosts)
   simulator.log(time)
