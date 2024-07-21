@@ -12,6 +12,7 @@ import randomUtils
 import logger
 import options
 import argumentParser
+import sequtils
 
 let parsedOptions = parseArguments()
 initRand(parsedOptions.seed)
@@ -23,6 +24,7 @@ simulator.log(0)
 for time in 1..parsedOptions.tick:
   # Interactions
   let targets = chooseTargets(parsedOptions.n).get().toHashSet()
+  let evaluatedPosts = targets.toSeq.mapIt(simulator.agents[int(it)]).readTimeline(simulator.posts, simulator.screenSize)
   simulator = simulator.opinionDynamics(targets, time)
   simulator = simulator.beliefRevisionGames(targets, time)
 #  simulator = simulator.opinionFormation(targets, time)

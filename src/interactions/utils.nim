@@ -7,6 +7,7 @@ import sets
 import options
 import algorithm
 import intbrg
+import tables
 
 var eps = none(float)
 var delta = none(int)
@@ -42,6 +43,17 @@ proc getAcceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[
 
 proc getUnacceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(not agent.isAcceptablePost(it))
+
+proc readTimeline(agent: Agent, posts: seq[Message], messages: int): EvaluatedTimeline =
+  EvaluatedTimeline(
+    acceptables: agent.getAcceptablePosts(posts, messages),
+    unacceptables: agent.getUnacceptablePosts(posts, messages)
+  )
+
+proc readTimeline*(agents: seq[Agent], posts: seq[Message], messages: int): Table[Id, EvaluatedTimeline] =
+  result = initTable[Id, EvaluatedTimeline]()
+  for agent in agents:
+    result[agent.id] = agent.readTimeline(posts, messages)
 
 proc takeN*[T](xs: seq[T], n: int): Option[seq[T]] =
   if xs.len < n:

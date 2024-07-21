@@ -68,3 +68,7 @@ type CommandLineArgs* = object
   delta*: int
   atomicProps*: int
   screenSize*: int
+
+type EvaluatedTimeline* = object
+  acceptables*: seq[Message]
+  unacceptables*: seq[Message]
