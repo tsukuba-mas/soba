@@ -58,4 +58,7 @@ proc parseArguments*(): CommandLineArgs =
   except ShortCircuit as err:
     # show help message
     echo err.help
+    echo "fs: ", (FilterStrategy.low..FilterStrategy.high).toSeq.join(", ")
+    echo "us: ", (UpdatingStrategy.low..UpdatingStrategy.high).toSeq.join(", ")
+    echo "rs: ", (RewritingStrategy.low..RewritingStrategy.high).toSeq.join(", ")
     quit(0)
