@@ -22,7 +22,7 @@ proc generateNewPost(agent: Agent, evaluatedPosts: EvaluatedTimeline, time: int)
         repostedAt: some(time),
         repostedBy: some(agent.id),
       )
-      simulator.verboseLogger(
+      verboseLogger(
         fmt"REPOST {time} {agent.id} {repost.author} {repost.belief} {repost.opinion}",
         time
       )
@@ -36,7 +36,7 @@ proc generateNewPost(agent: Agent, evaluatedPosts: EvaluatedTimeline, time: int)
     repostedAt: none(int),
     repostedBy: none(Id),
   )
-  simulator.verboseLogger(
+  verboseLogger(
     fmt"POST {time} {agent.id} {post.belief} {post.opinion}",
     time
   )

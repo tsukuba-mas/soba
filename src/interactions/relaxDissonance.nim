@@ -19,7 +19,7 @@ proc getBeliefBasedOpinion(agent: Agent, topic: Formulae): float =
 
 proc opinionFormation(simulator: Simulator, agent: Agent, tick: int): Agent =
   let newOpinion = agent.opinion * agent.alpha + (1.0 - agent.alpha) * agent.getBeliefBasedOpinion(simulator.topic)
-  simulator.verboseLogger(
+  verboseLogger(
     fmt"OF {tick} {agent.id} {agent.opinion} -> {newOpinion}",
     tick
   )
@@ -47,7 +47,7 @@ proc beliefAlignment(simulator: Simulator, agent: Agent, tick: int): Agent =
 
   # choose one of the optimal one randomly
   let updatedBelief = currentCandidates.choose().get
-  simulator.verboseLogger(
+  verboseLogger(
     fmt"BA {tick} {agent.id} {agent.belief} -> {updatedBelief}",
     tick
   )

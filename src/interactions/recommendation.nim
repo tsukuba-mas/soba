@@ -47,7 +47,7 @@ proc updateNeighbors(agent: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: 
     let unfollowed = evaluatedPosts.unacceptables.getAuthorsOrRepostedUser().choose()
     let newNeighbor = agent.recommendUser(evaluatedPosts, agentNum)
     if unfollowed.isSome() and newNeighbor.isSome():
-      simulator.verboseLogger(
+      verboseLogger(
         fmt"NG {tick} {agent.id} removed {unfollowed.get()} followed {newNeighbor.get()}",
         tick
       )
