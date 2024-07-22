@@ -9,11 +9,11 @@ import options
 import strformat
 import tables
 
-proc isNotFollowed(agentId: Id, neighbors: HashSet[Id]): bool =
-  not neighbors.contains(agentId)
+proc isNotFollowing(by: Agent, id: Id): bool =
+  not by.neighbors.contains(id) and by.id != id
 
 proc recommendRandomly(target: Agent, agentNum: int): Option[Id] = 
-  let notFollowes = (0..<agentNum).toSeq.map(toId).filterIt(it != target.id and it.isNotFollowed(target.neighbors))
+  let notFollowes = (0..<agentNum).toSeq.map(toId).filterIt(target.isNotFollowing(it))
   notFollowes.choose()
 
 proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: int): Option[Id] =
@@ -32,7 +32,7 @@ proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: i
         repostAuthors.choose()
     of RewritingStrategy.recommendation:
       let recommendedUsers = evaluatedPosts.acceptables.mapIt(it.author)
-      let candidates = recommendedUsers.filterIt(it != target.id and it.isNotFollowed(target.neighbors))
+      let candidates = recommendedUsers.filterIt(target.isNotFollowing(it))
       if candidates.len == 0:
         target.recommendRandomly(agentNum)
       else:
@@ -49,6 +49,8 @@ proc updateNeighbors(agent: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: 
     let unfollowed = evaluatedPosts.unacceptables.getAuthorsOrRepostedUser().choose()
     let newNeighbor = agent.recommendUser(evaluatedPosts, agentNum)
     if unfollowed.isSome() and newNeighbor.isSome():
+      assert agent.neighbors.contains(unfollowed.get())
+      assert not agent.neighbors.contains(newNeighbor.get())
       verboseLogger(
         fmt"NG {tick} {agent.id} removed {unfollowed.get()} followed {newNeighbor.get()}",
         tick
