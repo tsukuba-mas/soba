@@ -3,6 +3,7 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
+import util
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--dir")
 parser.add_argument("-t", "--tick", action='append', type=int)
@@ -10,21 +11,15 @@ parser.add_argument("-e", "--eps", type=float, default=0.05)
 args = parser.parse_args()
 
 DIR = args.dir
-
-with open(f'{DIR}/ophist.csv') as f:
-    reader = csv.reader(f)
-    OPHIST = [list(map(float, r)) for r in reader]
-
-with open(f'{DIR}/graph.csv') as f:
-    reader = csv.reader(f)
-    GRAPHS = [list(map(int, r))  for r in reader]
+OPHIST = util.readOphist(DIR)
+GRAPHS = util.readGraph(DIR)
 
 AGENTS = len(OPHIST[0]) - 1
 EPS = args.eps
 
 def classify():
     group = {}
-    LAST_OPS = OPHIST[-1][1:]
+    LAST_OPS = OPHIST[-1]
     for i, op in enumerate(LAST_OPS):
         notyet = True
         for g in group:
