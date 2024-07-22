@@ -51,6 +51,8 @@ proc updateNeighbors(agent: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: 
     if unfollowed.isSome() and newNeighbor.isSome():
       assert agent.neighbors.contains(unfollowed.get())
       assert not agent.neighbors.contains(newNeighbor.get())
+      assert agent.id != unfollowed.get
+      assert agent.id != newNeighbor.get
       verboseLogger(
         fmt"NG {tick} {agent.id} removed {unfollowed.get()} followed {newNeighbor.get()}",
         tick
