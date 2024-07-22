@@ -46,10 +46,15 @@ def getClusterId(data: list[float], eps: float) -> dict[float, int]:
             groups.append(c)
     
     groups.sort(key=lambda x: mean(x.members))
-    result = {}
+    opinion2id = {}
     for id, g in enumerate(groups):
         for m in g.members:
-            result[m] = id
+            opinion2id[m] = id
+    
+    result = {
+        a: opinion2id[data[a]]
+        for a in range(len(data))
+    }
     return result
 
 if __name__ == '__main__':
