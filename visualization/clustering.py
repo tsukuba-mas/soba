@@ -18,7 +18,7 @@ class Cluster():
     def converged(self):
         self.isConverged = True
 
-def getClusters(data: list[float]) -> dict[int, Cluster]:
+def performHierarchicalClustering(data: list[float]) -> dict[int, Cluster]:
     d = [[x] for x in data]
     clusters = linkage(pdist(d, 'euclidean'), 'ward')
     result = {i: Cluster(id=i, members=[data[i]]) for i in range(len(data))}
@@ -29,8 +29,8 @@ def getClusters(data: list[float]) -> dict[int, Cluster]:
         result[gNew] = Cluster(id=gNew, members=result[g1].members+result[g2].members, left=g1, right=g2)
     return result
 
-def separateMaximumClusters(data: list[float], eps: float) -> dict[float, int]:
-    clusters = getClusters(data)
+def getClusterId(data: list[float], eps: float) -> dict[float, int]:
+    clusters = performHierarchicalClustering(data)
     keys = list(reversed(sorted(clusters.keys())))
     for key in keys:
         maxElem = max(clusters[key].members)
@@ -61,4 +61,4 @@ if __name__ == '__main__':
 
     OPHIST = util.readOphist(args.dir)
     for tick in args.tick:
-        print(separateMaximumClusters(OPHIST[tick], args.eps))
+        print(getClusterId(OPHIST[tick], args.eps))
