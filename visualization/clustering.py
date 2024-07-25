@@ -57,6 +57,18 @@ def getClusterId(data: list[float], eps: float) -> dict[float, int]:
     }
     return result
 
+def getBeliefClusterId(beliefs: list[str]) -> dict[int, int]:
+    belief2id = {}
+    result = {}
+    for i, belief in enumerate(beliefs):
+        if belief in belief2id:
+            result[i] = belief2id[belief]
+        else:
+            nextId = len(belief2id)
+            belief2id[belief] = nextId
+            result[i] = nextId
+    return result
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--dir")
