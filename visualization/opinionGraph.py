@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--dir")
 parser.add_argument("-t", "--tick", action='append', type=int)
 parser.add_argument("-e", "--eps", type=float, default=0.1)
-parser.add_argument("-l", "--last", type=bool, default=False)
+parser.add_argument("-l", "--last", action='store_true')
 args = parser.parse_args()
 
 DIR = args.dir
