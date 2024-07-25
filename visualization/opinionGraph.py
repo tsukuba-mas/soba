@@ -48,7 +48,7 @@ def draw(tick: int, clusterTick: int):
                      pos=nx.multipartite_layout(G), 
                      node_color=[v["color"] for v in G.nodes.values()])
     plt.title(f"tick = {tick}, m-value = {mValue(tick)}")
-    plt.savefig(f"graph-{tick}.png")
+    plt.savefig(f"{DIR}/opgraph-{tick}.pdf")
 
 for tick in args.tick:
     groupedAt = max(args.tick) if args.last else tick
