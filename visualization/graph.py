@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--dir")
 parser.add_argument("-t", "--tick", action='append', type=int)
 parser.add_argument("-e", "--eps", type=float, default=0.1)
+parser.add_argument("-l", "--last", type=bool, default=False)
 args = parser.parse_args()
 
 DIR = args.dir
@@ -50,5 +51,6 @@ def draw(tick: int, clusterTick: int):
     plt.savefig(f"graph-{tick}.png")
 
 for tick in args.tick:
-    draw(tick, max(args.tick))
+    groupedAt = max(args.tick) if args.last else tick
+    draw(tick, groupedAt)
     print(tick)
