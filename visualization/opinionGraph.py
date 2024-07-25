@@ -46,7 +46,8 @@ def draw(tick: int, clusterTick: int):
         G.add_edge(u, v, weight=abs(OPHIST[tick][u] - OPHIST[tick][v]))
     nx.draw_networkx(G, 
                      pos=nx.multipartite_layout(G), 
-                     node_color=[v["color"] for v in G.nodes.values()])
+                     node_color=[v["color"] for v in G.nodes.values()],
+                     font_color="white")
     plt.title(f"tick = {tick}, m-value = {mValue(tick)}")
     plt.savefig(f"{DIR}/opgraph-{tick}.pdf")
 
