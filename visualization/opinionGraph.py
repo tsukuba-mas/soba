@@ -43,7 +43,7 @@ def draw(tick: int, clusterTick: int):
     EDGES = [(u, v) for (t, u, v) in GRAPHS if t == tick]
    
     for (u, v) in EDGES:
-        G.add_edge(u, v, weight=abs(OPHIST[tick][u] - OPHIST[tick][v]))
+        G.add_edge(u, v)
     nx.draw_networkx(G, 
                      pos=nx.multipartite_layout(G), 
                      node_color=[v["color"] for v in G.nodes.values()],
