@@ -29,7 +29,7 @@ def performHierarchicalClustering(data: list[float]) -> dict[int, Cluster]:
         result[gNew] = Cluster(id=gNew, members=result[g1].members+result[g2].members, left=g1, right=g2)
     return result
 
-def getClusterId(data: list[float], eps: float) -> dict[float, int]:
+def agent2OpinionCluster(data: list[float], eps: float) -> dict[int, int]:
     clusters = performHierarchicalClustering(data)
     keys = list(reversed(sorted(clusters.keys())))
     for key in keys:
@@ -57,7 +57,7 @@ def getClusterId(data: list[float], eps: float) -> dict[float, int]:
     }
     return result
 
-def getBeliefClusterId(beliefs: list[str]) -> dict[int, int]:
+def agent2BeliefCluster(beliefs: list[str]) -> dict[int, int]:
     belief2id = {}
     result = {}
     for i, belief in enumerate(beliefs):

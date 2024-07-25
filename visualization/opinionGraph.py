@@ -31,7 +31,7 @@ def mValue(tick: int) -> float:
 def draw(tick: int, clusterTick: int):
     G = nx.DiGraph()
     plt.figure(figsize=(15, 15))
-    group = clustering.getClusterId(OPHIST[clusterTick], EPS)
+    group = clustering.agent2OpinionCluster(OPHIST[clusterTick], EPS)
     colors = [int(c) for c in np.linspace(0, 255, len(set(group.values())))]
     for a in range(AGENTS):
         clusterId = group[a]

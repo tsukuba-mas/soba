@@ -19,7 +19,7 @@ AGENTS = len(BELHIST[0])
 def draw(tick: int, clusterTick: int):
     G = nx.DiGraph()
     plt.figure(figsize=(15, 15))
-    group = clustering.getBeliefClusterId(BELHIST[clusterTick])
+    group = clustering.agent2BeliefCluster(BELHIST[clusterTick])
     colors = [int(c) for c in np.linspace(0, 255, len(set(group.values())))]
     for a in range(AGENTS):
         clusterId = group[a]
