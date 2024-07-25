@@ -23,7 +23,7 @@ def mValue(tick: int) -> float:
     ops = [o for o in OPHIST[tick]]
     bins = list(np.histogram(ops, bins=int(1 / EPS), range=(0.0 - EPS, 1.0 + EPS))[0])
     maxCount = max(bins)
-    m = 0
+    m = abs(bins[0]) + abs(bins[-1])
     for i in range(1, len(bins)):
         m += abs(bins[i] - bins[i-1])
     return m / maxCount
