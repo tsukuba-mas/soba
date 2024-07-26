@@ -28,7 +28,7 @@ def saveHeatmap(agent2cluster: dict[int, int], filepath: str):
         vid = f"to-{agent2cluster[v]}"
         d[uid][vid] += 1
     df = pd.DataFrame(d)
-    sns.heatmap(df, annot=True, square=True)
+    sns.heatmap(df, annot=True, square=True, fmt='d')
     plt.savefig(filepath)
     plt.clf()
 
