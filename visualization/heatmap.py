@@ -10,6 +10,7 @@ parser.add_argument("-t", "--tick", action='append', type=int)
 parser.add_argument("-e", "--eps", type=float, default=0.1)
 parser.add_argument("-o", "--opinion", action='store_true')
 parser.add_argument("-b", "--belief", action='store_true')
+parser.add_argument("-l", "--last", action='store_true')
 args = parser.parse_args()
 assert(args.opinion or args.belief)
 
@@ -32,9 +33,10 @@ def saveHeatmap(agent2cluster: dict[int, int], filepath: str):
     plt.clf()
 
 for tick in args.tick:
+    clusteringTick = max(args.tick) if args.last else tick
     if args.opinion:
-        ops = clustering.agent2OpinionCluster(OPHIST[tick], args.eps)
+        ops = clustering.agent2OpinionCluster(OPHIST[clusteringTick], args.eps)
         saveHeatmap(ops, f"{DIR}/opheat-{tick}.pdf")
     if args.belief:
-        bels = clustering.agent2BeliefCluster(BELHIST[tick])
+        bels = clustering.agent2BeliefCluster(BELHIST[clusteringTick])
         saveHeatmap(ops, f"{DIR}/belheat-{tick}.pdf")
