@@ -22,10 +22,10 @@ GRAPH = util.readGraph(DIR)
 def saveHeatmap(agent2cluster: dict[int, int], filepath: str):
     clusterNum = len(set(agent2cluster.values()))
     graphAtTick = [(u, v) for (t, u, v) in GRAPH if t == tick]
-    d = {uid: {vid: 0 for vid in range(clusterNum)} for uid in range(clusterNum)}
+    d = {f"from-{uid}": {f"to-{vid}": 0 for vid in range(clusterNum)} for uid in range(clusterNum)}
     for (u, v) in graphAtTick:
-        uid = agent2cluster[u]
-        vid = agent2cluster[v]
+        uid = f"from-{agent2cluster[u]}"
+        vid = f"to-{agent2cluster[v]}"
         d[uid][vid] += 1
     df = pd.DataFrame(d)
     sns.heatmap(df, annot=True, square=True)
