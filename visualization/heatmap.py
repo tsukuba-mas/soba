@@ -38,14 +38,17 @@ def saveHeatmap(agent2cluster: dict[int, int], filepath: str):
         d[uid][vid] += 1
 
     clusterToMembers = getClusterToMembers(agent2cluster)
+    dd = {f"from-{uid}": {f"to-{vid}": 0 for vid in range(clusterNum)} for uid in range(clusterNum)}
+    annotation = {f"from-{uid}": {f"to-{vid}": "" for vid in range(clusterNum)} for uid in range(clusterNum)}
     for u in range(clusterNum):
         for v in range(clusterNum):
-            uid = f"from-{agent2cluster[u]}"
-            vid = f"to-{agent2cluster[v]}"
+            uid = f"from-{u}"
+            vid = f"to-{v}"
             pairs = clusterToMembers[u] * clusterToMembers[v] if u != v else clusterToMembers[u] * (clusterToMembers[u] - 1)
-            d[uid][vid] = d[uid][vid] / pairs * 100
-    df = pd.DataFrame(d)
-    sns.heatmap(df, annot=True, square=True, fmt='.3f', vmin=0, vmax=25)
+            dd[uid][vid] = d[uid][vid] / pairs * 100
+            annotation[uid][vid] = f"{d[uid][vid]}\n{dd[uid][vid]:.1f}"
+    df = pd.DataFrame(dd)
+    sns.heatmap(df, annot=pd.DataFrame(annotation), fmt="", square=True, vmin=0, vmax=25)
     plt.savefig(filepath)
     plt.clf()
 
