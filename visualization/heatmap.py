@@ -19,6 +19,15 @@ BELHIST = util.readBelhist(DIR)
 OPHIST = util.readOphist(DIR)
 GRAPH = util.readGraph(DIR)
 
+def getClusterToMembers(agent2cluster: dict[int, int]) -> dict[int, int]:
+    result = {}
+    for c in agent2cluster.values():
+        if c in result:
+            result[c] += 1
+        else:
+            result[c] = 1
+    return result
+
 def saveHeatmap(agent2cluster: dict[int, int], filepath: str):
     clusterNum = len(set(agent2cluster.values()))
     graphAtTick = [(u, v) for (t, u, v) in GRAPH if t == tick]
@@ -27,8 +36,16 @@ def saveHeatmap(agent2cluster: dict[int, int], filepath: str):
         uid = f"from-{agent2cluster[u]}"
         vid = f"to-{agent2cluster[v]}"
         d[uid][vid] += 1
+
+    clusterToMembers = getClusterToMembers(agent2cluster)
+    for u in range(clusterNum):
+        for v in range(clusterNum):
+            uid = f"from-{agent2cluster[u]}"
+            vid = f"to-{agent2cluster[v]}"
+            pairs = clusterToMembers[u] * clusterToMembers[v] if u != v else clusterToMembers[u] * (clusterToMembers[u] - 1)
+            d[uid][vid] = d[uid][vid] / pairs * 100
     df = pd.DataFrame(d)
-    sns.heatmap(df, annot=True, square=True, fmt='d', vmin=0, vmax=len(graphAtTick))
+    sns.heatmap(df, annot=True, square=True, fmt='.3f', vmin=0, vmax=25)
     plt.savefig(filepath)
     plt.clf()
 
