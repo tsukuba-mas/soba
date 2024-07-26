@@ -45,7 +45,7 @@ def saveHeatmap(agent2cluster: dict[int, int], filepath: str):
             uid = f"from-{u}"
             vid = f"to-{v}"
             pairs = clusterToMembers[u] * clusterToMembers[v] if u != v else clusterToMembers[u] * (clusterToMembers[u] - 1)
-            dd[uid][vid] = d[uid][vid] / pairs * 100
+            dd[uid][vid] = d[uid][vid] / pairs * 100 if pairs > 0 else 0
             annotation[uid][vid] = f"{d[uid][vid]}\n{dd[uid][vid]:.1f}"
     df = pd.DataFrame(dd)
     sns.heatmap(df, annot=pd.DataFrame(annotation), fmt="", square=True, vmin=0, vmax=25)
