@@ -1,8 +1,5 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
 import util
-import clustering
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--dir")
