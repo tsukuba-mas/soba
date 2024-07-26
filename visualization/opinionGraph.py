@@ -28,16 +28,20 @@ def mValue(tick: int) -> float:
         m += abs(bins[i] - bins[i-1])
     return m / maxCount
 
+def getColors(opinion: float) -> str:
+    r = int(255 * opinion)
+    b = int(255 * (1.0 - opinion))
+    return f"#{r:02x}00{b:02x}"
+
 def draw(tick: int, clusterTick: int):
     G = nx.DiGraph()
     plt.figure(figsize=(15, 15))
     group = clustering.agent2OpinionCluster(OPHIST[clusterTick], EPS)
-    colors = [int(c) for c in np.linspace(0, 255, len(set(group.values())))]
     for a in range(AGENTS):
         clusterId = group[a]
         G.add_node(
             a, 
-            color=f"#{colors[clusterId]:02x}00{255 - colors[clusterId]:02x}",
+            color=getColors(OPHIST[tick][a]),
             subset=clusterId
         )
     EDGES = [(u, v) for (t, u, v) in GRAPHS if t == tick]
