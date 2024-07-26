@@ -29,6 +29,7 @@ def saveHeatmap(agent2cluster: dict[int, int], filepath: str):
     df = pd.DataFrame(d)
     sns.heatmap(df, annot=True, square=True)
     plt.savefig(filepath)
+    plt.clf()
 
 for tick in args.tick:
     if args.opinion:
