@@ -27,6 +27,7 @@ def draw(tick: int, clusterTick: int, belhist: list[list[str]], graph: list[list
                      font_color="white")
     plt.title(f"tick = {tick}")
     plt.savefig(f"{dir}/belgraph-{tick}.pdf")
+    plt.clf()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

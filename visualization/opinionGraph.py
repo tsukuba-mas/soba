@@ -40,6 +40,7 @@ def draw(tick: int, clusterTick: int, ophist: list[list[float]], eps: float, gra
                      font_color="white")
     plt.title(f"tick = {tick}, m-value = {mValue(tick, ophist, eps)}")
     plt.savefig(f"{dir}/opgraph-{tick}.pdf")
+    plt.clf()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
