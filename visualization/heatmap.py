@@ -14,7 +14,7 @@ def getClusterToMembers(agent2cluster: dict[int, int]) -> dict[int, int]:
             result[c] = 1
     return result
 
-def saveHeatmap(agent2cluster: dict[int, int], filepath: str, graph: list[list[int]]):
+def saveHeatmap(tick: int, agent2cluster: dict[int, int], filepath: str, graph: list[list[int]]):
     clusterNum = len(set(agent2cluster.values()))
     graphAtTick = [(u, v) for (t, u, v) in graph if t == tick]
     d = {f"from-{uid}": {f"to-{vid}": 0 for vid in range(clusterNum)} for uid in range(clusterNum)}
@@ -47,7 +47,7 @@ def drawOpinionClusterHeatmap(
     dir: str
 ):
     ops = clustering.agent2OpinionCluster(ophist[clusteringTick], eps)
-    saveHeatmap(ops, f"{dir}/opheat-{tick}.pdf", graph)
+    saveHeatmap(tick, ops, f"{dir}/opheat-{tick}.pdf", graph)
 
 def drawBeliefClusterHeatmap(
     tick: int, 
@@ -57,8 +57,8 @@ def drawBeliefClusterHeatmap(
     graph: list[list[int]], 
     dir: str
 ):
-    bels = clustering.agent2BeliefCluster(belhist[clusteringTick], eps)
-    saveHeatmap(bels, f"{dir}/opheat-{tick}.pdf", graph)
+    bels = clustering.agent2BeliefCluster(belhist[clusteringTick])
+    saveHeatmap(tick, bels, f"{dir}/opheat-{tick}.pdf", graph)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
