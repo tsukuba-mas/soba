@@ -13,3 +13,4 @@ bin           = @["belop_echo_chamber"]
 requires "nim >= 2.0.0"
 requires "https://github.com/Azumabashi/intbrg >= 0.2.1"
 requires "https://github.com/iffy/nim-argparse >= 4.0.1"
+requires "parsetoml >= 0.7.1"
