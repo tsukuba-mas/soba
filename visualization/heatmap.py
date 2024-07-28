@@ -4,20 +4,6 @@ import pandas as pd
 import util
 import clustering
 import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("-d", "--dir")
-parser.add_argument("-t", "--tick", action='append', type=int)
-parser.add_argument("-e", "--eps", type=float, default=0.1)
-parser.add_argument("-o", "--opinion", action='store_true')
-parser.add_argument("-b", "--belief", action='store_true')
-parser.add_argument("-l", "--last", action='store_true')
-args = parser.parse_args()
-assert(args.opinion or args.belief)
-
-DIR = args.dir
-BELHIST = util.readBelhist(DIR)
-OPHIST = util.readOphist(DIR)
-GRAPH = util.readGraph(DIR)
 
 def getClusterToMembers(agent2cluster: dict[int, int]) -> dict[int, int]:
     result = {}
@@ -28,9 +14,9 @@ def getClusterToMembers(agent2cluster: dict[int, int]) -> dict[int, int]:
             result[c] = 1
     return result
 
-def saveHeatmap(agent2cluster: dict[int, int], filepath: str):
+def saveHeatmap(agent2cluster: dict[int, int], filepath: str, graph: list[list[int]]):
     clusterNum = len(set(agent2cluster.values()))
-    graphAtTick = [(u, v) for (t, u, v) in GRAPH if t == tick]
+    graphAtTick = [(u, v) for (t, u, v) in graph if t == tick]
     d = {f"from-{uid}": {f"to-{vid}": 0 for vid in range(clusterNum)} for uid in range(clusterNum)}
     for (u, v) in graphAtTick:
         uid = f"from-{agent2cluster[u]}"
@@ -52,11 +38,26 @@ def saveHeatmap(agent2cluster: dict[int, int], filepath: str):
     plt.savefig(filepath)
     plt.clf()
 
-for tick in args.tick:
-    clusteringTick = max(args.tick) if args.last else tick
-    if args.opinion:
-        ops = clustering.agent2OpinionCluster(OPHIST[clusteringTick], args.eps)
-        saveHeatmap(ops, f"{DIR}/opheat-{tick}.pdf")
-    if args.belief:
-        bels = clustering.agent2BeliefCluster(BELHIST[clusteringTick])
-        saveHeatmap(ops, f"{DIR}/belheat-{tick}.pdf")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--dir")
+    parser.add_argument("-t", "--tick", action='append', type=int)
+    parser.add_argument("-e", "--eps", type=float, default=0.1)
+    parser.add_argument("-o", "--opinion", action='store_true')
+    parser.add_argument("-b", "--belief", action='store_true')
+    parser.add_argument("-l", "--last", action='store_true')
+    args = parser.parse_args()
+    assert(args.opinion or args.belief)
+
+    DIR = args.dir
+    BELHIST = util.readBelhist(DIR)
+    OPHIST = util.readOphist(DIR)
+    GRAPH = util.readGraph(DIR)
+    for tick in args.tick:
+        clusteringTick = max(args.tick) if args.last else tick
+        if args.opinion:
+            ops = clustering.agent2OpinionCluster(OPHIST[clusteringTick], args.eps)
+            saveHeatmap(ops, f"{DIR}/opheat-{tick}.pdf", GRAPH)
+        if args.belief:
+            bels = clustering.agent2BeliefCluster(BELHIST[clusteringTick])
+            saveHeatmap(ops, f"{DIR}/belheat-{tick}.pdf", GRAPH)
