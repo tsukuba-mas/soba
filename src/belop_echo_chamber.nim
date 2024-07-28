@@ -16,6 +16,7 @@ import sequtils
 let parsedOptions = parseArguments()
 initRand(parsedOptions.seed)
 initLogger(parsedOptions.dir, parsedOptions.verbose)
+parsedOptions.saveAsToml()
 initializeThresholds(parsedOptions.epsilon, parsedOptions.delta)
 var simulator = initilizeSimulator(parsedOptions)
 
