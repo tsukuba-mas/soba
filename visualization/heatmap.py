@@ -38,6 +38,28 @@ def saveHeatmap(agent2cluster: dict[int, int], filepath: str, graph: list[list[i
     plt.savefig(filepath)
     plt.clf()
 
+def drawOpinionClusterHeatmap(
+    tick: int, 
+    clusteringTick: int, 
+    ophist: list[list[float]], 
+    eps: float, 
+    graph: list[list[int]], 
+    dir: str
+):
+    ops = clustering.agent2OpinionCluster(ophist[clusteringTick], eps)
+    saveHeatmap(ops, f"{dir}/opheat-{tick}.pdf", graph)
+
+def drawBeliefClusterHeatmap(
+    tick: int, 
+    clusteringTick: int, 
+    belhist: list[list[str]], 
+    eps: float, 
+    graph: list[list[int]], 
+    dir: str
+):
+    bels = clustering.agent2BeliefCluster(belhist[clusteringTick], eps)
+    saveHeatmap(bels, f"{dir}/opheat-{tick}.pdf", graph)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--dir")
@@ -53,11 +75,11 @@ if __name__ == '__main__':
     BELHIST = util.readBelhist(DIR)
     OPHIST = util.readOphist(DIR)
     GRAPH = util.readGraph(DIR)
+    EPS = args.eps
+
     for tick in args.tick:
         clusteringTick = max(args.tick) if args.last else tick
         if args.opinion:
-            ops = clustering.agent2OpinionCluster(OPHIST[clusteringTick], args.eps)
-            saveHeatmap(ops, f"{DIR}/opheat-{tick}.pdf", GRAPH)
+            drawOpinionClusterHeatmap(tick, clusteringTick, OPHIST, EPS, GRAPH, DIR)
         if args.belief:
-            bels = clustering.agent2BeliefCluster(BELHIST[clusteringTick])
-            saveHeatmap(ops, f"{DIR}/belheat-{tick}.pdf", GRAPH)
+            drawBeliefClusterHeatmap(tick, clusteringTick, BELHIST, EPS, GRAPH, DIR)
