@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 import util
 import argparse
 
-def draw(tick: int, filepath: str, ophist: list[list[float]], eps: float):
+def draw(tick: int, dir: str, ophist: list[list[float]], eps: float):
     ops = ophist[tick]
     plt.xlim([0.0, 1.0])
     plt.hist(ops, bins=int(1 / eps), range=[0.0, 1.0])
     plt.xlabel("Opinion")
     plt.ylabel("Number of agents")
-    plt.savefig(filepath)
+    plt.savefig(f"{dir}/ophist-{tick}.pdf")
     plt.clf()
 
 if __name__ == '__main__':
@@ -20,4 +20,4 @@ if __name__ == '__main__':
 
     OPHIST = util.readOphist(args.dir)
     for tick in args.tick:
-        draw(tick, f"{args.dir}/ophist-{tick}.pdf", OPHIST, args.eps)
+        draw(tick, args.dir, OPHIST, args.eps)
