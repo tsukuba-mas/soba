@@ -27,11 +27,11 @@ proc initLogger*(outputTo: string, isVerboseMode: bool) =
     removeDir(dirname)
   createDir(dirname)
 
-proc appendToFile(path: string, content: string, tick: int) =
+proc appendToFile(path: string, content: string) =
   var f = open(path, fmAppend)
   defer:
     f.close()
-  f.write($tick & "," & content & "\n")
+  f.write(content & "\n")
 
 proc graphLogger(simulator: Simulator, tick: int) =
   let saveTo = dirname & "/" & "graph.csv"
@@ -39,14 +39,13 @@ proc graphLogger(simulator: Simulator, tick: int) =
   for agent in simulator.agents:
     for next in agent.neighbors:
       content.add($tick & "," & $agent.id & "," & $next)
-  saveTo.appendToFile(content.join("\n"), tick)
+  saveTo.appendToFile(content.join("\n"))
 
 proc verboseLogger*(content: string, tick: int) = 
   if isVerbose:
     appendToFile(
       dirname & "/" & verbose,
-      content,
-      tick
+      $tick & "," & content
     )
 
 proc saveAsToml*(options: CommandLineArgs) =
@@ -77,6 +76,6 @@ screen = {options.screenSize}
 proc log*(simulator: Simulator, tick: int) =
   let beliefs = simulator.agents.mapIt($(it.belief)).join(",")
   let opinions = simulator.agents.mapIt($(it.opinion)).join(",")
-  getBeliefHistPath().appendToFile(beliefs, tick)
-  getOpinionHistPath().appendToFile(opinions, tick)
+  getBeliefHistPath().appendToFile($tick & "," & beliefs)
+  getOpinionHistPath().appendToFile($tick & "," & opinions)
   simulator.graphLogger(tick)
