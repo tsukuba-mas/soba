@@ -35,9 +35,11 @@ proc appendToFile(path: string, content: string, tick: int) =
 
 proc graphLogger(simulator: Simulator, tick: int) =
   let saveTo = dirname & "/" & "graph.csv"
+  var content: seq[string] = @[]
   for agent in simulator.agents:
     for next in agent.neighbors:
-      saveTo.appendToFile($agent.id & "," & $next, tick)
+      content.add($tick & "," & $agent.id & "," & $next)
+  saveTo.appendToFile(content.join("\n"), tick)
 
 proc verboseLogger*(content: string, tick: int) = 
   if isVerbose:
