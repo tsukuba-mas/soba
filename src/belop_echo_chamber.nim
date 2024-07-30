@@ -16,8 +16,8 @@ import sequtils
 let parsedOptions = parseArguments()
 initRand(parsedOptions.seed)
 initLogger(parsedOptions.dir, parsedOptions.verbose)
-parsedOptions.saveAsToml()
 var simulator = initilizeSimulator(parsedOptions)
+parsedOptions.saveAsToml(simulator.topic)
 
 simulator.log(0)
 for time in 1..parsedOptions.tick:
