@@ -16,6 +16,9 @@ proc initializeThresholds*(epsVal: float, deltaVal: int) =
   eps = some(epsVal)
   delta = some(deltaVal)
 
+proc getEpsilon*(): float =
+  eps.get
+
 proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
   result = 
     if post.repostedBy.isSome():
