@@ -12,7 +12,7 @@ import tables
 
 proc getBeliefBasedOpinion(belief: Formulae, values: seq[float], topic: Formulae): float =
   let merged = revision(belief, @[topic])
-  zip($merged, values).mapIt(if it[0] == '1': it[1] else: 0.0).mean()
+  zip($merged, values).filterIt(it[0] == '1').mapIt(it[1]).mean()
 
 proc getBeliefBasedOpinion(agent: Agent, topic: Formulae): float =
   getBeliefBasedOpinion(agent.belief, agent.values, topic)
