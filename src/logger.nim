@@ -78,4 +78,5 @@ proc log*(simulator: Simulator, tick: int) =
   let opinions = simulator.agents.mapIt($(it.opinion)).join(",")
   getBeliefHistPath().appendToFile($tick & "," & beliefs)
   getOpinionHistPath().appendToFile($tick & "," & opinions)
-  simulator.graphLogger(tick)
+  if tick mod 1000 == 0:
+    simulator.graphLogger(tick)
