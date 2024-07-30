@@ -52,7 +52,7 @@ proc getAuthorsOrRepostedUser(posts: seq[Message]): seq[Id] =
 proc updateNeighbors(agent: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: int, allPosts: seq[Message], tick: int): Agent =
   withProbability(agent.unfollowProb):
     let unfollowed = evaluatedPosts.unacceptables.getAuthorsOrRepostedUser().choose()
-    let newNeighbor = agent.recommendUser(evaluatedPosts, agentNum, allPosts, getEpsilon())
+    let newNeighbor = agent.recommendUser(evaluatedPosts, agentNum, allPosts, agent.epsilon)
     if unfollowed.isSome() and newNeighbor.isSome():
       assert agent.neighbors.contains(unfollowed.get())
       assert not agent.neighbors.contains(newNeighbor.get())

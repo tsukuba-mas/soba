@@ -26,6 +26,8 @@ proc copy(agent: Agent): Agent =
     alpha: agent.alpha,
     repostProb: agent.repostProb,
     unfollowProb: agent.unfollowProb,
+    epsilon: agent.epsilon,
+    delta: agent.delta,
   )
 
 proc updateOpinion*(agent: Agent, opinion: Opinion): Agent =

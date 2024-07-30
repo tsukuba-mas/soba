@@ -9,16 +9,6 @@ import algorithm
 import intbrg
 import tables
 
-var eps = none(float)
-var delta = none(int)
-
-proc initializeThresholds*(epsVal: float, deltaVal: int) =
-  eps = some(epsVal)
-  delta = some(deltaVal)
-
-proc getEpsilon*(): float =
-  eps.get
-
 proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
   result = 
     if post.repostedBy.isSome():
@@ -35,11 +25,11 @@ proc isAcceptablePost*(agent: Agent, post: Message): bool =
     of FilterStrategy.all:
       true
     of FilterStrategy.obounded:
-      distance(agent.opinion, post.opinion) <= eps.get()
+      distance(agent.opinion, post.opinion) <= agent.epsilon
     of FilterStrategy.bbounded:
-      distance(agent.belief, post.belief) <= delta.get()
+      distance(agent.belief, post.belief) <= agent.delta
     of FilterStrategy.both:
-      distance(agent.opinion, post.opinion) <= eps.get() and distance(agent.belief, post.belief) <= delta.get()
+      distance(agent.opinion, post.opinion) <= agent.epsilon and distance(agent.belief, post.belief) <= agent.delta
 
 proc getAcceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))

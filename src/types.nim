@@ -33,6 +33,8 @@ type Agent* = object
   mu*: float  # Torelance threshold for opinion dynamics
   repostProb*: float
   unfollowProb*: float
+  epsilon*: float
+  delta*: int
 
 type Message* = object
   author*: Id
