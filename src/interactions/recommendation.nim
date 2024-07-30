@@ -24,7 +24,7 @@ proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: i
     of RewritingStrategy.random:
       target.recommendRandomly(agentNum)
     of RewritingStrategy.repost:
-      let reposts = concat(evaluatedPosts.acceptables, evaluatedPosts.unacceptables).filterIt(it.repostedBy.isSome)
+      let reposts = evaluatedPosts.acceptables.filterIt(it.repostedBy.isSome)
       let repostAuthors = reposts.mapIt(it.author).filterIt(target.isNotFollowing(it))
       if repostAuthors.len == 0:
         target.recommendRandomly(agentNum)
