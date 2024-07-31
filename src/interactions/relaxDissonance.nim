@@ -25,6 +25,14 @@ proc opinionFormation(agent: Agent, topic: Formulae, tick: int): Agent =
   )
   agent.updateOpinion(newOpinion)
 
+proc hamming(x, y: Formulae): int =
+  zip($x, $y).filterIt(it[0] != it[1]).len
+
+proc argmin(xs: seq[Formulae], current: Formulae): seq[Formulae] =
+  let distances = xs.mapIt(hamming(it, current))
+  let minDist = distances.min
+  (0..<xs.len).toSeq.filterIt(distances[it] == minDist).mapIt(xs[it])
+
 proc beliefAlignment(agent: Agent, topic: Formulae, tick: int): Agent =
   var maxError = high(float)
   var currentCandidates: seq[Formulae] = @[]
@@ -39,7 +47,7 @@ proc beliefAlignment(agent: Agent, topic: Formulae, tick: int): Agent =
       currentCandidates.add(phi)
 
   # choose one of the optimal one randomly
-  let updatedBelief = currentCandidates.choose().get
+  let updatedBelief = currentCandidates.argmin(agent.belief).choose().get
   verboseLogger(
     fmt"BA {tick} {agent.id} {agent.belief} -> {updatedBelief}",
     tick
