@@ -31,6 +31,13 @@ proc filterRecommendedPosts(target: Agent, posts: seq[Message], myMostRecentPost
   else:
     # NOT expected to reach here
     @[]
+  
+proc getMyMostRecentPost(target: Agent, allPosts: seq[Message]): Option[Message] =
+  let myPosts = allPosts.filterIt(it.author == target.id)
+  if myPosts.len == 0:
+    none(Message)
+  else:
+    some(myPosts[^1])
 
 proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: int, allPosts: seq[Message]): Option[Id] =
   result = 
@@ -49,11 +56,11 @@ proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: i
     of RewritingStrategy.oprecommendation, 
        RewritingStrategy.belrecommendation, 
        RewritingStrategy.bothrecommendation:
-      let myPosts = allPosts.filterIt(it.author == target.id)
-      if myPosts.len == 0:
+      let myMostRecentPostOptional = target.getMyMostRecentPost(allPosts)
+      if myMostRecentPostOptional.isNone:
         target.recommendRandomly(agentNum)
       else:
-        let myMostRecentPost = myPosts[^1]
+        let myMostRecentPost = myMostRecentPostOptional.get()
         let recommendedUsers = target.filterRecommendedPosts(allPosts, myMostRecentPost).mapIt(it.author)
         let candidates = recommendedUsers.filterIt(target.isNotFollowing(it))
         if candidates.len == 0:
