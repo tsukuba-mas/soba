@@ -20,13 +20,12 @@ proc recommendRandomly(target: Agent, agentNum: int): Option[Id] =
 proc filterRecommendedPosts(target: Agent, posts: seq[Message], myMostRecentPost: Message): seq[Message] = 
   case target.rewritingStrategy
   of RewritingStrategy.oprecommendation:
-    posts.filterIt(distance(it.opinion, myMostRecentPost.opinion) <= target.epsilon)
+    posts.filterIt(target.hasSimilarOpinion(it))
   of RewritingStrategy.belrecommendation:
-    posts.filterIt(distance(it.belief, myMostRecentPost.belief) <= target.delta)
+    posts.filterIt(target.hasSimilarBelief(it))
   of RewritingStrategy.bothrecommendation:
     posts.filterIt(
-      distance(it.opinion, myMostRecentPost.opinion) <= target.epsilon and
-      distance(it.belief, myMostRecentPost.belief) <= target.delta
+      target.hasSimilarOpinion(it) and target.hasSimilarBelief(it)
     )
   else:
     # NOT expected to reach here

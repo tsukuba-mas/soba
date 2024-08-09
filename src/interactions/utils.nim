@@ -25,11 +25,11 @@ proc isAcceptablePost*(agent: Agent, post: Message): bool =
     of FilterStrategy.all:
       true
     of FilterStrategy.obounded:
-      distance(agent.opinion, post.opinion) <= agent.epsilon
+      agent.hasSimilarOpinion(post)
     of FilterStrategy.bbounded:
-      distance(agent.belief, post.belief) <= agent.delta
+      agent.hasSimilarBelief(post)
     of FilterStrategy.both:
-      distance(agent.opinion, post.opinion) <= agent.epsilon and distance(agent.belief, post.belief) <= agent.delta
+      agent.hasSimilarOpinion(post) and agent.hasSimilarBelief(post)
 
 proc getAcceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))
