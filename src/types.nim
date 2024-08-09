@@ -70,6 +70,7 @@ type CommandLineArgs* = object
   delta*: int
   atomicProps*: int
   screenSize*: int
+  topic*: Formulae
 
 type EvaluatedTimeline* = object
   acceptables*: seq[Message]

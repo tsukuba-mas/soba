@@ -61,7 +61,7 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   )
   Simulator(
     agents: allAgents, 
-    topic: generateRandomBelief(atomicProps),
+    topic: options.topic,
     posts: @[],
     screenSize: options.screenSize,
     verbose: options.verbose,

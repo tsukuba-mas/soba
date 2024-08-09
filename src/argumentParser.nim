@@ -5,6 +5,7 @@ import sequtils
 import algorithm
 import parsetoml
 import options
+import intbrg
 
 proc optionsFromToml(tomlPath: string): CommandLineArgs =
   let toml = parseFile(tomlPath)
@@ -27,6 +28,7 @@ proc optionsFromToml(tomlPath: string): CommandLineArgs =
     delta: toml["delta"].getInt(),
     atomicProps: 3,
     screenSize: toml["screen"].getInt(),
+    topic: toml["topic"].getStr().toFormula,
   )
 
 proc parseValue(path: string): seq[float] =
@@ -53,6 +55,7 @@ proc parseArguments*(): CommandLineArgs =
     option("-v", "--values", help="path to cultural values")
     option("--epsilon", help="threshold for opinions", default=some("0.01"))
     option("--delta", help="threshold for beliefs", default=some("4"))
+    option("--topic", help="topic", default=some("11110000"))
     option("-l", "--screen", help="set screen size", default=some("10"))
     flag("--verbose", help="verbose mode")
     option("--toml", help="input TOML format file", default=none(string))
@@ -84,6 +87,7 @@ proc parseArguments*(): CommandLineArgs =
         delta: parsed.delta.parseInt,
         atomicProps: 3,
         screenSize: parsed.screen.parseInt,
+        topic: parsed.topic.toFormula,
       )
   except ShortCircuit as err:
     # show help message
