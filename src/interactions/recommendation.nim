@@ -32,7 +32,7 @@ proc filterRecommendedPosts(target: Agent, posts: seq[Message], myMostRecentPost
     # NOT expected to reach here
     @[]
 
-proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: int, allPosts: seq[Message], eps: float): Option[Id] =
+proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: int, allPosts: seq[Message]): Option[Id] =
   result = 
     case target.rewritingStrategy
     of RewritingStrategy.none:
@@ -70,7 +70,7 @@ proc getAuthorsOrRepostedUser(posts: seq[Message]): seq[Id] =
 proc updateNeighbors(agent: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: int, allPosts: seq[Message], tick: int): Agent =
   withProbability(agent.unfollowProb):
     let unfollowed = evaluatedPosts.unacceptables.getAuthorsOrRepostedUser().choose()
-    let newNeighbor = agent.recommendUser(evaluatedPosts, agentNum, allPosts, agent.epsilon)
+    let newNeighbor = agent.recommendUser(evaluatedPosts, agentNum, allPosts)
     if unfollowed.isSome() and newNeighbor.isSome():
       assert agent.neighbors.contains(unfollowed.get())
       assert not agent.neighbors.contains(newNeighbor.get())
