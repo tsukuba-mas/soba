@@ -2,6 +2,7 @@ import ../types
 import ../randomUtils
 import ../copyUtils
 import ../logger
+import ../distance
 import utils
 import sequtils
 import sets
@@ -15,6 +16,21 @@ proc isNotFollowing(by: Agent, id: Id): bool =
 proc recommendRandomly(target: Agent, agentNum: int): Option[Id] = 
   let notFollowes = (0..<agentNum).toSeq.map(toId).filterIt(target.isNotFollowing(it))
   notFollowes.choose()
+
+proc filterRecommendedPosts(target: Agent, posts: seq[Message], myMostRecentPost: Message): seq[Message] = 
+  case target.rewritingStrategy
+  of RewritingStrategy.oprecommendation:
+    posts.filterIt(distance(it.opinion, myMostRecentPost.opinion) <= target.epsilon)
+  of RewritingStrategy.belrecommendation:
+    posts.filterIt(distance(it.belief, myMostRecentPost.belief) <= target.delta)
+  of RewritingStrategy.bothrecommendation:
+    posts.filterIt(
+      distance(it.opinion, myMostRecentPost.opinion) <= target.epsilon and
+      distance(it.belief, myMostRecentPost.belief) <= target.delta
+    )
+  else:
+    # NOT expected to reach here
+    @[]
 
 proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: int, allPosts: seq[Message], eps: float): Option[Id] =
   result = 
@@ -30,13 +46,15 @@ proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: i
         target.recommendRandomly(agentNum)
       else:
         repostAuthors.choose()
-    of RewritingStrategy.recommendation:
+    of RewritingStrategy.oprecommendation, 
+       RewritingStrategy.belrecommendation, 
+       RewritingStrategy.bothrecommendation:
       let myPosts = allPosts.filterIt(it.author == target.id)
       if myPosts.len == 0:
         target.recommendRandomly(agentNum)
       else:
         let myMostRecentPost = myPosts[^1]
-        let recommendedUsers = allPosts.filterIt(abs(it.opinion - myMostRecentPost.opinion) <= eps).mapIt(it.author)
+        let recommendedUsers = target.filterRecommendedPosts(allPosts, myMostRecentPost).mapIt(it.author)
         let candidates = recommendedUsers.filterIt(target.isNotFollowing(it))
         if candidates.len == 0:
           target.recommendRandomly(agentNum)
