@@ -6,16 +6,19 @@ import strutils
 import sequtils
 import tables
 
-proc generateRandomBelief(atomicProps: int): Formulae =
-  let uniqueModels = 1 shl atomicProps
-  let possibleBeliefs = 1 shl uniqueModels
-  toFormula(toBin(rand(1, possibleBeliefs - 1), uniqueModels))
-
 proc generateInitialBeliefs(agents: int, atomicProps: int): seq[Formulae] =
-  var beliefs = initHashSet[Formulae]()
-  while beliefs.len < agents:
-    beliefs.incl(generateRandomBelief(atomicProps))
-  beliefs.toSeq.shuffle()
+  var res = newSeqWith(agents, "")
+  let uniqueModels = 1 shl atomicProps
+  let ones = agents div 2
+  for _ in 0..<uniqueModels:
+    var q = newSeqWith(ones, "1").concat(newSeqWith(agents - ones, "0")).shuffle()
+    for i in 0..<agents:
+      res[i] = res[i] & q[i]
+  let nomodel = "0".repeat(uniqueModels)
+  if nomodel in res:
+    generateInitialBeliefs(agents, atomicProps)
+  else:
+    res.map(toFormula)
 
 iterator pairs[S, T](xs: seq[S], ys: seq[T]): (S, T) =
   for x in xs:
@@ -41,11 +44,12 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   let atomicProps = options.atomicProps
   let initialBeliefs = generateInitialBeliefs(agents, atomicProps)
   let graph = randomGraphGenerator(agents, options.follow)
+  let opinions = (0..<agents).toSeq.mapIt(it / (agents - 1)).shuffle()
   let allAgents = (0..<agents).toSeq.mapIt(
     Agent(
       id: it.toId, 
       belief: initialBeliefs[it], 
-      opinion: rand(0.0, 1.0),
+      opinion: opinions[it],
       neighbors: graph[it.toId],
       filterStrategy: options.filter,
       updatingStrategy: options.update,
