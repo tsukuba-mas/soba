@@ -67,8 +67,6 @@ values = [{options.values.mapIt($it).join(",")}]
 epsilon = {options.epsilon}
 delta = {options.delta}
 screen = {options.screenSize}
-
-# The simulator will ignore following content when this file is passed to it
 topic = "{topic}"
 """
   var f = open(dirname & "/input.toml", fmWrite)
