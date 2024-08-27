@@ -9,7 +9,6 @@ import interactions/relaxDissonance
 import interactions/utils
 import randomUtils
 import logger
-import options
 import argumentParser
 import sequtils
 
@@ -22,7 +21,7 @@ parsedOptions.saveAsToml(simulator.topic)
 simulator.log(0)
 for time in 1..parsedOptions.tick:
   # Interactions
-  let targets = chooseTargets(parsedOptions.n).get()
+  let targets = chooseTargets(simulator.agents)
   let evaluatedPosts = targets.mapIt(simulator.agents[int(it)]).readTimeline(simulator.posts, simulator.screenSize)
   simulator = simulator.opinionDynamics(evaluatedPosts, time)
   simulator = simulator.beliefRevisionGames(evaluatedPosts, time)

@@ -1,6 +1,11 @@
-import sequtils
-import options
+import ../randomUtils
 import ../types
 
-proc chooseTargets*(agents: int): Option[seq[Id]] = 
-  (0..<agents).toSeq.map(toId).some()
+proc chooseTargets*(agents: seq[Agent]): seq[Id] = 
+  for agent in agents:
+    withProbability(agent.activationProb):
+      result.add(agent.id)
+  if result.len == 0:
+    agents.chooseTargets()
+  else:
+    result
