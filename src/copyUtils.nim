@@ -26,6 +26,7 @@ proc copy(agent: Agent): Agent =
     alpha: agent.alpha,
     repostProb: agent.repostProb,
     unfollowProb: agent.unfollowProb,
+    activationProb: agent.activationProb,
     epsilon: agent.epsilon,
     delta: agent.delta,
   )

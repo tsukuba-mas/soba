@@ -33,6 +33,7 @@ type Agent* = object
   mu*: float  # Torelance threshold for opinion dynamics
   repostProb*: float
   unfollowProb*: float
+  activationProb*: float
   epsilon*: float
   delta*: int
 
@@ -65,6 +66,7 @@ type CommandLineArgs* = object
   alpha*: float
   unfollowProb*: float
   repostProb*: float
+  activationProb*: float
   values*: seq[float]
   epsilon*: float
   delta*: int

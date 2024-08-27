@@ -23,6 +23,7 @@ proc optionsFromToml(tomlPath: string): CommandLineArgs =
     alpha: toml["alpha"].getFloat(),
     unfollowProb: toml["unfollow"].getFloat(),
     repostProb: toml["repost"].getFloat(),
+    activationProb: toml["activation"].getFloat(),
     values: toml["values"].getElems().mapIt(it.getFloat()),
     epsilon: toml["epsilon"].getFloat(),
     delta: toml["delta"].getInt(),
@@ -52,6 +53,7 @@ proc parseArguments*(): CommandLineArgs =
     option("--alpha", help="parameter in opinion formation", default=some("0.5"))
     option("--up", "--unfollow", help="probability of unfollowing agents", default=some("0.5"))
     option("--rp", "--repost", help="probability of reposting", default=some("0.5"))
+    option("--ap", "--activation", help="probability of activation", default=some("0.5"))
     option("-v", "--values", help="path to cultural values")
     option("--epsilon", help="threshold for opinions", default=some("0.01"))
     option("--delta", help="threshold for beliefs", default=some("4"))
@@ -80,6 +82,7 @@ proc parseArguments*(): CommandLineArgs =
         alpha: parsed.alpha.parseFloat,
         unfollowProb: parsed.unfollow.parseFloat,
         repostProb: parsed.repost.parseFloat,
+        activationProb: parsed.activation.parseFloat,
         values: 
           if parsed.values.len == 0: (0..7).toSeq.reversed.mapIt(it.toFloat / 7.0) 
           else: parsed.values.parseValue,
