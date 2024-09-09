@@ -51,6 +51,7 @@ type Simulator* = object
   posts*: seq[Message]
   screenSize*: int
   verbose*: bool
+  followFrom*: seq[Id]
 
 type CommandLineArgs* = object
   seed*: int

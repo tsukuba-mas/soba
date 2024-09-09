@@ -10,6 +10,7 @@ proc copy(simulator: Simulator): Simulator =
     posts: simulator.posts,
     screenSize: simulator.screenSize,
     verbose: simulator.verbose,
+    followFrom: simulator.followFrom,
   )
 
 proc copy(agent: Agent): Agent =
