@@ -38,6 +38,15 @@ proc randomGraphGenerator(vertices: int, edges: int): Table[Id, HashSet[Id]] =
     graph
   else:
     vertices.randomGraphGenerator(edges)
+
+proc generateFollowFrom(agents: seq[Agent], follows: int): seq[Id] =
+  result = newSeqWith(follows, Id(-1))
+  var idx = 0
+  for agent in agents:
+    for neighbor in agent.neighbors:
+      result[idx] = agent.id
+      idx += 1
+  assert(result.allIt(it.int >= 0))
   
 proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   let agents = options.n
@@ -70,4 +79,5 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
     posts: @[],
     screenSize: options.screenSize,
     verbose: options.verbose,
+    followFrom: allAgents.generateFollowFrom(options.follow),
   )
