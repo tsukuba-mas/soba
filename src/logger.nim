@@ -8,6 +8,7 @@ import strformat
 
 let beliefHist = "belhist.csv"
 let ophist = "ophist.csv"
+let graphHist = "grhist.csv"
 let verbose = "verbose.txt"
 var dirname = ""
 var isVerbose = false
@@ -16,6 +17,8 @@ proc getBeliefHistPath(): string = dirname & "/" & beliefHist
 
 proc getOpinionHistPath(): string = dirname & "/" & ophist
 
+proc getGraphHistPath(): string = dirname & "/" & graphHist
+
 proc initLogger*(outputTo: string, isVerboseMode: bool) = 
   dirname = outputTo
   isVerbose = isVerboseMode
@@ -23,6 +26,8 @@ proc initLogger*(outputTo: string, isVerboseMode: bool) =
     removeFile(getBeliefHistPath())
   if getOpinionHistPath().fileExists():
     removeFile(getOpinionHistPath())
+  if getGraphHistPath().fileExists():
+    removeFile(getGraphHistPath())
   if dirExists(dirname):
     removeDir(dirname)
   createDir(dirname)
@@ -34,12 +39,17 @@ proc appendToFile(path: string, content: string) =
   f.write(content & "\n")
 
 proc graphLogger(simulator: Simulator, tick: int) =
-  let saveTo = dirname & "/" & "graph.csv"
+  let saveTo = getGraphHistPath()
+  if tick == 0:
+    saveTo.appendToFile($tick & "," & simulator.followFrom.join(","))
   var content: seq[string] = @[]
+  var idx = 0
   for agent in simulator.agents:
     for next in agent.neighbors:
-      content.add($tick & "," & $agent.id & "," & $next)
-  saveTo.appendToFile(content.join("\n"))
+      assert(simulator.followFrom[idx] == agent.id)
+      content.add($next)
+      idx += 1
+  saveTo.appendToFile($tick & "," & content.join(","))
 
 proc verboseLogger*(content: string, tick: int) = 
   if isVerbose:
@@ -80,5 +90,4 @@ proc log*(simulator: Simulator, tick: int) =
   let opinions = simulator.agents.mapIt($(it.opinion)).join(",")
   getBeliefHistPath().appendToFile($tick & "," & beliefs)
   getOpinionHistPath().appendToFile($tick & "," & opinions)
-  if tick mod 1000 == 0:
-    simulator.graphLogger(tick)
+  simulator.graphLogger(tick)
