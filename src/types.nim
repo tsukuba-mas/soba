@@ -9,7 +9,7 @@ type FilterStrategy* {.pure.} = enum
   all, obounded, bbounded, both
 
 type UpdatingStrategy* {.pure.} = enum
-  independent, badjust, oadjust, bcirc, ocirc
+  od, br, `of`, ba
 
 type RewritingStrategy* {.pure.} = enum
   none, random, repost, oprecommendation, belrecommendation, bothrecommendation
@@ -26,7 +26,7 @@ type Agent* = object
   opinion*: Opinion
   neighbors*: HashSet[Id]
   filterStrategy*: FilterStrategy
-  updatingStrategy*: UpdatingStrategy
+  updatingStrategy*: seq[UpdatingStrategy]
   rewritingStrategy*: RewritingStrategy
   values*: seq[float]
   alpha*: float
@@ -60,7 +60,7 @@ type CommandLineArgs* = object
   follow*: int
   tick*: int
   filter*: FilterStrategy
-  update*: UpdatingStrategy
+  update*: seq[UpdatingStrategy]
   rewriting*: RewritingStrategy
   verbose*: bool
   mu*: float

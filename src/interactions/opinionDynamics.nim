@@ -6,7 +6,7 @@ import stats
 import tables
 import strformat
 
-proc opinionDynamics(agent: Agent, acceptablePosts: seq[Message], tick: int): Agent =
+proc opinionDynamics*(agent: Agent, acceptablePosts: seq[Message], tick: int): Agent =
   let neighbors = acceptablePosts.mapIt(it.opinion)
   let updatedOpinion = 
     if neighbors.len > 0: 

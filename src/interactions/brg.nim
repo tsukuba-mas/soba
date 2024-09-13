@@ -6,7 +6,7 @@ import utils
 import tables
 import strformat
 
-proc beliefRevisionGames(agent: Agent, acceptablePosts: seq[Message], tick: int): Agent =
+proc beliefRevisionGames*(agent: Agent, acceptablePosts: seq[Message], tick: int): Agent =
   let neighborBeliefs = acceptablePosts.mapIt(it.belief)
   let updatedBelief = revision(agent.belief, neighborBeliefs)
   verboseLogger(
