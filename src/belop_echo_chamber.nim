@@ -1,11 +1,8 @@
 import initializer
 import types
-import interactions/opinionDynamics
-import interactions/brg
 import interactions/registerPosts
 import interactions/chooseTargets
 import interactions/recommendation
-import interactions/relaxDissonance
 import interactions/utils
 import interactions/interactions
 import randomUtils

@@ -3,7 +3,6 @@ import ../copyUtils
 import ../logger
 import sequtils
 import stats
-import tables
 import strformat
 
 proc opinionDynamics*(agent: Agent, acceptablePosts: seq[Message], tick: int): Agent =
@@ -18,10 +17,3 @@ proc opinionDynamics*(agent: Agent, acceptablePosts: seq[Message], tick: int): A
     tick
   )
   agent.updateOpinion(updatedOpinion)
-
-proc opinionDynamics*(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], tick: int): Simulator =
-  let updatedAgents = simulator.agents.mapIt(
-    if evaluatedPosts.hasKey(it.id): it.opinionDynamics(evaluatedPosts[it.id].acceptables, tick) 
-    else: it
-  )
-  simulator.updateAgents(updatedAgents)
