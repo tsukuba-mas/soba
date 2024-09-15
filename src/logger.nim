@@ -59,6 +59,7 @@ proc verboseLogger*(content: string, tick: int) =
     )
 
 proc saveAsToml*(options: CommandLineArgs, topic: Formulae) =
+  let updatingStrategyInTomlList = "\"" & options.update.mapIt($it).join("\", \"") & "\""
   let toml = fmt"""
 seed = {options.seed}
 dir = "{options.dir}"
@@ -66,7 +67,7 @@ agents = {options.n}
 follow = {options.follow}
 tick = {options.tick}
 filter = "{options.filter}"
-updating = "{options.update}"
+updating = [{updatingStrategyInTomlList}]
 rewriting = "{options.rewriting}"
 verbose = {options.verbose}
 mu = {options.mu}
