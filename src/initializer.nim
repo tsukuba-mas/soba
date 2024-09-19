@@ -5,6 +5,7 @@ import intbrg
 import strutils
 import sequtils
 import tables
+import interactions/relaxDissonance
 
 proc generateInitialBeliefs(agents: int, atomicProps: int): seq[Formulae] =
   var res = newSeqWith(agents, "")
@@ -53,7 +54,7 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   let atomicProps = options.atomicProps
   let initialBeliefs = generateInitialBeliefs(agents, atomicProps)
   let graph = randomGraphGenerator(agents, options.follow)
-  let opinions = (0..<agents).toSeq.mapIt(it / (agents - 1)).shuffle()
+  let opinions = (0..<agents).toSeq.mapIt(getBeliefBasedOpinion(initialBeliefs[it], options.values, options.topic))
   let allAgents = (0..<agents).toSeq.mapIt(
     Agent(
       id: it.toId, 

@@ -12,7 +12,7 @@ import tables
 
 var opinion2beliefCache = initTable[Opinion, seq[Formulae]]()
 
-proc getBeliefBasedOpinion(belief: Formulae, values: seq[float], topic: Formulae): float =
+proc getBeliefBasedOpinion*(belief: Formulae, values: seq[float], topic: Formulae): float =
   let merged = revision(belief, @[topic])
   zip($merged, values).filterIt(it[0] == '1').mapIt(it[1]).mean()
 
