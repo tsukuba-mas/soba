@@ -5,21 +5,6 @@ import intbrg
 import strutils
 import sequtils
 import tables
-import interactions/relaxDissonance
-
-proc generateInitialBeliefs(agents: int, atomicProps: int): seq[Formulae] =
-  var res = newSeqWith(agents, "")
-  let uniqueModels = 1 shl atomicProps
-  let ones = agents div 2
-  for _ in 0..<uniqueModels:
-    var q = newSeqWith(ones, "1").concat(newSeqWith(agents - ones, "0")).shuffle()
-    for i in 0..<agents:
-      res[i] = res[i] & q[i]
-  let nomodel = "0".repeat(uniqueModels)
-  if nomodel in res:
-    generateInitialBeliefs(agents, atomicProps)
-  else:
-    res.map(toFormula)
 
 iterator pairs[S, T](xs: seq[S], ys: seq[T]): (S, T) =
   for x in xs:
@@ -52,9 +37,9 @@ proc generateFollowFrom(agents: seq[Agent], follows: int): seq[Id] =
 proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   let agents = options.n
   let atomicProps = options.atomicProps
-  let initialBeliefs = generateInitialBeliefs(agents, atomicProps)
+  let initialBeliefs = (0..<agents).toSeq.mapIt(rand(1, 255).toBin(1 shl atomicProps).toFormula)
   let graph = randomGraphGenerator(agents, options.follow)
-  let opinions = (0..<agents).toSeq.mapIt(getBeliefBasedOpinion(initialBeliefs[it], options.values, options.topic))
+  let opinions = (0..<agents).toSeq.mapIt(rand(0.0, 1.0))
   let allAgents = (0..<agents).toSeq.mapIt(
     Agent(
       id: it.toId, 
