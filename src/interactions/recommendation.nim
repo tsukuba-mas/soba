@@ -73,10 +73,11 @@ proc getAuthorsOrRepostedUser(posts: seq[Message]): seq[Id] =
     else: it.author
   )
   
-proc updateNeighbors(agent: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: int, allPosts: seq[Message], tick: int): Agent =
+proc updateNeighbors(agent: Agent, messages: seq[Message], agentNum: int, allPosts: seq[Message], tick: int): Agent =
   withProbability(agent.unfollowProb):
-    let unfollowed = evaluatedPosts.unacceptables.getAuthorsOrRepostedUser().choose()
-    let newNeighbor = agent.recommendUser(evaluatedPosts, agentNum, allPosts)
+    let evaluatedMessages = agent.readTimeline(messages, 1000)
+    let unfollowed = evaluatedMessages.unacceptables.getAuthorsOrRepostedUser().choose()
+    let newNeighbor = agent.recommendUser(evaluatedMessages, agentNum, allPosts)
     if unfollowed.isSome() and newNeighbor.isSome():
       assert agent.neighbors.contains(unfollowed.get())
       assert not agent.neighbors.contains(newNeighbor.get())
@@ -90,9 +91,9 @@ proc updateNeighbors(agent: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: 
 
   return agent
 
-proc updateNeighbors*(simulator: Simulator, evaluatedPosts: Table[Id, EvaluatedTimeline], time: int): Simulator =
+proc updateNeighbors*(simulator: Simulator, id2messages: Table[Id, seq[Message]], time: int): Simulator =
   let updatedAgents = simulator.agents.mapIt(
-    if evaluatedPosts.hasKey(it.id): it.updateNeighbors(evaluatedPosts[it.id], simulator.agents.len, simulator.posts, time) 
+    if id2messages.hasKey(it.id): it.updateNeighbors(id2messages[it.id], simulator.agents.len, simulator.posts, time) 
     else: it
   )
   simulator.updateAgents(updatedAgents)
