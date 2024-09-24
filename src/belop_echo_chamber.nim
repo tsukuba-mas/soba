@@ -6,6 +6,7 @@ import interactions/recommendation
 import interactions/utils
 import interactions/interactions
 import interactions/relaxDissonance
+import interactions/messageReceiver
 import randomUtils
 import logger
 import argumentParser
@@ -36,6 +37,7 @@ simulator.log(0)
 for time in 1..parsedOptions.tick:
   # Interactions
   let targets = chooseTargets(simulator.agents)
+  let messages = simulator.receiveMessages()
   let evaluatedPosts = targets.mapIt(simulator.agents[int(it)]).readTimeline(simulator.posts, simulator.screenSize)
   simulator = simulator.performInteractions(evaluatedPosts, time)
   simulator = simulator.updateNeighbors(evaluatedPosts, time)
