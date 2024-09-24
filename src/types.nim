@@ -11,7 +11,7 @@ type UpdatingStrategy* {.pure.} = enum
   od = "od", br = "br", `of` = "of", ba = "ba"
 
 type RewritingStrategy* {.pure.} = enum
-  none, random, repost, oprecommendation, belrecommendation, bothrecommendation
+  none, random, oprecommendation, belrecommendation, bothrecommendation
 
 type Id* = distinct int
 proc hash*(id: Id): Hash {.borrow.}
