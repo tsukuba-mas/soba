@@ -1,6 +1,5 @@
 import intbrg
 import sets
-import options
 import hashes
 
 type Opinion* = float
@@ -41,9 +40,6 @@ type Message* = object
   author*: Id
   belief*: Formulae
   opinion*: Opinion
-  postedAt*: int
-  repostedBy*: Option[Id]
-  repostedAt*: Option[int]
 
 type Simulator* = object
   agents*: seq[Agent]
