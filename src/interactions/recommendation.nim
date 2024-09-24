@@ -61,10 +61,7 @@ proc recommendUser(target: Agent, evaluatedPosts: EvaluatedTimeline, agentNum: i
           candidates.choose()
   
 proc getAuthorsOrRepostedUser(posts: seq[Message]): seq[Id] =
-  posts.mapIt(
-    if it.repostedBy.isSome(): it.repostedBy.get()
-    else: it.author
-  )
+  posts.mapIt(it.author)
   
 proc updateNeighbors(agent: Agent, messages: seq[Message], agentNum: int, allPosts: seq[Message], tick: int): Agent =
   withProbability(agent.unfollowProb):
