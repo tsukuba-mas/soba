@@ -37,7 +37,7 @@ proc getAcceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[
 proc getUnacceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(not agent.isAcceptablePost(it))
 
-proc readTimeline(agent: Agent, posts: seq[Message], messages: int): EvaluatedTimeline =
+proc readTimeline*(agent: Agent, posts: seq[Message], messages: int): EvaluatedTimeline =
   EvaluatedTimeline(
     acceptables: agent.getAcceptablePosts(posts, messages),
     unacceptables: agent.getUnacceptablePosts(posts, messages)
