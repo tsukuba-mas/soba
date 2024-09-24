@@ -10,11 +10,7 @@ import intbrg
 import tables
 
 proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
-  result = 
-    if post.repostedBy.isSome():
-      neighbors.contains(post.repostedBy.get())
-    else:
-      neighbors.contains(post.author)
+  neighbors.contains(post.author)
 
 proc getTimeline*(agent: Agent, posts: seq[Message], messages: int): seq[Message] = 
   posts.filterIt(agent.neighbors.isRelatedToNeighbors(it)).tail(messages)
