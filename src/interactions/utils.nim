@@ -12,7 +12,7 @@ import tables
 proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
   neighbors.contains(post.author)
 
-proc getTimeline*(agent: Agent, posts: seq[Message], messages: int): seq[Message] = 
+proc getTimeline(agent: Agent, posts: seq[Message], messages: int): seq[Message] = 
   posts.filterIt(agent.neighbors.isRelatedToNeighbors(it)).tail(messages)
 
 proc isAcceptablePost*(agent: Agent, post: Message): bool =
@@ -27,10 +27,10 @@ proc isAcceptablePost*(agent: Agent, post: Message): bool =
     of FilterStrategy.both:
       agent.hasSimilarOpinion(post) and agent.hasSimilarBelief(post)
 
-proc getAcceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
+proc getAcceptablePosts(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))
 
-proc getUnacceptablePosts*(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
+proc getUnacceptablePosts(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(not agent.isAcceptablePost(it))
 
 proc readTimeline*(agent: Agent, posts: seq[Message], messages: int): EvaluatedTimeline =
@@ -38,11 +38,6 @@ proc readTimeline*(agent: Agent, posts: seq[Message], messages: int): EvaluatedT
     acceptables: agent.getAcceptablePosts(posts, messages),
     unacceptables: agent.getUnacceptablePosts(posts, messages)
   )
-
-proc readTimeline*(agents: seq[Agent], posts: seq[Message], messages: int): Table[Id, EvaluatedTimeline] =
-  result = initTable[Id, EvaluatedTimeline]()
-  for agent in agents:
-    result[agent.id] = agent.readTimeline(posts, messages)
 
 proc takeN*[T](xs: seq[T], n: int): Option[seq[T]] =
   if xs.len < n:
