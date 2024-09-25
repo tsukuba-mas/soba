@@ -17,16 +17,16 @@ proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
 proc getTimeline(agent: Agent, posts: seq[Message], messages: int): seq[Message] = 
   posts.filterIt(agent.neighbors.isRelatedToNeighbors(it)).tail(messages)
 
-proc getAcceptablePosts(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
+proc getAcceptableMessages(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))
 
-proc getUnacceptablePosts(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
+proc getUnacceptableMessages(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
   agent.getTimeline(posts, messages).filterIt(not agent.isAcceptablePost(it))
 
-proc readTimeline(agent: Agent, posts: seq[Message], messages: int): EvaluatedTimeline =
+proc evaluateMessages(agent: Agent, posts: seq[Message], messages: int): EvaluatedTimeline =
   EvaluatedTimeline(
-    acceptables: agent.getAcceptablePosts(posts, messages),
-    unacceptables: agent.getUnacceptablePosts(posts, messages)
+    acceptables: agent.getAcceptableMessages(posts, messages),
+    unacceptables: agent.getUnacceptableMessages(posts, messages)
   )
 
 proc isNotFollowing(by: Agent, id: Id): bool =
@@ -73,7 +73,7 @@ proc getAuthors(posts: seq[Message]): seq[Id] =
   
 proc updateNeighbors(agent: Agent, messages: seq[Message], agentNum: int, allPosts: seq[Message], tick: int): Agent =
   withProbability(agent.unfollowProb):
-    let evaluatedMessages = agent.readTimeline(messages, 1000)
+    let evaluatedMessages = agent.evaluateMessages(messages, 1000)
     let unfollowed = evaluatedMessages.unacceptables.getAuthors().choose()
     let newNeighbor = agent.recommendUser(evaluatedMessages, agentNum, allPosts)
     if unfollowed.isSome() and newNeighbor.isSome():
