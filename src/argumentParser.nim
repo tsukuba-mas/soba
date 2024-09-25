@@ -26,7 +26,6 @@ proc optionsFromToml(tomlPath: string): CommandLineArgs =
     epsilon: toml["epsilon"].getFloat(),
     delta: toml["delta"].getInt(),
     atomicProps: 3,
-    screenSize: toml["screen"].getInt(),
     topic: toml["topic"].getStr().toFormula,
   )
 

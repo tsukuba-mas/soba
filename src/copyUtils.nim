@@ -6,8 +6,6 @@ proc copy(simulator: Simulator): Simulator =
   Simulator(
     agents: simulator.agents,
     topic: simulator.topic,
-    posts: simulator.posts,
-    screenSize: simulator.screenSize,
     verbose: simulator.verbose,
     followFrom: simulator.followFrom,
   )
@@ -49,9 +47,4 @@ proc updateNeighbors*(agent: Agent, removed: Id, added: Id): Agent =
 proc updateAgents*(simulator: Simulator, agents: seq[Agent]): Simulator =
   var newSimulator = simulator.copy()
   newSimulator.agents = agents
-  newSimulator
-
-proc updatePosts*(simulator: Simulator, posts: seq[Message]): Simulator =
-  var newSimulator = simulator.copy()
-  newSimulator.posts = posts
   newSimulator

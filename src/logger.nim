@@ -78,7 +78,6 @@ activation = {options.activationProb}
 values = [{options.values.mapIt($it).join(",")}]
 epsilon = {options.epsilon}
 delta = {options.delta}
-screen = {options.screenSize}
 topic = "{topic}"
 """
   var f = open(dirname & "/input.toml", fmWrite)

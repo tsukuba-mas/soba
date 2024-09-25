@@ -44,8 +44,6 @@ type Message* = object
 type Simulator* = object
   agents*: seq[Agent]
   topic*: Formulae
-  posts*: seq[Message]
-  screenSize*: int
   verbose*: bool
   followFrom*: seq[Id]
 
@@ -68,7 +66,6 @@ type CommandLineArgs* = object
   epsilon*: float
   delta*: int
   atomicProps*: int
-  screenSize*: int
   topic*: Formulae
 
 type EvaluatedTimeline* = object

@@ -62,8 +62,6 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   Simulator(
     agents: allAgents, 
     topic: options.topic,
-    posts: @[],
-    screenSize: options.screenSize,
     verbose: options.verbose,
     followFrom: allAgents.generateFollowFrom(options.follow),
   )
