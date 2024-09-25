@@ -52,7 +52,7 @@ proc recommendUser(target: Agent, agentNum: int, allPosts: seq[Message]): Option
     of RewritingStrategy.oprecommendation, 
        RewritingStrategy.belrecommendation, 
        RewritingStrategy.bothrecommendation:
-      let myMessage = Message(author: target.id, belief: target.belief, opinion: target.opinion)
+      let myMessage = target.writeMessage()
       let recommendedUsers = target.filterRecommendedPosts(allPosts, myMessage).mapIt(it.author)
       let candidates = recommendedUsers.filterIt(target.isNotFollowing(it))
       if candidates.len == 0:

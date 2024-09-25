@@ -42,7 +42,7 @@ proc revision*(self: Formulae, others: seq[Formulae]): Formulae =
   else:
     r3(self, others, hamming, sum)
 
-proc writeMessage(agent: Agent): Message =
+proc writeMessage*(agent: Agent): Message =
   Message(
     author: agent.id,
     belief: agent.belief,
