@@ -8,7 +8,6 @@ import sequtils
 import sets
 import options
 import strformat
-import tables
 
 proc isNotFollowing(by: Agent, id: Id): bool =
   not by.neighbors.contains(id) and by.id != id
@@ -70,9 +69,9 @@ proc updateNeighbors(agent: Agent, messages: seq[Message], agentNum: int, allPos
 
   return agent
 
-proc updateNeighbors*(simulator: Simulator, id2messages: Table[Id, seq[Message]], targets: seq[Id], time: int): Simulator =
+proc updateNeighbors*(simulator: Simulator, allMessages: seq[Message], targets: seq[Id], time: int): Simulator =
   let updatedAgents = simulator.agents.mapIt(
-    if targets.contains(it.id): it.updateNeighbors(id2messages[it.id], simulator.agents.len, simulator.posts, time) 
+    if targets.contains(it.id): it.updateNeighbors(allMessages, simulator.agents.len, simulator.posts, time) 
     else: it
   )
   simulator.updateAgents(updatedAgents)
