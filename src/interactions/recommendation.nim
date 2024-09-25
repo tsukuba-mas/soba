@@ -70,9 +70,9 @@ proc updateNeighbors(agent: Agent, messages: seq[Message], agentNum: int, allPos
 
   return agent
 
-proc updateNeighbors*(simulator: Simulator, id2messages: Table[Id, seq[Message]], time: int): Simulator =
+proc updateNeighbors*(simulator: Simulator, id2messages: Table[Id, seq[Message]], targets: seq[Id], time: int): Simulator =
   let updatedAgents = simulator.agents.mapIt(
-    if id2messages.hasKey(it.id): it.updateNeighbors(id2messages[it.id], simulator.agents.len, simulator.posts, time) 
+    if targets.contains(it.id): it.updateNeighbors(id2messages[it.id], simulator.agents.len, simulator.posts, time) 
     else: it
   )
   simulator.updateAgents(updatedAgents)

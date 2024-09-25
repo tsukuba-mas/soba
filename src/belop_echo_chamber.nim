@@ -37,5 +37,6 @@ for time in 1..parsedOptions.tick:
   let targets = chooseTargets(simulator.agents)
   let messages = simulator.receiveMessages(targets)
   simulator = simulator.performInteractions(messages, time)
-  simulator = simulator.updateNeighbors(messages, time)
+  let messagesAfterRevision = simulator.receiveMessages((0..<simulator.agents.len).toSeq.mapIt(Id(it)))
+  simulator = simulator.updateNeighbors(messagesAfterRevision, targets, time)
   simulator.log(time)
