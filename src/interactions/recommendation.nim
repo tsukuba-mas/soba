@@ -8,25 +8,17 @@ import sequtils
 import sets
 import options
 import strformat
-import ../utils
 
+proc getAcceptableMessages(agent: Agent, messages: seq[Message]): seq[Message] =
+  messages.filterIt(agent.isAcceptablePost(it))
 
-proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
-  neighbors.contains(post.author)
+proc getUnacceptableMessages(agent: Agent, messages: seq[Message]): seq[Message] =
+  messages.filterIt(not agent.isAcceptablePost(it))
 
-proc getTimeline(agent: Agent, posts: seq[Message], messages: int): seq[Message] = 
-  posts.filterIt(agent.neighbors.isRelatedToNeighbors(it)).tail(messages)
-
-proc getAcceptableMessages(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
-  agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))
-
-proc getUnacceptableMessages(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
-  agent.getTimeline(posts, messages).filterIt(not agent.isAcceptablePost(it))
-
-proc evaluateMessages(agent: Agent, posts: seq[Message], messages: int): EvaluatedTimeline =
+proc evaluateMessages(agent: Agent, messages: seq[Message]): EvaluatedTimeline =
   EvaluatedTimeline(
-    acceptables: agent.getAcceptableMessages(posts, messages),
-    unacceptables: agent.getUnacceptableMessages(posts, messages)
+    acceptables: agent.getAcceptableMessages(messages),
+    unacceptables: agent.getUnacceptableMessages(messages)
   )
 
 proc isNotFollowing(by: Agent, id: Id): bool =
@@ -73,7 +65,7 @@ proc getAuthors(posts: seq[Message]): seq[Id] =
   
 proc updateNeighbors(agent: Agent, messages: seq[Message], agentNum: int, allPosts: seq[Message], tick: int): Agent =
   withProbability(agent.unfollowProb):
-    let evaluatedMessages = agent.evaluateMessages(messages, 1000)
+    let evaluatedMessages = agent.evaluateMessages(messages)
     let unfollowed = evaluatedMessages.unacceptables.getAuthors().choose()
     let newNeighbor = agent.recommendUser(evaluatedMessages, agentNum, allPosts)
     if unfollowed.isSome() and newNeighbor.isSome():
