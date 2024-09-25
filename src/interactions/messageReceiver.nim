@@ -3,14 +3,18 @@ import tables
 import sequtils
 import sets
 
-proc receiveMessages*(simulator: Simulator, activated: seq[Id]): Table[Id, seq[Message]] =
-  let messages = simulator.agents.mapIt(
-    Message(
-      author: it.id,
-      belief: it.belief,
-      opinion: it.opinion,
-    )
+proc writeMessage(agent: Agent): Message =
+  Message(
+    author: agent.id,
+    belief: agent.belief,
+    opinion: agent.opinion,
   )
+
+proc writeMessage*(agents: seq[Agent]): seq[Message] =
+  agents.map(writeMessage)
+
+proc receiveMessages*(simulator: Simulator, activated: seq[Id]): Table[Id, seq[Message]] =
+  let messages = simulator.agents.writeMessage()
   var id2msgs = initTable[Id, seq[Message]]()
   for agent in simulator.agents:
     if not activated.contains(agent.id):
