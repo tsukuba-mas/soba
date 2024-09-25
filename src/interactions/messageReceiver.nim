@@ -2,16 +2,7 @@ import ../types
 import tables
 import sequtils
 import sets
-
-proc writeMessage(agent: Agent): Message =
-  Message(
-    author: agent.id,
-    belief: agent.belief,
-    opinion: agent.opinion,
-  )
-
-proc writeMessage*(agents: seq[Agent]): seq[Message] =
-  agents.map(writeMessage)
+import utils
 
 proc receiveMessages*(simulator: Simulator, activated: seq[Id]): Table[Id, seq[Message]] =
   let messages = simulator.agents.writeMessage()

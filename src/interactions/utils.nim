@@ -41,3 +41,13 @@ proc revision*(self: Formulae, others: seq[Formulae]): Formulae =
     self
   else:
     r3(self, others, hamming, sum)
+
+proc writeMessage(agent: Agent): Message =
+  Message(
+    author: agent.id,
+    belief: agent.belief,
+    opinion: agent.opinion,
+  )
+
+proc writeMessage*(agents: seq[Agent]): seq[Message] =
+  agents.map(writeMessage)
