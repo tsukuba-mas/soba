@@ -8,6 +8,26 @@ import sequtils
 import sets
 import options
 import strformat
+import ../utils
+
+
+proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
+  neighbors.contains(post.author)
+
+proc getTimeline(agent: Agent, posts: seq[Message], messages: int): seq[Message] = 
+  posts.filterIt(agent.neighbors.isRelatedToNeighbors(it)).tail(messages)
+
+proc getAcceptablePosts(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
+  agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))
+
+proc getUnacceptablePosts(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
+  agent.getTimeline(posts, messages).filterIt(not agent.isAcceptablePost(it))
+
+proc readTimeline*(agent: Agent, posts: seq[Message], messages: int): EvaluatedTimeline =
+  EvaluatedTimeline(
+    acceptables: agent.getAcceptablePosts(posts, messages),
+    unacceptables: agent.getUnacceptablePosts(posts, messages)
+  )
 
 proc isNotFollowing(by: Agent, id: Id): bool =
   not by.neighbors.contains(id) and by.id != id

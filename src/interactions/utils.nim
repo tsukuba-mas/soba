@@ -1,19 +1,12 @@
 import ../types
 import ../distance
 import ../randomUtils
-import ../utils
 import sequtils
 import sets
 import options
 import algorithm
 import intbrg
 import tables
-
-proc isRelatedToNeighbors(neighbors: HashSet[Id], post: Message): bool =
-  neighbors.contains(post.author)
-
-proc getTimeline(agent: Agent, posts: seq[Message], messages: int): seq[Message] = 
-  posts.filterIt(agent.neighbors.isRelatedToNeighbors(it)).tail(messages)
 
 proc isAcceptablePost*(agent: Agent, post: Message): bool =
   result = 
@@ -26,18 +19,6 @@ proc isAcceptablePost*(agent: Agent, post: Message): bool =
       agent.hasSimilarBelief(post)
     of FilterStrategy.both:
       agent.hasSimilarOpinion(post) and agent.hasSimilarBelief(post)
-
-proc getAcceptablePosts(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
-  agent.getTimeline(posts, messages).filterIt(agent.isAcceptablePost(it))
-
-proc getUnacceptablePosts(agent: Agent, posts: seq[Message], messages: int): seq[Message] =
-  agent.getTimeline(posts, messages).filterIt(not agent.isAcceptablePost(it))
-
-proc readTimeline*(agent: Agent, posts: seq[Message], messages: int): EvaluatedTimeline =
-  EvaluatedTimeline(
-    acceptables: agent.getAcceptablePosts(posts, messages),
-    unacceptables: agent.getUnacceptablePosts(posts, messages)
-  )
 
 proc takeN*[T](xs: seq[T], n: int): Option[seq[T]] =
   if xs.len < n:
