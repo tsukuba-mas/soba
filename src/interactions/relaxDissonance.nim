@@ -65,3 +65,17 @@ proc beliefAlignment*(agent: Agent, topic: Formulae, tick: int): Agent =
     tick
   )
   agent.updateBelief(updatedBelief)
+
+proc makeOpinionsAndBeliefsCoherent*(simulator: Simulator): Simulator =
+  let conv = 1e-5
+  var canBreak = false
+  result = simulator
+  while not canBreak:
+    var aligned = result.agents.mapIt(
+      it.opinionFormation(result.topic, -1).beliefAlignment(result.topic, -1)
+    )
+    canBreak = (0..<aligned.len).toSeq.allIt(
+      result.agents[it].belief == aligned[it].belief and
+      abs(result.agents[it].opinion - aligned[it].opinion) <= conv
+    )
+    result = result.updateAgents(aligned)
