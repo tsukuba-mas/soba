@@ -5,7 +5,6 @@ import interactions/recommendation
 import interactions/interactions
 import interactions/relaxDissonance
 import interactions/messageReceiver
-import interactions/utils
 import randomUtils
 import logger
 import argumentParser
