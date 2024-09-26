@@ -65,7 +65,7 @@ proc getAuthors(posts: seq[Message]): seq[Id] =
   
 proc updateNeighbors(agent: Agent, messages: seq[Message], agentNum: int, tick: int): Agent =
   withProbability(agent.unfollowProb):
-    let evaluatedMessages = agent.evaluateMessages(messages)
+    let evaluatedMessages = agent.evaluateMessages(messages.filterIt(agent.neighbors.contains(it.author)))
     let unfollowed = evaluatedMessages.unacceptables.getAuthors().choose()
     let newNeighbor = agent.recommendUser(agentNum, messages)
     if unfollowed.isSome() and newNeighbor.isSome():
