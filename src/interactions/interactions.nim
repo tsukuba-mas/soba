@@ -6,6 +6,7 @@ import brg
 import relaxDissonance
 import intbrg
 import tables
+import utils
 
 proc performInteractions(agent: Agent, messages: seq[Message], topic: Formulae, tick: int): Agent =
   var newAgent = agent
@@ -21,10 +22,11 @@ proc performInteractions(agent: Agent, messages: seq[Message], topic: Formulae, 
       newAgent.opinionFormation(topic, tick)
   return newAgent
 
-proc performInteractions*(simulator: Simulator, id2messages: Table[Id, seq[Message]], tick: int): Simulator =
+proc performInteractions*(simulator: Simulator, id2evaluatedMessages: Table[Id, EvaluatedTimeline], tick: int): Simulator =
   let newAgents = simulator.agents.mapIt(
-    if id2messages.hasKey(it.id):
-      performInteractions(it, id2messages[it.id], simulator.topic, tick)
+    if id2evaluatedMessages.contains(it.id):
+      let allMessages = id2evaluatedMessages[it.id].concat()
+      performInteractions(it, allMessages, simulator.topic, tick)
     else:
       it
   )
