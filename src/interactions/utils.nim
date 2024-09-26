@@ -51,3 +51,6 @@ proc writeMessage*(agent: Agent): Message =
 
 proc writeMessage*(agents: seq[Agent]): seq[Message] =
   agents.map(writeMessage)
+
+proc concat*(evaluatedMessage: EvaluatedTimeline): seq[Message] =
+  evaluatedMessage.acceptables.concat(evaluatedMessage.unacceptables)
