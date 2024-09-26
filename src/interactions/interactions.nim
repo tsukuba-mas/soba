@@ -22,7 +22,7 @@ proc performInteractions(agent: Agent, messages: seq[Message], topic: Formulae, 
       newAgent.opinionFormation(topic, tick)
   return newAgent
 
-proc performInteractions*(simulator: Simulator, id2evaluatedMessages: Table[Id, EvaluatedTimeline], tick: int): Simulator =
+proc performInteractions*(simulator: Simulator, id2evaluatedMessages: Table[Id, EvaluatedMessages], tick: int): Simulator =
   let newAgents = simulator.agents.mapIt(
     if id2evaluatedMessages.contains(it.id):
       let allMessages = id2evaluatedMessages[it.id].concat()

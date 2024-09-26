@@ -16,8 +16,8 @@ proc getAcceptableMessages(agent: Agent, messages: seq[Message]): seq[Message] =
 proc getUnacceptableMessages(agent: Agent, messages: seq[Message]): seq[Message] =
   messages.filterIt(not agent.isAcceptablePost(it))
 
-proc evaluateMessages*(agent: Agent, messages: seq[Message]): EvaluatedTimeline =
-  EvaluatedTimeline(
+proc evaluateMessages*(agent: Agent, messages: seq[Message]): EvaluatedMessages =
+  EvaluatedMessages(
     acceptables: agent.getAcceptableMessages(messages),
     unacceptables: agent.getUnacceptableMessages(messages)
   )
@@ -64,7 +64,7 @@ proc recommendUser(target: Agent, agentNum: int, allPosts: seq[Message]): Option
 proc getAuthors(posts: seq[Message]): seq[Id] =
   posts.mapIt(it.author)
   
-proc updateNeighbors(agent: Agent, evaluatedMessages: EvaluatedTimeline, allMessages: seq[Message], agentNum: int, tick: int): Agent =
+proc updateNeighbors(agent: Agent, evaluatedMessages: EvaluatedMessages, allMessages: seq[Message], agentNum: int, tick: int): Agent =
   withProbability(agent.unfollowProb):
     let unfollowed = evaluatedMessages.unacceptables.getAuthors().choose()
     let newNeighbor = agent.recommendUser(agentNum, allMessages)
@@ -81,7 +81,7 @@ proc updateNeighbors(agent: Agent, evaluatedMessages: EvaluatedTimeline, allMess
 
   return agent
 
-proc updateNeighbors*(simulator: Simulator, id2evaluatedMessages: Table[Id, EvaluatedTimeline], time: int): Simulator =
+proc updateNeighbors*(simulator: Simulator, id2evaluatedMessages: Table[Id, EvaluatedMessages], time: int): Simulator =
   let allMessages = simulator.agents.writeMessage()
   let updatedAgents = simulator.agents.mapIt(
     if id2evaluatedMessages.contains(it.id): 

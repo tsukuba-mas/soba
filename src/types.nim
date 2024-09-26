@@ -66,6 +66,6 @@ type CommandLineArgs* = object
   atomicProps*: int
   topic*: Formulae
 
-type EvaluatedTimeline* = object
+type EvaluatedMessages* = object
   acceptables*: seq[Message]
   unacceptables*: seq[Message]

@@ -5,9 +5,9 @@ import sequtils
 import sets
 import utils
 
-proc receiveMessages*(simulator: Simulator, activated: seq[Id]): Table[Id, EvaluatedTimeline] =
+proc receiveMessages*(simulator: Simulator, activated: seq[Id]): Table[Id, EvaluatedMessages] =
   let messages = simulator.agents.writeMessage()
-  var id2msgs = initTable[Id, EvaluatedTimeline]()
+  var id2msgs = initTable[Id, EvaluatedMessages]()
   for agent in simulator.agents:
     if not activated.contains(agent.id):
       continue
