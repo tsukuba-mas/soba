@@ -10,18 +10,6 @@ import options
 import strformat
 import tables
 
-proc getAcceptableMessages(agent: Agent, messages: seq[Message]): seq[Message] =
-  messages.filterIt(agent.isAcceptablePost(it))
-
-proc getUnacceptableMessages(agent: Agent, messages: seq[Message]): seq[Message] =
-  messages.filterIt(not agent.isAcceptablePost(it))
-
-proc evaluateMessages*(agent: Agent, messages: seq[Message]): EvaluatedMessages =
-  EvaluatedMessages(
-    acceptables: agent.getAcceptableMessages(messages),
-    unacceptables: agent.getUnacceptableMessages(messages)
-  )
-
 proc isNotFollowing(by: Agent, id: Id): bool =
   not by.neighbors.contains(id) and by.id != id
 

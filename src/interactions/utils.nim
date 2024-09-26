@@ -54,3 +54,15 @@ proc writeMessage*(agents: seq[Agent]): seq[Message] =
 
 proc concat*(evaluatedMessage: EvaluatedMessages): seq[Message] =
   evaluatedMessage.acceptables.concat(evaluatedMessage.unacceptables)
+
+proc getAcceptableMessages(agent: Agent, messages: seq[Message]): seq[Message] =
+  messages.filterIt(agent.isAcceptablePost(it))
+
+proc getUnacceptableMessages(agent: Agent, messages: seq[Message]): seq[Message] =
+  messages.filterIt(not agent.isAcceptablePost(it))
+
+proc evaluateMessages*(agent: Agent, messages: seq[Message]): EvaluatedMessages =
+  EvaluatedMessages(
+    acceptables: agent.getAcceptableMessages(messages),
+    unacceptables: agent.getUnacceptableMessages(messages)
+  )

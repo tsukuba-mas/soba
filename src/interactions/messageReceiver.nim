@@ -1,5 +1,4 @@
 import ../types
-import recommendation
 import tables
 import sequtils
 import sets
