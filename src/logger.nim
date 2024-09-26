@@ -73,7 +73,6 @@ verbose = {options.verbose}
 mu = {options.mu}
 alpha = {options.alpha}
 unfollow = {options.unfollowProb}
-repost = {options.repostProb}
 activation = {options.activationProb}
 values = [{options.values.mapIt($it).join(",")}]
 epsilon = {options.epsilon}

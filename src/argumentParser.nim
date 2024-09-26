@@ -20,7 +20,6 @@ proc optionsFromToml(tomlPath: string): CommandLineArgs =
     mu: toml["mu"].getFloat(),
     alpha: toml["alpha"].getFloat(),
     unfollowProb: toml["unfollow"].getFloat(),
-    repostProb: toml["repost"].getFloat(),
     activationProb: toml["activation"].getFloat(),
     values: toml["values"].getElems().mapIt(it.getFloat()),
     epsilon: toml["epsilon"].getFloat(),

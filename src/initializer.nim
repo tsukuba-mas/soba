@@ -49,7 +49,6 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
       mu: options.mu,
       alpha: options.alpha,
       unfollowProb: options.unfollowProb,
-      repostProb: options.repostProb,
       activationProb: options.activationProb,
       values: options.values,
       epsilon: options.epsilon,
