@@ -20,7 +20,10 @@ proc randomGraphGenerator(vertices: int, edges: int): Table[Id, HashSet[Id]] =
   for i in 0..<edges:
     let (u, v) = allEdges[i]
     graph[u].incl(v)
-  graph
+  if graph.keys.toSeq.allIt(graph[it].len > 0):
+    graph
+  else:
+    vertices.randomGraphGenerator(edges)
 
 proc generateFollowFrom(agents: seq[Agent], follows: int): seq[Id] =
   result = newSeqWith(follows, Id(-1))
