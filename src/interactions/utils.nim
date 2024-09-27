@@ -64,10 +64,6 @@ proc writeMessage*(agents: seq[Agent]): seq[Message] =
   ## Returns messages from all of the agents.
   agents.map(writeMessage)
 
-proc concat*(evaluatedMessage: EvaluatedMessages): seq[Message] =
-  ## Concatnate the messages in `evaluatedMessage`.
-  evaluatedMessage.acceptables.concat(evaluatedMessage.unacceptables)
-
 proc getAcceptableMessages(agent: Agent, messages: seq[Message]): seq[Message] =
   ## Returns acceptable messages for `agent` in `messages`.
   messages.filterIt(agent.isAcceptablePost(it))

@@ -6,7 +6,6 @@ import brg
 import relaxDissonance
 import intbrg
 import tables
-import utils
 
 proc performInteractions(agent: Agent, messages: seq[Message], topic: Formulae, tick: int): Agent =
   ## Perform the four procedures (od, br, ba, of) following to the array of updating strategy.
@@ -30,8 +29,9 @@ proc performInteractions*(simulator: Simulator, id2evaluatedMessages: Table[Id, 
   ## they do them according to their updating strategy. Otherwise, do nothing.
   let newAgents = simulator.agents.mapIt(
     if id2evaluatedMessages.contains(it.id):
-      let allMessages = id2evaluatedMessages[it.id].concat()
-      performInteractions(it, allMessages, simulator.topic, tick)
+      # for od and br, use acceptable messages only.
+      let acceptableMessages = id2evaluatedMessages[it.id].acceptables
+      performInteractions(it, acceptableMessages, simulator.topic, tick)
     else:
       it
   )
