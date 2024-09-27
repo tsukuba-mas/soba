@@ -9,6 +9,8 @@ import tables
 import utils
 
 proc performInteractions(agent: Agent, messages: seq[Message], topic: Formulae, tick: int): Agent =
+  ## Perform the four procedures (od, br, ba, of) following to the array of updating strategy.
+  ## The execution order will be the same with the order in the array.
   var newAgent = agent
   for strategy in agent.updatingStrategy:
     newAgent = case strategy
@@ -23,6 +25,9 @@ proc performInteractions(agent: Agent, messages: seq[Message], topic: Formulae, 
   return newAgent
 
 proc performInteractions*(simulator: Simulator, id2evaluatedMessages: Table[Id, EvaluatedMessages], tick: int): Simulator =
+  ## Returns the simulator with agents after interactions.
+  ## If an agent is activated to perform (possibly some of) the four procedures (od, br, ba, of),
+  ## they do them according to their updating strategy. Otherwise, do nothing.
   let newAgents = simulator.agents.mapIt(
     if id2evaluatedMessages.contains(it.id):
       let allMessages = id2evaluatedMessages[it.id].concat()

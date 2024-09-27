@@ -6,6 +6,7 @@ import stats
 import strformat
 
 proc opinionDynamics*(agent: Agent, acceptablePosts: seq[Message], tick: int): Agent =
+  ## Perform opinion dynamics based on a bounded confidence model.
   let neighbors = acceptablePosts.mapIt(it.opinion)
   let updatedOpinion = 
     if neighbors.len > 0: 

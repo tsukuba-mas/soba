@@ -6,6 +6,7 @@ import intbrg
 import os
 
 proc optionsFromToml(tomlPath: string): CommandLineArgs =
+  ## Parse given toml file and return the result.
   let toml = parseFile(tomlPath)
   CommandLineArgs(
     seed: toml["seed"].getInt(),
@@ -29,6 +30,7 @@ proc optionsFromToml(tomlPath: string): CommandLineArgs =
   )
 
 proc parseArguments*(): CommandLineArgs =
+  ## Parse command line argument (path to a TOML file).
   let params = commandLineParams()
   assert(params.len > 0, "Empty parameter")
   let toml = params[0]

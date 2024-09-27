@@ -6,6 +6,7 @@ import utils
 import strformat
 
 proc beliefRevisionGames*(agent: Agent, acceptablePosts: seq[Message], tick: int): Agent =
+  ## Perform belief revision games (BRG).
   let neighborBeliefs = acceptablePosts.mapIt(it.belief)
   let updatedBelief = revision(agent.belief, neighborBeliefs)
   verboseLogger(

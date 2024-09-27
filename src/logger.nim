@@ -20,6 +20,8 @@ proc getOpinionHistPath(): string = dirname & "/" & ophist
 proc getGraphHistPath(): string = dirname & "/" & graphHist
 
 proc initLogger*(outputTo: string, isVerboseMode: bool) = 
+  ## Initialize logger. This procedure should be called before 
+  ## logger procedures are called.
   dirname = outputTo
   isVerbose = isVerboseMode
   if getBeliefHistPath().fileExists():
@@ -33,12 +35,14 @@ proc initLogger*(outputTo: string, isVerboseMode: bool) =
   createDir(dirname)
 
 proc appendToFile(path: string, content: string) =
+  ## Append `content` to the file on `path`.
   var f = open(path, fmAppend)
   defer:
     f.close()
   f.write(content & "\n")
 
 proc graphLogger(simulator: Simulator, tick: int) =
+  ## Output network structure.
   let saveTo = getGraphHistPath()
   if tick == 0:
     saveTo.appendToFile($tick & "," & simulator.followFrom.join(","))
@@ -52,6 +56,8 @@ proc graphLogger(simulator: Simulator, tick: int) =
   saveTo.appendToFile($tick & "," & content.join(","))
 
 proc verboseLogger*(content: string, tick: int) = 
+  ## If simulator is running in verbose mode, output additional information.
+  ## Otherwise, do nothing.
   if isVerbose:
     appendToFile(
       dirname & "/" & verbose,
@@ -59,6 +65,7 @@ proc verboseLogger*(content: string, tick: int) =
     )
 
 proc saveAsToml*(options: CommandLineArgs, topic: Formulae) =
+  ## Output the parsed options as TOML file.
   let updatingStrategyInTomlList = "\"" & options.update.mapIt($it).join("\", \"") & "\""
   let toml = fmt"""
 seed = {options.seed}
@@ -85,6 +92,7 @@ topic = "{topic}"
   f.write(toml)
 
 proc log*(simulator: Simulator, tick: int) =
+  ## Output current opinions, beliefs and network structure.
   let beliefs = simulator.agents.mapIt($(it.belief)).join(",")
   let opinions = simulator.agents.mapIt($(it.opinion)).join(",")
   getBeliefHistPath().appendToFile($tick & "," & beliefs)
