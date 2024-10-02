@@ -77,18 +77,8 @@ proc beliefAlignment*(agent: Agent, topic: Formulae, tick: int): Agent =
 
 proc makeOpinionsAndBeliefsCoherent*(simulator: Simulator): Simulator =
   ## Make opinions and beliefs are coherent for all agents.
-  ## More specifically, it repeats opinion formation and belief alignment in this order 
-  ## until beliefs do not change and the difference of opinions between before them and after 
-  ## is equal to or less than 1e-5 for all agents.
-  let conv = 1e-5
-  var canBreak = false
-  result = simulator
-  while not canBreak:
-    var aligned = result.agents.mapIt(
-      it.opinionFormation(result.topic, -1).beliefAlignment(result.topic, -1)
-    )
-    canBreak = (0..<aligned.len).toSeq.allIt(
-      result.agents[it].belief == aligned[it].belief and
-      abs(result.agents[it].opinion - aligned[it].opinion) <= conv
-    )
-    result = result.updateAgents(aligned)
+  ## Here, agents perform just belief alignment.
+  generateOpinionToBeliefCache(simulator.topic, simulator.agents[0].values)
+  simulator.updateAgents(
+    simulator.agents.mapIt(it.beliefAlignment(simulator.topic, 0))
+  )
