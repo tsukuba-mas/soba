@@ -35,9 +35,9 @@ proc hamming(x, y: Formulae): int =
   ## between two formulae `x` and `y`.
   zip($x, $y).filterIt(it[0] != it[1]).len
 
-proc argmin(xs: seq[Formulae], current: Formulae): seq[Formulae] =
-  ## Returns all of formulae in `xs` such that they minimize the distance to `current`.
-  let distances = xs.mapIt(hamming(it, current))
+proc argmin[T](xs: seq[T], by: T, dist: proc (x, y: T): float | int): seq[T] =
+  ## Returns all of elements in `xs` such that they minimize the distance to `by`.
+  let distances = xs.mapIt(dist(it, by))
   let minDist = distances.min
   (0..<xs.len).toSeq.filterIt(distances[it] == minDist).mapIt(xs[it])
 
@@ -68,7 +68,7 @@ proc beliefAlignment*(agent: Agent, topic: Formulae, tick: int): Agent =
       key = opinion
 
   # choose one of the optimal one randomly
-  let updatedBelief = opinion2beliefCache[key].argmin(agent.belief).choose().get
+  let updatedBelief = opinion2beliefCache[key].argmin(agent.belief, hamming).choose().get
   verboseLogger(
     fmt"BA {tick} {agent.id} {agent.belief} -> {updatedBelief}",
     tick
