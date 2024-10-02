@@ -10,6 +10,8 @@ import ../logger
 import strformat
 import tables
 
+## Table which associates opinion to beliefs which yield opinions.
+## Here, it is assumed that all of the agents share the same cultural values.
 var opinion2beliefCache = initTable[Opinion, seq[Formulae]]()
 
 proc getBeliefBasedOpinion(belief: Formulae, values: seq[float], topic: Formulae): float =
