@@ -66,10 +66,15 @@ proc generateOpinionToBeliefCache(topic: Formulae, values: seq[float]) =
     else:
       opinion2beliefCache[opinion] = @[phi]
 
+proc flatten[T](xxs: seq[seq[T]]): seq[T] =
+  for xs in xxs:
+    for x in xs:
+      result.add(x)
+
 proc beliefAlignment*(agent: Agent, topic: Formulae, tick: int): Agent =
   ## Returns agent after belief alignment.
   var maxError = high(float)
-  var key = 0.0
+  var keys: seq[float] = @[]
   
   if opinion2beliefCache.len == 0:
     generateOpinionToBeliefCache(topic, agent.values)
@@ -78,10 +83,12 @@ proc beliefAlignment*(agent: Agent, topic: Formulae, tick: int): Agent =
     let diff = abs(agent.opinion - opinion)
     if diff < maxError:
       maxError = diff
-      key = opinion
+      keys = @[opinion]
+    elif diff == maxError:
+      keys.add(opinion)
 
   # choose one of the optimal one randomly
-  let updatedBelief = opinion2beliefCache[key].argmin(agent.belief, hamming).choose().get
+  let updatedBelief = keys.mapIt(opinion2beliefCache[it]).flatten().argmin(agent.belief, hamming).choose().get
   verboseLogger(
     fmt"BA {tick} {agent.id} {agent.belief} -> {updatedBelief}",
     tick
