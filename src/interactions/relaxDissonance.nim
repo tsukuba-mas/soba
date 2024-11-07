@@ -7,6 +7,7 @@ import intbrg
 import stats
 import options
 import ../logger
+import ../randomUtils
 import strformat
 import tables
 
