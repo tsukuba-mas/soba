@@ -43,10 +43,20 @@ proc argmin[T](xs: seq[T], by: T, dist: proc (x, y: T): float | int): seq[T] =
   let minDist = distances.min
   (0..<xs.len).toSeq.filterIt(distances[it] == minDist).mapIt(xs[it])
 
+proc getNumberOfAtomicProps[T](values: seq[T]): int =
+  ## Return the number of atomic propositions.
+  ## It is assumed that len(values) == 2^n where n is the number.
+  let interpretations = values.len
+  var atomicProps = 1
+  while true:
+    if interpretations == (1 shl atomicProps):
+      return atomicProps
+    atomicProps += 1
+
 proc generateOpinionToBeliefCache(topic: Formulae, values: seq[float]) = 
   ## Generate the cache of opinions to beliefs, i.e., tables from opinions to
   ## beliefs which yields the key (opinion).
-  for phi in allFormulae(3):
+  for phi in allFormulae(getNumberOfAtomicProps(values)):
     if (not phi).isTautology():
       continue
     let opinion = getBeliefBasedOpinion(phi, values, topic)
