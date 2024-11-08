@@ -23,12 +23,12 @@ suite "utility procedure: hamming distance":
 suite "utility procedure: argmin":
   test "for string":
     let by = "x"
-    let dist = proc (x, y: string): int = len(x) - len(y)
+    let dist = proc (x: string): int = len(x) - len(by)
     let longStr = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    check argmin(@[longStr], by, dist) == @[longStr]
-    check argmin(@["aaa", "aa", "a"], by, dist) == @["a"]
-    check argmin(@["aa", "a", ""], by, dist) == @[""]
-    check argmin(@["a", "b", "c"], by, dist) == @["a", "b", "c"]
+    check argmin(@[longStr], dist) == @[longStr]
+    check argmin(@["aaa", "aa", "a"], dist) == @["a"]
+    check argmin(@["aa", "a", ""], dist) == @[""]
+    check argmin(@["a", "b", "c"], dist) == @["a", "b", "c"]
   
   test "for original types":
     type Foo = ref object
@@ -44,12 +44,12 @@ suite "utility procedure: argmin":
         return true
     
     let by = Foo(val: 0.5)
-    let dist = proc (x, y: Foo): float = x.val * y.val
-    check argmin(@[Foo(val: 2.0), Foo(val: 1.0)], by, dist) == @[Foo(val: 1.0)]
-    check argmin(@[Foo(val: -1.0), Foo(val: 1.0), Foo(val: 0.0)], by, dist) == @[Foo(val: -1.0)]
-    check argmin(@[Foo(val: 1.0), Foo(val: 1.0)], by, dist) == @[Foo(val: 1.0), Foo(val: 1.0)]
+    let dist = proc (x: Foo): float = x.val * by.val
+    check argmin(@[Foo(val: 2.0), Foo(val: 1.0)], dist) == @[Foo(val: 1.0)]
+    check argmin(@[Foo(val: -1.0), Foo(val: 1.0), Foo(val: 0.0)], dist) == @[Foo(val: -1.0)]
+    check argmin(@[Foo(val: 1.0), Foo(val: 1.0)], dist) == @[Foo(val: 1.0), Foo(val: 1.0)]
 
-suite "Belief Alignment":
+suite "Belief Alignment (Random choose)":
   let values = @[0.0, 0.1, 0.8, 1.0]
   let topic = toFormula("1100")
   initRand(42)
@@ -66,15 +66,15 @@ suite "Belief Alignment":
 
   test "belief alignment for already coherent agent":
     let agent = Agent(opinion: 0.05, belief: toFormula("1101"))
-    check agent.beliefAlignment(topic, 0).belief == toFormula("1101")
+    check agent.beliefAlignment(topic, 0, UpdatingStrategy.barc).belief == toFormula("1101")
   
   test "belief alignment without distance sorting and random choice":
     let agent = Agent(opinion: 0.5, belief: toFormula("1111"))
-    check agent.beliefAlignment(topic, 0).belief == toFormula("0011")
+    check agent.beliefAlignment(topic, 0, UpdatingStrategy.barc).belief == toFormula("0011")
   
   test "belief alignment with sorting with distance sorting and without random choice":
     let agent = Agent(opinion: 0.4375, belief: toFormula("0010"))
-    check agent.beliefAlignment(topic, 0).belief == toFormula("0010")
+    check agent.beliefAlignment(topic, 0, UpdatingStrategy.barc).belief == toFormula("0010")
   
   test "belief alignment with sorting with distance sorting and random choice":
     let agent = Agent(opinion: 0.03, belief: toFormula("1101"))
@@ -84,6 +84,27 @@ suite "Belief Alignment":
     opinion2beliefCache.clear()
     generateOpinionToBeliefCache(topic, v2)
 
-    let alignedBelief = agent.beliefAlignment(topic, 0).belief 
+    let alignedBelief = agent.beliefAlignment(topic, 0, UpdatingStrategy.barc).belief 
     check alignedBelief == toFormula("0001") or alignedBelief == toFormula("0011")
+    
+suite "Belief Alignment (deterministic choice with respect to values)":
+  let values = @[0.0, 0.1, 0.8, 1.0]
+  let topic = toFormula("1100")
+  initRand(42)
+  generateOpinionToBeliefCache(topic, values)
+
+  test "choose the best one wrt values":
+    let b1 = toFormula("1100")
+    let b2 = toFormula("1101")
+    let b3 = toFormula("1111")
+    check @[b1].chooseBest(values) == b1
+    check @[b1, b2].chooseBest(values) == b2
+    check @[b3, b2, b1].chooseBest(values) == b3
+
+  test "belief alignment for already coherent agent":
+    let agent1 = Agent(opinion: 0.05, belief: toFormula("1101"), values: values)
+    check agent1.beliefAlignment(topic, 0, UpdatingStrategy.bavm).belief == toFormula("1111")
+    let agent2 = Agent(opinion: 0.05, belief: toFormula("1111"), values: values)
+    check agent2.beliefAlignment(topic, 0, UpdatingStrategy.bavm).belief == toFormula("1111")
+
     

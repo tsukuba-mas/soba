@@ -10,6 +10,7 @@ import ../logger
 import ../randomUtils
 import strformat
 import tables
+import algorithm
 
 ## Table which associates opinion to beliefs which yield opinions.
 ## Here, it is assumed that all of the agents share the same cultural values.
@@ -38,11 +39,17 @@ proc hamming(x, y: Formulae): int =
   ## between two formulae `x` and `y`.
   zip($x, $y).filterIt(it[0] != it[1]).len
 
-proc argmin[T](xs: seq[T], by: T, dist: proc (x, y: T): float | int): seq[T] =
-  ## Returns all of elements in `xs` such that they minimize the distance to `by`.
-  let distances = xs.mapIt(dist(it, by))
-  let minDist = distances.min
+proc argm[T](xs: seq[T], dist: proc (x: T): float | int, isMin: bool): seq[T] =
+  ## Returns all of elements in `xs` which minimizes the distance function `dist`.
+  let distances = xs.mapIt(dist(it))
+  let minDist = if isMin: distances.min else: distances.max
   (0..<xs.len).toSeq.filterIt(distances[it] == minDist).mapIt(xs[it])
+
+proc argmin[T](xs: seq[T], dist: proc (x: T): float | int) : seq[T] =
+  argm(xs, dist, true)
+
+proc argmax[T](xs: seq[T], dist: proc (x: T): float | int) : seq[T] =
+  argm(xs, dist, false)
 
 proc getNumberOfAtomicProps[T](values: seq[T]): int =
   ## Return the number of atomic propositions.
@@ -71,7 +78,32 @@ proc flatten[T](xxs: seq[seq[T]]): seq[T] =
     for x in xs:
       result.add(x)
 
-proc beliefAlignment*(agent: Agent, topic: Formulae, tick: int): Agent =
+proc interpretation2preference(values: seq[float]): seq[int] =
+  let allInterpretations = (0..<values.len).toSeq
+  let sortedInterpretations = zip(values, allInterpretations).toSeq.sorted().mapIt(it[1])
+  result = newSeqWith(values.len, 0)
+  for idx, interpretation in sortedInterpretations:
+    result[interpretation] = 1 shl idx
+
+proc chooseBest(candidates: seq[Formulae], values: seq[float]): Formulae =
+  assert values.toHashSet.len == values.len, "Values should be unique"
+  let preferences = values.interpretation2preference()  # i is preferable to j iff preferences[j] < preferences[j]
+  let formula2preference = proc (x: Formulae): int = zip($x, preferences).toSeq.filterIt(it[0] == '1').mapIt(it[1]).sum()
+  # It can be assumed that it returns the seq with length 1.
+  candidates.argmax(formula2preference)[0]
+
+proc selectOneBelief(candidates: seq[Formulae], by: Agent, strategy: UpdatingStrategy): Formulae =
+  case strategy
+  of UpdatingStrategy.barc:
+    let hammingWithCurrentBelief = proc (x: Formulae): int = hamming(by.belief, x)
+    candidates.argmin(hammingWithCurrentBelief).choose().get
+  of UpdatingStrategy.bavm:
+    candidates.chooseBest(by.values)
+  else:
+    assert false, "Performing belief alignment while the corresponding strategy is " & $strategy
+    by.belief
+
+proc beliefAlignment*(agent: Agent, topic: Formulae, tick: int, strategy: UpdatingStrategy): Agent =
   ## Returns agent after belief alignment.
   var maxError = high(float)
   var keys: seq[float] = @[]
@@ -88,7 +120,7 @@ proc beliefAlignment*(agent: Agent, topic: Formulae, tick: int): Agent =
       keys.add(opinion)
 
   # choose one of the optimal one randomly
-  let updatedBelief = keys.mapIt(opinion2beliefCache[it]).flatten().argmin(agent.belief, hamming).choose().get
+  let updatedBelief = keys.mapIt(opinion2beliefCache[it]).flatten().selectOneBelief(agent, strategy)
   verboseLogger(
     fmt"BA {tick} {agent.id} {agent.belief} -> {updatedBelief}",
     tick
@@ -100,5 +132,5 @@ proc makeOpinionsAndBeliefsCoherent*(simulator: Simulator): Simulator =
   ## Here, agents perform just belief alignment.
   generateOpinionToBeliefCache(simulator.topic, simulator.agents[0].values)
   simulator.updateAgents(
-    simulator.agents.mapIt(it.beliefAlignment(simulator.topic, 0))
+    simulator.agents.mapIt(it.beliefAlignment(simulator.topic, 0, UpdatingStrategy.barc))
   )

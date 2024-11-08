@@ -19,8 +19,8 @@ proc performInteractions(agent: Agent, messages: seq[Message], topic: Formulae, 
       newAgent.opinionDynamicsDeGrootmodel(messages, tick)
     of UpdatingStrategy.br:
       newAgent.beliefRevisionGames(messages, tick)
-    of UpdatingStrategy.ba:
-      newAgent.beliefAlignment(topic, tick)
+    of UpdatingStrategy.bavm, UpdatingStrategy.barc:
+      newAgent.beliefAlignment(topic, tick, strategy)
     of UpdatingStrategy.`of`:
       newAgent.opinionFormation(topic, tick)
   return newAgent

@@ -8,7 +8,7 @@ type FilterStrategy* {.pure.} = enum
   all, obounded, bbounded, both
 
 type UpdatingStrategy* {.pure.} = enum
-  oddw = "oddw", oddg = "oddg", br = "br", `of` = "of", ba = "ba"
+  oddw = "oddw", oddg = "oddg", br = "br", `of` = "of", barc = "barc", bavm = "bavm"
 
 type RewritingStrategy* {.pure.} = enum
   none, random, oprecommendation, belrecommendation, bothrecommendation
