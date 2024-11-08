@@ -4,7 +4,6 @@ import sequtils
 import intbrg
 import os
 import sets
-import strformat
 
 let beliefHist = "belhist.csv"
 let ophist = "ophist.csv"
@@ -63,33 +62,6 @@ proc verboseLogger*(content: string, tick: int) =
       dirname & "/" & verbose,
       $tick & "," & content
     )
-
-proc saveAsToml*(options: CommandLineArgs, topics: seq[Formulae]) =
-  ## Output the parsed options as TOML file.
-  let updatingStrategyInTomlList = "\"" & options.update.mapIt($it).join("\", \"") & "\""
-  let toml = fmt"""
-seed = {options.seed}
-dir = "{options.dir}"
-agents = {options.n}
-follow = {options.follow}
-tick = {options.tick}
-filter = "{options.filter}"
-updating = [{updatingStrategyInTomlList}]
-rewriting = "{options.rewriting}"
-verbose = {options.verbose}
-mu = {options.mu}
-alpha = {options.alpha}
-unfollow = {options.unfollowProb}
-activation = {options.activationProb}
-values = [{options.values.mapIt($it).join(",")}]
-epsilon = {options.epsilon}
-delta = {options.delta}
-topics = "{topics}"
-"""
-  var f = open(dirname & "/input.toml", fmWrite)
-  defer:
-    f.close()
-  f.write(toml)
 
 proc log*(simulator: Simulator, tick: int) =
   ## Output current opinions, beliefs and network structure.

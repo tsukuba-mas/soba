@@ -51,7 +51,6 @@ type CommandLineArgs* = object
   seed*: int
   dir*: string
   n*: int
-  follow*: int
   tick*: int
   filter*: FilterStrategy
   update*: seq[UpdatingStrategy]
@@ -66,6 +65,9 @@ type CommandLineArgs* = object
   epsilon*: float
   delta*: int
   topics*: seq[Formulae]
+  opinions*: Table[Id, Table[Formulae, Opinion]]
+  beliefs*: Table[Id, Formulae]
+  network*: Table[Id, HashSet[Id]]
 
 type EvaluatedMessages* = object
   acceptables*: seq[Message]

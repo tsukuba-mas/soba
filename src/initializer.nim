@@ -31,7 +31,7 @@ proc randomGraphGenerator(vertices: int, edges: int): Table[Id, HashSet[Id]] =
   else:
     vertices.randomGraphGenerator(edges)
 
-proc generateFollowFrom(agents: seq[Agent], follows: int): seq[Id] =
+proc generateFollowFrom(agents: seq[Agent]): seq[Id] =
   ## Returns sequence of the agents corresponding to the network they form.
   ## It is sorted in ascending order by agents' id.
   ## If an agent follow N other agents, its id appears N times.
@@ -39,27 +39,30 @@ proc generateFollowFrom(agents: seq[Agent], follows: int): seq[Id] =
   ## For example, let $G=(V,E)$ where $V=\{1,2,3\}$ and 
   ## $E=\{(1,2),(1,3),(2,3)\}$. Then, this procedure returns the sequence
   ## `@[1,1,2]` because agent 1 follows two other agents, etc.
-  result = newSeqWith(follows, Id(-1))
+  result = @[]
   var idx = 0
   for agent in agents:
     for neighbor in agent.neighbors:
-      result[idx] = agent.id
+      result.add(agent.id)
       idx += 1
   assert(result.allIt(it.int >= 0))
+
+proc initializeOpinionsRandomly(topics: seq[Formulae]): Table[Formulae, Opinion] =
+  result = initTable[Formulae, Opinion]()
+  for topic in topics:
+    result[topic] = rand(0.0, 1.0)
   
 proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   ## Returns simulator initialized with `options`.
   let agents = options.n
   let atomicProps = options.values.getNumberOfAtomicProps()
-  let initialBeliefs = (0..<agents).toSeq.mapIt(rand(1, 255).toBin(1 shl atomicProps).toFormula)
-  let graph = randomGraphGenerator(agents, options.follow)
-  let opinions = (0..<agents).toSeq.mapIt(rand(0.0, 1.0))
-  let allAgents = (0..<agents).toSeq.mapIt(
+  let allIds = (0..<agents).toSeq.map(toId)
+  let allAgents = allIds.mapIt(
     Agent(
-      id: it.toId, 
-      belief: initialBeliefs[it], 
-      opinions: @[(options.topics[0], opinions[it])].toTable,  # temporal implementation
-      neighbors: graph[it.toId],
+      id: it, 
+      belief: options.beliefs.getOrDefault(it, rand(1, 255).toBin(1 shl atomicProps).toFormula), 
+      opinions: options.opinions.getOrDefault(it, initializeOpinionsRandomly(options.topics)),
+      neighbors: options.network[it],
       filterStrategy: options.filter,
       updatingStrategy: options.update,
       rewritingStrategy: options.rewriting,
@@ -76,5 +79,5 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
     agents: allAgents, 
     topics: options.topics,
     verbose: options.verbose,
-    followFrom: allAgents.generateFollowFrom(options.follow),
+    followFrom: allAgents.generateFollowFrom(),
   )

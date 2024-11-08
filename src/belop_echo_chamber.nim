@@ -12,7 +12,6 @@ let parsedOptions = parseArguments()
 initRand(parsedOptions.seed)
 initLogger(parsedOptions.dir, parsedOptions.verbose)
 var simulator = initilizeSimulator(parsedOptions)
-parsedOptions.saveAsToml(simulator.topics)
 
 simulator = simulator.performPrehoc(parsedOptions.prehoc)
 simulator.log(0)
