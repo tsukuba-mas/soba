@@ -13,8 +13,10 @@ proc performInteractions(agent: Agent, messages: seq[Message], topic: Formulae, 
   var newAgent = agent
   for strategy in agent.updatingStrategy:
     newAgent = case strategy
-    of UpdatingStrategy.od:
-      newAgent.opinionDynamics(messages, tick)
+    of UpdatingStrategy.oddw:
+      newAgent.opinionDynamicsDWmodel(messages, tick)
+    of UpdatingStrategy.oddg:
+      newAgent.opinionDynamicsDeGrootmodel(messages, tick)
     of UpdatingStrategy.br:
       newAgent.beliefRevisionGames(messages, tick)
     of UpdatingStrategy.ba:
