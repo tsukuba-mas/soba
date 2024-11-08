@@ -29,7 +29,6 @@ proc optionsFromToml(tomlPath: string): CommandLineArgs =
     values: toml["values"].getElems().mapIt(it.getFloat()),
     epsilon: toml["epsilon"].getFloat(),
     delta: toml["delta"].getInt(),
-    atomicProps: 3,
     topic: toml["topic"].getStr().toFormula,
   )
 

@@ -5,6 +5,7 @@ import intbrg
 import strutils
 import sequtils
 import tables
+import interactions/utils
 
 iterator pairs[S, T](xs: seq[S], ys: seq[T]): (S, T) =
   ## Yield all of the element of Cartesian product.
@@ -49,7 +50,7 @@ proc generateFollowFrom(agents: seq[Agent], follows: int): seq[Id] =
 proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   ## Returns simulator initialized with `options`.
   let agents = options.n
-  let atomicProps = options.atomicProps
+  let atomicProps = options.values.getNumberOfAtomicProps()
   let initialBeliefs = (0..<agents).toSeq.mapIt(rand(1, 255).toBin(1 shl atomicProps).toFormula)
   let graph = randomGraphGenerator(agents, options.follow)
   let opinions = (0..<agents).toSeq.mapIt(rand(0.0, 1.0))

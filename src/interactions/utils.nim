@@ -50,3 +50,17 @@ proc evaluateMessages*(agent: Agent, messages: seq[Message]): EvaluatedMessages 
     acceptables: agent.getAcceptableMessages(messages),
     unacceptables: agent.getUnacceptableMessages(messages)
   )
+
+proc isPowerOfTwo(val: int): bool = 
+  val != 0 and (val and (val - 1)) == 0
+
+proc getNumberOfAtomicProps*[T](values: seq[T]): int =
+  ## Return the number of atomic propositions.
+  ## It is assumed that len(values) == 2^n where n is the number.
+  assert values.len.isPowerOfTwo
+  let interpretations = values.len
+  var atomicProps = 1
+  while true:
+    if interpretations == (1 shl atomicProps):
+      return atomicProps
+    atomicProps += 1

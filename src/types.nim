@@ -64,7 +64,6 @@ type CommandLineArgs* = object
   values*: seq[float]
   epsilon*: float
   delta*: int
-  atomicProps*: int
   topic*: Formulae
 
 type EvaluatedMessages* = object
