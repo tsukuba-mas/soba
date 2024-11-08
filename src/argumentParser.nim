@@ -29,7 +29,7 @@ proc optionsFromToml(tomlPath: string): CommandLineArgs =
     values: toml["values"].getElems().mapIt(it.getFloat()),
     epsilon: toml["epsilon"].getFloat(),
     delta: toml["delta"].getInt(),
-    topic: toml["topic"].getStr().toFormula,
+    topics: toml["topic"].getElems().mapIt(it.getStr().toFormula),
   )
 
 proc parseArguments*(): CommandLineArgs =

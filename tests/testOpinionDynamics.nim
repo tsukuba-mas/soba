@@ -2,31 +2,37 @@ import unittest
 
 import interactions/opinionDynamics
 import types 
+import intbrg
+import tables
 
 suite "Opinion Dynamics (DeGroot model)":
+  let topic = toFormula("0")
+
   test "Opinions do not update if empty list is given":
     let opinion = 0.5
-    let agent = Agent(opinion: opinion)
-    check agent.opinionDynamicsDeGrootmodel(@[], 0).opinion == opinion
+    let agent = Agent(opinions: @[(topic, opinion)].toTable)
+    check agent.opinionDynamicsDeGrootmodel(@[topic], @[], 0).opinions[topic] == opinion
   
   test "Opinions will be updated based on other opinions":
     let op1 = 0.5
     let op2 = 0.1
     let op3 = 0.2
 
-    let agent = Agent(opinion: op1)
+    let agent = Agent(opinions: @[(topic, op1)].toTable)
     let others = @[
-      Message(opinion: op2),
-      Message(opinion: op3),
+      Message(opinions: @[(topic, op2)].toTable),
+      Message(opinions: @[(topic, op3)].toTable),
     ]
     let expected = (op1 + op2 + op3) / 3.0
-    check agent.opinionDynamicsDeGrootmodel(others, 0).opinion == expected
+    check agent.opinionDynamicsDeGrootmodel(@[topic], others, 0).opinions[topic] == expected
 
 suite "Opinion Dynamics (DW model)":
+  let topic = toFormula("0")
+
   test "Opinions do not update if empty list is given":
     let opinion = 0.5
-    let agent = Agent(opinion: opinion)
-    check agent.opinionDynamicsDWmodel(@[], 0).opinion == opinion
+    let agent = Agent(opinions: @[(topic, opinion)].toTable)
+    check agent.opinionDynamicsDWmodel(@[topic], @[], 0).opinions[topic] == opinion
   
   test "Opinions will be updated based on other opinions":
     let mu = 0.25
@@ -34,10 +40,10 @@ suite "Opinion Dynamics (DW model)":
     let op2 = 0.1
     let op3 = 0.2
 
-    let agent = Agent(opinion: op1, mu: mu)
+    let agent = Agent(opinions: @[(topic, op1)].toTable, mu: mu)
     let others = @[
-      Message(opinion: op2),
-      Message(opinion: op3),
+      Message(opinions: @[(topic, op2)].toTable),
+      Message(opinions: @[(topic, op3)].toTable),
     ]
     let expected = (1.0 - mu) * op1 + mu * (op2 + op3) / 2.0
-    check agent.opinionDynamicsDWmodel(others, 0).opinion == expected
+    check agent.opinionDynamicsDWmodel(@[topic], others, 0).opinions[topic] == expected

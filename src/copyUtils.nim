@@ -1,12 +1,13 @@
 import types
 import intbrg
 import sets
+import tables
 
 proc copy(simulator: Simulator): Simulator =
   ## Copy `simulator` explicitly.
   Simulator(
     agents: simulator.agents,
-    topic: simulator.topic,
+    topics: simulator.topics,
     verbose: simulator.verbose,
     followFrom: simulator.followFrom,
   )
@@ -16,7 +17,7 @@ proc copy(agent: Agent): Agent =
   Agent(
     id: agent.id,
     belief: agent.belief,
-    opinion: agent.opinion,
+    opinions: agent.opinions,
     neighbors: agent.neighbors,
     filterStrategy: agent.filterStrategy,
     updatingStrategy: agent.updatingStrategy,
@@ -30,10 +31,10 @@ proc copy(agent: Agent): Agent =
     delta: agent.delta,
   )
 
-proc updateOpinion*(agent: Agent, opinion: Opinion): Agent =
-  ## Returns `agent` whose opinion is replaecd to `opinion`.
+proc updateOpinion*(agent: Agent, opinions: Table[Formulae, Opinion]): Agent =
+  ## Returns `agent` whose opinion is replaecd to `opinions`.
   var newAgent = agent.copy()
-  newAgent.opinion = opinion
+  newAgent.opinions = opinions
   newAgent
 
 proc updateBelief*(agent: Agent, belief: Formulae): Agent =

@@ -64,7 +64,7 @@ proc verboseLogger*(content: string, tick: int) =
       $tick & "," & content
     )
 
-proc saveAsToml*(options: CommandLineArgs, topic: Formulae) =
+proc saveAsToml*(options: CommandLineArgs, topics: seq[Formulae]) =
   ## Output the parsed options as TOML file.
   let updatingStrategyInTomlList = "\"" & options.update.mapIt($it).join("\", \"") & "\""
   let toml = fmt"""
@@ -84,7 +84,7 @@ activation = {options.activationProb}
 values = [{options.values.mapIt($it).join(",")}]
 epsilon = {options.epsilon}
 delta = {options.delta}
-topic = "{topic}"
+topics = "{topics}"
 """
   var f = open(dirname & "/input.toml", fmWrite)
   defer:
@@ -94,7 +94,7 @@ topic = "{topic}"
 proc log*(simulator: Simulator, tick: int) =
   ## Output current opinions, beliefs and network structure.
   let beliefs = simulator.agents.mapIt($(it.belief)).join(",")
-  let opinions = simulator.agents.mapIt($(it.opinion)).join(",")
+  let opinions = simulator.agents.mapIt($(it.opinions)).join(",")
   getBeliefHistPath().appendToFile($tick & "," & beliefs)
   getOpinionHistPath().appendToFile($tick & "," & opinions)
   simulator.graphLogger(tick)

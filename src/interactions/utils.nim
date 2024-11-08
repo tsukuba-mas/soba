@@ -29,7 +29,7 @@ proc writeMessage*(agent: Agent): Message =
   Message(
     author: agent.id,
     belief: agent.belief,
-    opinion: agent.opinion,
+    opinions: agent.opinions,
   )
 
 proc writeMessage*(agents: seq[Agent]): seq[Message] =

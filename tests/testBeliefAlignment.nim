@@ -58,40 +58,52 @@ suite "Belief Alignment (Random choose)":
     check values.getNumberOfAtomicProps() == 2
   
   test "generate cache":
-    generateOpinionToBeliefCache(topic, values)
+    generateOpinionToBeliefCache(@[topic], values)
     let possibleOpinions = opinion2beliefCache.keys.toSeq
     let expected = @[0.0, 0.05, 0.1, 0.4, 0.475, 0.55]
     check possibleOpinions.len == expected.len
-    check expected.allIt(possibleOpinions.contains(it))
+    check expected.allIt(possibleOpinions.contains(@[(topic, it)].toTable))
 
   test "belief alignment for already coherent agent":
-    let agent = Agent(opinion: 0.05, belief: toFormula("1101"))
-    check agent.beliefAlignment(topic, 0, UpdatingStrategy.barc).belief == toFormula("1101")
+    let agent = Agent(
+      opinions: @[(topic, 0.05)].toTable, 
+      belief: toFormula("1101")
+    )
+    check agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc).belief == toFormula("1101")
   
   test "belief alignment without distance sorting and random choice":
-    let agent = Agent(opinion: 0.5, belief: toFormula("1111"))
-    check agent.beliefAlignment(topic, 0, UpdatingStrategy.barc).belief == toFormula("0011")
+    let agent = Agent(
+      opinions: @[(topic, 0.5)].toTable,
+      belief: toFormula("1111")
+    )
+    check agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc).belief == toFormula("0011")
   
   test "belief alignment with sorting with distance sorting and without random choice":
-    let agent = Agent(opinion: 0.4375, belief: toFormula("0010"))
-    check agent.beliefAlignment(topic, 0, UpdatingStrategy.barc).belief == toFormula("0010")
+    let agent = Agent(
+      opinions: @[(topic, 0.4375)].toTable, 
+      belief: toFormula("0010")
+    )
+    check agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc).belief == toFormula("0010")
   
   test "belief alignment with sorting with distance sorting and random choice":
-    let agent = Agent(opinion: 0.03, belief: toFormula("1101"))
+    let agent = Agent(
+      opinions: @[(topic, 0.03)].toTable, 
+      belief: toFormula("1101")
+    )
 
     # To make defining test easily, use another values
     let v2 = @[0.5, 0.5, 0.0, 0.0]
     opinion2beliefCache.clear()
-    generateOpinionToBeliefCache(topic, v2)
+    generateOpinionToBeliefCache(@[topic], v2)
 
-    let alignedBelief = agent.beliefAlignment(topic, 0, UpdatingStrategy.barc).belief 
+    let alignedBelief = agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc).belief 
     check alignedBelief == toFormula("0001") or alignedBelief == toFormula("0011")
     
 suite "Belief Alignment (deterministic choice with respect to values)":
   let values = @[0.0, 0.1, 0.8, 1.0]
   let topic = toFormula("1100")
   initRand(42)
-  generateOpinionToBeliefCache(topic, values)
+  generateOpinionToBeliefCache(@[topic], values)
 
   test "choose the best one wrt values":
     let b1 = toFormula("1100")
@@ -102,9 +114,17 @@ suite "Belief Alignment (deterministic choice with respect to values)":
     check @[b3, b2, b1].chooseBest(values) == b3
 
   test "belief alignment for already coherent agent":
-    let agent1 = Agent(opinion: 0.05, belief: toFormula("1101"), values: values)
-    check agent1.beliefAlignment(topic, 0, UpdatingStrategy.bavm).belief == toFormula("1111")
-    let agent2 = Agent(opinion: 0.05, belief: toFormula("1111"), values: values)
-    check agent2.beliefAlignment(topic, 0, UpdatingStrategy.bavm).belief == toFormula("1111")
+    let agent1 = Agent(
+      opinions: @[(topic, 0.05)].toTable, 
+      belief: toFormula("1101"), 
+      values: values
+    )
+    check agent1.beliefAlignment(@[topic], 0, UpdatingStrategy.bavm).belief == toFormula("1111")
+    let agent2 = Agent(
+      opinions: @[(topic, 0.05)].toTable, 
+      belief: toFormula("1111"), 
+      values: values
+    )
+    check agent2.beliefAlignment(@[topic], 0, UpdatingStrategy.bavm).belief == toFormula("1111")
 
     

@@ -7,25 +7,25 @@ import relaxDissonance
 import intbrg
 import tables
 
-proc doOnestep(agent: Agent, strategy: UpdatingStrategy, messages: seq[Message], topic: Formulae, tick: int): Agent =
+proc doOnestep(agent: Agent, strategy: UpdatingStrategy, messages: seq[Message], topics: seq[Formulae], tick: int): Agent =
   case strategy
   of UpdatingStrategy.oddw:
-    agent.opinionDynamicsDWmodel(messages, tick)
+    agent.opinionDynamicsDWmodel(topics, messages, tick)
   of UpdatingStrategy.oddg:
-    agent.opinionDynamicsDeGrootmodel(messages, tick)
+    agent.opinionDynamicsDeGrootmodel(topics, messages, tick)
   of UpdatingStrategy.br:
     agent.beliefRevisionGames(messages, tick)
   of UpdatingStrategy.bavm, UpdatingStrategy.barc:
-    agent.beliefAlignment(topic, tick, strategy)
+    agent.beliefAlignment(topics, tick, strategy)
   of UpdatingStrategy.`of`:
-    agent.opinionFormation(topic, tick)
+    agent.opinionFormation(topics, tick)
 
-proc performInteractions(agent: Agent, messages: seq[Message], topic: Formulae, tick: int): Agent =
+proc performInteractions(agent: Agent, messages: seq[Message], topics: seq[Formulae], tick: int): Agent =
   ## Perform the four procedures (od, br, ba, of) following to the array of updating strategy.
   ## The execution order will be the same with the order in the array.
   var newAgent = agent
   for strategy in agent.updatingStrategy:
-    newAgent = newAgent.doOnestep(strategy, messages, topic, tick)
+    newAgent = newAgent.doOnestep(strategy, messages, topics, tick)
   return newAgent
 
 proc isInternalProcess(strategy: UpdatingStrategy): bool = 
@@ -35,7 +35,7 @@ proc isInternalProcess(strategy: UpdatingStrategy): bool =
   else:
     false
 
-proc performPrehoc(agent: Agent, prehocs: seq[UpdatingStrategy], topic: Formulae): Agent =
+proc performPrehoc(agent: Agent, prehocs: seq[UpdatingStrategy], topics: seq[Formulae]): Agent =
   ## Perform the four procedures (ba or of) following to the array of updating strategy.
   ## The execution order will be the same with the order in the array.
   ## **Note that only internal processes are allowed in this procedure.**
@@ -43,11 +43,11 @@ proc performPrehoc(agent: Agent, prehocs: seq[UpdatingStrategy], topic: Formulae
   var newAgent = agent
   for strategy in prehocs:
     if strategy.isInternalProcess():
-      newAgent = newAgent.doOnestep(strategy, @[], topic, 0)
+      newAgent = newAgent.doOnestep(strategy, @[], topics, 0)
   return newAgent
 
 proc performPrehoc*(simulator: Simulator, prehocs: seq[UpdatingStrategy]): Simulator = 
-  let newAgents = simulator.agents.mapIt(it.performPrehoc(prehocs, simulator.topic))
+  let newAgents = simulator.agents.mapIt(it.performPrehoc(prehocs, simulator.topics))
   simulator.updateAgents(newAgents)
 
 proc performInteractions*(simulator: Simulator, id2evaluatedMessages: Table[Id, EvaluatedMessages], tick: int): Simulator =
@@ -58,7 +58,7 @@ proc performInteractions*(simulator: Simulator, id2evaluatedMessages: Table[Id, 
     if id2evaluatedMessages.contains(it.id):
       # for od and br, use acceptable messages only.
       let acceptableMessages = id2evaluatedMessages[it.id].acceptables
-      performInteractions(it, acceptableMessages, simulator.topic, tick)
+      performInteractions(it, acceptableMessages, simulator.topics, tick)
     else:
       it
   )

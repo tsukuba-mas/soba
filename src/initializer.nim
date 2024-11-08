@@ -58,7 +58,7 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
     Agent(
       id: it.toId, 
       belief: initialBeliefs[it], 
-      opinion: opinions[it],
+      opinions: @[(options.topics[0], opinions[it])].toTable,  # temporal implementation
       neighbors: graph[it.toId],
       filterStrategy: options.filter,
       updatingStrategy: options.update,
@@ -74,7 +74,7 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   )
   Simulator(
     agents: allAgents, 
-    topic: options.topic,
+    topics: options.topics,
     verbose: options.verbose,
     followFrom: allAgents.generateFollowFrom(options.follow),
   )

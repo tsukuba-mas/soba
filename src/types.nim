@@ -1,6 +1,7 @@
 import intbrg
 import sets
 import hashes
+import tables
 
 type Opinion* = float
 
@@ -22,7 +23,7 @@ proc toId*(x: int): Id = Id(x)
 type Agent* = object
   id*: Id
   belief*: Formulae
-  opinion*: Opinion
+  opinions*: Table[Formulae, Opinion]
   neighbors*: HashSet[Id]
   filterStrategy*: FilterStrategy
   updatingStrategy*: seq[UpdatingStrategy]
@@ -38,11 +39,11 @@ type Agent* = object
 type Message* = object
   author*: Id
   belief*: Formulae
-  opinion*: Opinion
+  opinions*: Table[Formulae, Opinion]
 
 type Simulator* = object
   agents*: seq[Agent]
-  topic*: Formulae
+  topics*: seq[Formulae]
   verbose*: bool
   followFrom*: seq[Id]
 
@@ -64,7 +65,7 @@ type CommandLineArgs* = object
   values*: seq[float]
   epsilon*: float
   delta*: int
-  topic*: Formulae
+  topics*: seq[Formulae]
 
 type EvaluatedMessages* = object
   acceptables*: seq[Message]
