@@ -55,6 +55,7 @@ type CommandLineArgs* = object
   filter*: FilterStrategy
   update*: seq[UpdatingStrategy]
   rewriting*: RewritingStrategy
+  prehoc*: seq[UpdatingStrategy]
   verbose*: bool
   mu*: float
   alpha*: float

@@ -126,11 +126,3 @@ proc beliefAlignment*(agent: Agent, topic: Formulae, tick: int, strategy: Updati
     tick
   )
   agent.updateBelief(updatedBelief)
-
-proc makeOpinionsAndBeliefsCoherent*(simulator: Simulator): Simulator =
-  ## Make opinions and beliefs are coherent for all agents.
-  ## Here, agents perform just belief alignment.
-  generateOpinionToBeliefCache(simulator.topic, simulator.agents[0].values)
-  simulator.updateAgents(
-    simulator.agents.mapIt(it.beliefAlignment(simulator.topic, 0, UpdatingStrategy.barc))
-  )

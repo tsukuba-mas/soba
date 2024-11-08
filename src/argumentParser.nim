@@ -5,6 +5,9 @@ import parsetoml
 import intbrg
 import os
 
+proc parseToSeqOfUpdatingStrategy(toml: TomlValueRef): seq[UpdatingStrategy] =
+  toml.getElems().mapIt(parseEnum[UpdatingStrategy](it.getStr()))
+
 proc optionsFromToml(tomlPath: string): CommandLineArgs =
   ## Parse given toml file and return the result.
   let toml = parseFile(tomlPath)
@@ -15,8 +18,9 @@ proc optionsFromToml(tomlPath: string): CommandLineArgs =
     follow: toml["follow"].getInt(),
     tick: toml["tick"].getInt(),
     filter: parseEnum[FilterStrategy](toml["filter"].getStr()),
-    update: toml["updating"].getElems().mapIt(parseEnum[UpdatingStrategy](it.getStr())),
+    update: toml["updating"].parseToSeqOfUpdatingStrategy(),
     rewriting: parseEnum[RewritingStrategy](toml["rewriting"].getStr()),
+    prehoc: toml["prehoc"].parseToSeqOfUpdatingStrategy(),
     verbose: toml["verbose"].getBool(),
     mu: toml["mu"].getFloat(),
     alpha: toml["alpha"].getFloat(),

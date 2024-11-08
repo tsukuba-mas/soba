@@ -3,7 +3,6 @@ import types
 import interactions/chooseTargets
 import interactions/recommendation
 import interactions/interactions
-import interactions/relaxDissonance
 import interactions/messageReceiver
 import randomUtils
 import logger
@@ -12,9 +11,10 @@ import argumentParser
 let parsedOptions = parseArguments()
 initRand(parsedOptions.seed)
 initLogger(parsedOptions.dir, parsedOptions.verbose)
-var simulator = initilizeSimulator(parsedOptions).makeOpinionsAndBeliefsCoherent()
+var simulator = initilizeSimulator(parsedOptions)
 parsedOptions.saveAsToml(simulator.topic)
 
+simulator = simulator.performPrehoc(parsedOptions.prehoc)
 simulator.log(0)
 for time in 1..parsedOptions.tick:
   # Interactions
