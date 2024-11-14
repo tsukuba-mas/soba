@@ -63,7 +63,6 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
       belief: options.beliefs.getOrDefault(it, rand(1, 255).toBin(1 shl atomicProps).toFormula), 
       opinions: options.opinions.getOrDefault(it, initializeOpinionsRandomly(options.topics)),
       neighbors: options.network[it],
-      filterStrategy: options.filter,
       updatingStrategy: options.update,
       rewritingStrategy: options.rewriting,
       mu: options.mu,

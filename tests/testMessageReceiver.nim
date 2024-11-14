@@ -12,7 +12,6 @@ proc simulatorInitializer(
   eps: float, 
   delta: int,
   neighbors: seq[HashSet[Id]],
-  fs: FilterStrategy,
   topic: Formulae,
 ): Simulator =
   assert ops.len == bels.len
@@ -27,7 +26,6 @@ proc simulatorInitializer(
         neighbors: neighbors[i],
         epsilon: eps,
         delta: delta,
-        filterStrategy: fs,
       )
     )
   return sim
@@ -60,8 +58,8 @@ suite "Message Receiver":
     )
   ]
 
-  test "no filtering":
-    let simulator = simulatorInitializer(ops, bels, 1.0, 4, neighbors, FilterStrategy.all, topic)
+  test "no filtering (i.e., all messages are acceptable)":
+    let simulator = simulatorInitializer(ops, bels, 1.0, 8, neighbors, topic)
     let id2msg = simulator.receiveMessages(activated)
 
     for idx in 0..<ops.len:
@@ -78,7 +76,7 @@ suite "Message Receiver":
         check message.unacceptables.len == 0
   
   test "filtering based on opinions":
-    let simulator = simulatorInitializer(ops, bels, 0.2, 4, neighbors, FilterStrategy.obounded, topic)
+    let simulator = simulatorInitializer(ops, bels, 0.2, 8, neighbors, topic)
     let id2msg = simulator.receiveMessages(activated)
 
     block agent0:
@@ -104,7 +102,7 @@ suite "Message Receiver":
       check message.unacceptables.contains(expecteds[1])
 
   test "filtering based on beliefs":
-    let simulator = simulatorInitializer(ops, bels, 1.0, 2, neighbors, FilterStrategy.bbounded, topic)
+    let simulator = simulatorInitializer(ops, bels, 1.0, 2, neighbors, topic)
     let id2msg = simulator.receiveMessages(activated)
 
     block agent0:
@@ -130,7 +128,7 @@ suite "Message Receiver":
       check message.unacceptables.contains(expecteds[1])
 
   test "both filtering":
-    let simulator = simulatorInitializer(ops, bels, 0.2, 1, neighbors, FilterStrategy.both, topic)
+    let simulator = simulatorInitializer(ops, bels, 0.2, 1, neighbors, topic)
     let id2msg = simulator.receiveMessages(activated)
 
     for idx in 0..<ops.len:

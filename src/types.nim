@@ -5,9 +5,6 @@ import tables
 
 type Opinion* = float
 
-type FilterStrategy* {.pure.} = enum
-  all, obounded, bbounded, both
-
 type UpdatingStrategy* {.pure.} = enum
   oddw = "oddw", oddg = "oddg", br = "br", `of` = "of", barc = "barc", bavm = "bavm"
 
@@ -25,7 +22,6 @@ type Agent* = object
   belief*: Formulae
   opinions*: Table[Formulae, Opinion]
   neighbors*: HashSet[Id]
-  filterStrategy*: FilterStrategy
   updatingStrategy*: seq[UpdatingStrategy]
   rewritingStrategy*: RewritingStrategy
   values*: seq[float]
@@ -52,7 +48,6 @@ type CommandLineArgs* = object
   dir*: string
   n*: int
   tick*: int
-  filter*: FilterStrategy
   update*: seq[UpdatingStrategy]
   rewriting*: RewritingStrategy
   prehoc*: seq[UpdatingStrategy]

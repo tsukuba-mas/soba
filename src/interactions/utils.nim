@@ -5,16 +5,7 @@ import intbrg
 
 proc isAcceptablePost*(agent: Agent, post: Message): bool =
   ## Return `true` iff `post` is acceptable for `agent`.
-  result = 
-    case agent.filterStrategy
-    of FilterStrategy.all:
-      true
-    of FilterStrategy.obounded:
-      agent.hasSimilarOpinion(post)
-    of FilterStrategy.bbounded:
-      agent.hasSimilarBelief(post)
-    of FilterStrategy.both:
-      agent.hasSimilarOpinion(post) and agent.hasSimilarBelief(post)
+  agent.hasSimilarOpinion(post) and agent.hasSimilarBelief(post)
 
 proc revision*(self: Formulae, others: seq[Formulae]): Formulae = 
   ## Returns the formulae which merge `self` and `others`.

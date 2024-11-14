@@ -19,7 +19,6 @@ proc copy(agent: Agent): Agent =
     belief: agent.belief,
     opinions: agent.opinions,
     neighbors: agent.neighbors,
-    filterStrategy: agent.filterStrategy,
     updatingStrategy: agent.updatingStrategy,
     rewritingStrategy: agent.rewritingStrategy,
     values: agent.values,
