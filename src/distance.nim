@@ -5,10 +5,10 @@ import tables
 import math
 
 proc distance*(x, y: Table[Formulae, Opinion]): float =
-  ## Returns the Euclidian distance between two opinions `x` and `y`.
+  ## Returns the Manhattan distance between two opinions `x` and `y`.
   assert x.keys.toSeq == y.keys.toSeq
   let topics = x.keys.toSeq
-  topics.mapIt(pow(x[it] - y[it], 2)).sum().sqrt()
+  topics.mapIt(abs(x[it] - y[it])).sum()
 
 proc distance*(x, y: Formulae): int =
   ## Returns the Hamming distance between two beliefs `x` and `y`.
