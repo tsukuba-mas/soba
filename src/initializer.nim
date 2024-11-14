@@ -55,7 +55,7 @@ proc initializeOpinionsRandomly(topics: seq[Formulae]): Table[Formulae, Opinion]
 proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   ## Returns simulator initialized with `options`.
   let agents = options.n
-  let atomicProps = options.values.getNumberOfAtomicProps()
+  let atomicProps = options.values[Id(0)].getNumberOfAtomicProps()
   let allIds = (0..<agents).toSeq.map(toId)
   let allAgents = allIds.mapIt(
     Agent(
@@ -70,7 +70,7 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
       alpha: options.alpha,
       unfollowProb: options.unfollowProb,
       activationProb: options.activationProb,
-      values: options.values,
+      values: options.values[it],
       epsilon: options.epsilon,
       delta: options.delta,
     )

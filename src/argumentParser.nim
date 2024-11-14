@@ -59,6 +59,19 @@ proc parseOpinionJson(rawJson: string, agents: int, topics: seq[Formulae]): Tabl
       continue
     result[Id(parseInt(id))] = zip(topics, json[id].getElems()).mapIt((it[0], it[1].getFloat)).toTable
 
+proc parseValuesJson(rawJson: string, agents: int): Table[Id, seq[float]] =
+  let json = parseJson(rawJson)
+  const wildcard = "-1"
+  # -1 is "for all agents..."
+  if json.hasKey(wildcard):
+    for id in 0..<agents:
+      result[Id(id)] = json[wildcard].getElems().mapIt(it.getFloat)
+  
+  for id in json.keys:
+    if id == wildcard:
+      continue
+    result[Id(parseInt(id))] = json[id].getElems().mapIt(it.getFloat)
+
 proc parseNetworkJson(rawJson: string, agents: int): Table[Id, HashSet[Id]] =
   let json = parseJson(rawJson)
   result = initTable[Id, HashSet[Id]]()
@@ -83,7 +96,7 @@ proc parseArguments*(): CommandLineArgs =
     alpha: spec.alpha.value,
     unfollowProb: spec.pUnfollow.value,
     activationProb: spec.pActive.value,
-    values: spec.values.value.split(",").map(parseFloat),
+    values: spec.values.value.parseValuesJson(n),
     epsilon: spec.epsilon.value,
     delta: spec.delta.value,
     topics: topics,

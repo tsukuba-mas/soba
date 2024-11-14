@@ -61,7 +61,7 @@ type CommandLineArgs* = object
   alpha*: float
   unfollowProb*: float
   activationProb*: float
-  values*: seq[float]
+  values*: Table[Id, seq[float]]
   epsilon*: float
   delta*: int
   topics*: seq[Formulae]
