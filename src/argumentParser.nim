@@ -33,44 +33,30 @@ let spec = (
 )
 spec.parseOrQuit()
 
-proc parseBeliefJson(rawJson: string, agents: int): Table[Id, Formulae] =
+proc parseJson[T](rawJson: string, agents: int, convert: proc(x: JsonNode): T): Table[Id, T] =
   let json = parseJson(rawJson)
   const wildcard = "-1"
   # -1 is "for all agents..."
   if json.hasKey(wildcard):
     for id in 0..<agents:
-      result[Id(id)] = json[wildcard].getStr().toFormula
+      result[Id(id)] = json[wildcard].convert()
   
   for id in json.keys:
     if id == wildcard:
       continue
-    result[Id(parseInt(id))] = json[id].getStr().toFormula
+    result[Id(parseInt(id))] = json[id].convert()
+
+proc parseBeliefJson(rawJson: string, agents: int): Table[Id, Formulae] =
+  parseJson(rawJson, agents, proc (x: JsonNode): Formulae = x.getStr().toFormula)
 
 proc parseOpinionJson(rawJson: string, agents: int, topics: seq[Formulae]): Table[Id, Table[Formulae, Opinion]] =
-  let json = parseJson(rawJson)
-  const wildcard = "-1"
-  # -1 is "for all agents..."
-  if json.hasKey(wildcard):
-    for id in 0..<agents:
-      result[Id(id)] = zip(topics, json[wildcard].getElems()).mapIt((it[0], it[1].getFloat)).toTable
+  let convert = proc (ops: JsonNode): Table[Formulae, Opinion] =
+    zip(topics, ops.getElems()).mapIt((it[0], it[1].getFloat)).toTable
   
-  for id in json.keys:
-    if id == wildcard:
-      continue
-    result[Id(parseInt(id))] = zip(topics, json[id].getElems()).mapIt((it[0], it[1].getFloat)).toTable
+  parseJson(rawJson, agents, convert)
 
 proc parseValuesJson(rawJson: string, agents: int): Table[Id, seq[float]] =
-  let json = parseJson(rawJson)
-  const wildcard = "-1"
-  # -1 is "for all agents..."
-  if json.hasKey(wildcard):
-    for id in 0..<agents:
-      result[Id(id)] = json[wildcard].getElems().mapIt(it.getFloat)
-  
-  for id in json.keys:
-    if id == wildcard:
-      continue
-    result[Id(parseInt(id))] = json[id].getElems().mapIt(it.getFloat)
+  parseJson(rawJson, agents, proc (x: JsonNode): seq[float] = x.getElems().mapIt(it.getFloat))
 
 proc parseNetworkJson(rawJson: string, agents: int): Table[Id, HashSet[Id]] =
   let json = parseJson(rawJson)
