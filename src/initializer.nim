@@ -1,35 +1,9 @@
 import types
-import randomUtils
 import sets
 import intbrg
-import strutils
+import strformat
 import sequtils
 import tables
-import interactions/utils
-
-iterator pairs[S, T](xs: seq[S], ys: seq[T]): (S, T) =
-  ## Yield all of the element of Cartesian product.
-  ## The difference between this and the standard `algorithm.product` is that 
-  ## this is an iterator.
-  for x in xs:
-    for y in ys:
-      yield (x, y)
-
-proc randomGraphGenerator(vertices: int, edges: int): Table[Id, HashSet[Id]] =
-  ## Generate random graph with `vertices` nodes and `edges` edges.
-  ## Note that all of the outdegrees of each of the edges are 1 or more.
-  let vs = (0..<vertices).toSeq.map(toId)
-  var allEdges = pairs(vs, vs).toSeq.filterIt(it[0] != it[1]).shuffle()
-  var graph = initTable[Id, HashSet[Id]]()
-  for v in 0..<vertices:
-    graph[v.toId] = initHashSet[Id]()
-  for i in 0..<edges:
-    let (u, v) = allEdges[i]
-    graph[u].incl(v)
-  if graph.keys.toSeq.allIt(graph[it].len > 0):
-    graph
-  else:
-    vertices.randomGraphGenerator(edges)
 
 proc generateFollowFrom(agents: seq[Agent]): seq[Id] =
   ## Returns sequence of the agents corresponding to the network they form.
@@ -46,22 +20,33 @@ proc generateFollowFrom(agents: seq[Agent]): seq[Id] =
       result.add(agent.id)
       idx += 1
   assert(result.allIt(it.int >= 0))
-
-proc initializeOpinionsRandomly(topics: seq[Formulae]): Table[Formulae, Opinion] =
-  result = initTable[Formulae, Opinion]()
-  for topic in topics:
-    result[topic] = rand(0.0, 1.0)
   
 proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   ## Returns simulator initialized with `options`.
   let agents = options.n
-  let atomicProps = options.values[Id(0)].getNumberOfAtomicProps()
+  let atoms = options.atoms
   let allIds = (0..<agents).toSeq.map(toId)
+
+  # Verify everything is specified correctly
+  let models = 1 shl atoms
+  assert options.topics.allIt(($(it)).len == models),
+    fmt"Topics are specified wrong: expected #atoms is {atoms}, given topics is {options.topics}"
+  for id in allIds:
+    assert ($(options.beliefs[id])).len == models,
+      fmt"Agent {id}'s beliefs are specified wrongly: expected #atoms is {atoms} but {options.beliefs[id]}"
+    assert options.opinions[id].len == options.topics.len,
+      fmt"Agent {id}'s opinions are specified wrongly: there are {options.topics.len} topics and {options.opinions[id].len} opinions"
+    assert options.topics.allIt(options.opinions[id].contains(it)),
+      fmt"Agent {id}'s opinions are specified wrongly: topics are {options.topics} but opinions are toward {options.opinions[id].keys.toSeq}"
+    assert options.values[id].len == models,
+      fmt"Agent {id}'s values are specified wrongly: values are length of {options.values[id].len} but expected length is {models}"
+
+  # initialize agents
   let allAgents = allIds.mapIt(
     Agent(
       id: it, 
-      belief: options.beliefs.getOrDefault(it, rand(1, 255).toBin(1 shl atomicProps).toFormula), 
-      opinions: options.opinions.getOrDefault(it, initializeOpinionsRandomly(options.topics)),
+      belief: options.beliefs[it], 
+      opinions: options.opinions[it],
       neighbors: options.network[it],
       updatingStrategy: options.update,
       rewritingStrategy: options.rewriting,

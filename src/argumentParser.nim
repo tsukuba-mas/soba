@@ -109,6 +109,7 @@ proc parseArguments*(): CommandLineArgs =
     seed: spec.seed.value,
     dir: spec.dir.value,
     n: n,
+    atoms: atoms,
     tick: spec.tick.value,
     update: spec.update.value.split(",").mapIt(parseEnum[UpdatingStrategy](it.strip)),
     rewriting: parseEnum[RewritingStrategy](spec.rewrite.value.strip),

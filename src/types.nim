@@ -47,6 +47,7 @@ type CommandLineArgs* = object
   seed*: int
   dir*: string
   n*: int
+  atoms*: int
   tick*: int
   update*: seq[UpdatingStrategy]
   rewriting*: RewritingStrategy
