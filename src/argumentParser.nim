@@ -9,6 +9,7 @@ import tables
 import sets
 import randomUtils
 
+const prolog = "SOBA: Simulator for Opinions-Beliefs interactions between Agents"
 let spec = (
   seed: newIntArg(@["--seed"], "seed", defaultVal=42),
   dir: newStringArg(@["-d", "--dir"], "directory to output files", defaultVal="results/tmp"),
@@ -32,7 +33,7 @@ let spec = (
   topics: newStringArg(@["--topics"], "topics", optional=true),
   help: newHelpArg(@["-h", "--help"], "print help message"),
 )
-spec.parseOrQuit()
+spec.parseOrQuit(prolog)
 
 proc generateBeliefRandomly(atoms: int): Formulae =
   let models = 1 shl atoms
