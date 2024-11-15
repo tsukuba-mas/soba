@@ -8,12 +8,13 @@ proc compare(xs, ys: seq[float]): bool =
 
 suite "Values Json Parser":
   const agents = 5
+  const atoms = 3
   let ids = (0..<agents).mapIt(Id(it))
   
   test "when the key is -1 only":
     let values = (0..<8).toSeq.mapIt(it.toFloat / 7.0)
     let json = """{"-1":[""" & values.mapIt($it).join(",") & """]}"""
-    let actual = json.parseValuesJson(agents)
+    let actual = json.parseValuesJson(agents, atoms)
     let expected = (0..<agents).mapIt((Id(it), values)).toTable
     check ids.allIt(compare(actual[it], expected[it]))
   
@@ -26,7 +27,7 @@ suite "Values Json Parser":
       @[0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48],
     ]
     let json = "{" & (0..<agents).mapIt("\"" & $it & "\":[" & values[it].mapIt($it).join(",") & "]").join(",") & "}"
-    let actual = json.parseValuesJson(agents)
+    let actual = json.parseValuesJson(agents, atoms)
     let expected = (0..<agents).mapIt((Id(it), values[it])).toTable
     check ids.allIt(compare(actual[it], expected[it]))
   
@@ -40,6 +41,6 @@ suite "Values Json Parser":
       @[0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48],
     ]
     let json = "{\"-1\":[" & fixed.mapIt($it).join(",") & "]," & (0..<agents).mapIt("\"" & $it & "\":[" & values[it].mapIt($it).join(",") & "]").join(",") & "}"
-    let actual = json.parseValuesJson(agents)
+    let actual = json.parseValuesJson(agents, atoms)
     let expected = (0..<agents).mapIt((Id(it), values[it])).toTable
     check ids.allIt(compare(actual[it], expected[it]))

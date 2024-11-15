@@ -5,6 +5,16 @@ include argumentParser
 suite "Opinion Json Parser":
   const agents = 5
   const topics = @[toFormula("0"), toFormula("1")]
+  const seed = 42
+  initRand(seed)
+
+  test "if nothing is specified":
+    let actual = "".parseOpinionJson(agents, topics)
+    for idx in 0..<agents:
+      let id = Id(idx)
+      check actual[id].len == topics.len
+      for topic in topics:
+        check 0.0 <= actual[id][topic] and actual[id][topic] <= 1.0
   
   test "when the key is -1 only":
     let opinions = [0.25, 0.75]

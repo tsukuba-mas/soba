@@ -4,12 +4,10 @@ import interactions/chooseTargets
 import interactions/recommendation
 import interactions/interactions
 import interactions/messageReceiver
-import randomUtils
 import logger
 import argumentParser
 
 let parsedOptions = parseArguments()
-initRand(parsedOptions.seed)
 initLogger(parsedOptions.dir, parsedOptions.verbose, parsedOptions.topics.len)
 var simulator = initilizeSimulator(parsedOptions)
 
