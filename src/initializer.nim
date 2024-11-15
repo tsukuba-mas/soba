@@ -48,7 +48,6 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
       belief: options.beliefs[it], 
       opinions: options.opinions[it],
       neighbors: options.network[it],
-      updatingStrategy: options.update,
       rewritingStrategy: options.rewriting,
       mu: options.mu,
       alpha: options.alpha,
@@ -64,4 +63,5 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
     topics: options.topics,
     verbose: options.verbose,
     followFrom: allAgents.generateFollowFrom(),
+    updatingProcesses: options.update,
   )

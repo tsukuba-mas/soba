@@ -22,7 +22,6 @@ type Agent* = object
   belief*: Formulae
   opinions*: Table[Formulae, Opinion]
   neighbors*: HashSet[Id]
-  updatingStrategy*: seq[UpdatingStrategy]
   rewritingStrategy*: RewritingStrategy
   values*: seq[float]
   alpha*: float
@@ -42,6 +41,7 @@ type Simulator* = object
   topics*: seq[Formulae]
   verbose*: bool
   followFrom*: seq[Id]
+  updatingProcesses*: seq[UpdatingStrategy]
 
 type CommandLineArgs* = object
   seed*: int

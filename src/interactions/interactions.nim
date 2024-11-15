@@ -6,6 +6,7 @@ import brg
 import relaxDissonance
 import intbrg
 import tables
+import messageReceiver
 
 proc doOnestep(agent: Agent, strategy: UpdatingStrategy, messages: seq[Message], topics: seq[Formulae], tick: int): Agent =
   case strategy
@@ -19,14 +20,6 @@ proc doOnestep(agent: Agent, strategy: UpdatingStrategy, messages: seq[Message],
     agent.beliefAlignment(topics, tick, strategy)
   of UpdatingStrategy.`of`:
     agent.opinionFormation(topics, tick)
-
-proc performInteractions(agent: Agent, messages: seq[Message], topics: seq[Formulae], tick: int): Agent =
-  ## Perform the four procedures (od, br, ba, of) following to the array of updating strategy.
-  ## The execution order will be the same with the order in the array.
-  var newAgent = agent
-  for strategy in agent.updatingStrategy:
-    newAgent = newAgent.doOnestep(strategy, messages, topics, tick)
-  return newAgent
 
 proc isInternalProcess(strategy: UpdatingStrategy): bool = 
   case strategy
@@ -54,12 +47,16 @@ proc performInteractions*(simulator: Simulator, id2evaluatedMessages: Table[Id, 
   ## Returns the simulator with agents after interactions.
   ## If an agent is activated to perform (possibly some of) the four procedures (od, br, ba, of),
   ## they do them according to their updating strategy. Otherwise, do nothing.
-  let newAgents = simulator.agents.mapIt(
-    if id2evaluatedMessages.contains(it.id):
-      # for od and br, use acceptable messages only.
-      let acceptableMessages = id2evaluatedMessages[it.id].acceptables
-      performInteractions(it, acceptableMessages, simulator.topics, tick)
-    else:
-      it
-  )
-  simulator.updateAgents(newAgents)
+  var newSimulator = simulator.copy()
+  for process in simulator.updatingProcesses:
+    let messages = newSimulator.receiveMessages(id2evaluatedMessages.keys.toSeq)
+    let newAgents = newSimulator.agents.mapIt(
+      if messages.contains(it.id):
+        # for od and br, use acceptable messages only.
+        let acceptableMessages = messages[it.id].acceptables
+        doOnestep(it, process, acceptableMessages, simulator.topics, tick)
+      else:
+        it
+    )
+    newSimulator = newSimulator.updateAgents(newAgents)
+  return newSimulator

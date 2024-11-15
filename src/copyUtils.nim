@@ -3,13 +3,14 @@ import intbrg
 import sets
 import tables
 
-proc copy(simulator: Simulator): Simulator =
+proc copy*(simulator: Simulator): Simulator =
   ## Copy `simulator` explicitly.
   Simulator(
     agents: simulator.agents,
     topics: simulator.topics,
     verbose: simulator.verbose,
     followFrom: simulator.followFrom,
+    updatingProcesses: simulator.updatingProcesses,
   )
 
 proc copy(agent: Agent): Agent =
@@ -19,7 +20,6 @@ proc copy(agent: Agent): Agent =
     belief: agent.belief,
     opinions: agent.opinions,
     neighbors: agent.neighbors,
-    updatingStrategy: agent.updatingStrategy,
     rewritingStrategy: agent.rewritingStrategy,
     values: agent.values,
     mu: agent.mu,
