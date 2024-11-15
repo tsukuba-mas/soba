@@ -100,21 +100,28 @@ proc parseTopics(val: string, atoms: int): seq[Formulae] =
   else:
     val.split(",").map(toFormula)
 
+proc parseAsSeqOfEnum[T: enum](raw: string): seq[T] =
+  if raw == "":
+    @[]
+  else:
+    raw.split(",").mapIt(parseEnum[T](it.strip))
+
 proc parseArguments*(): CommandLineArgs =
   ## Parse command line argument.
   initRand(spec.seed.value)
   let n = spec.nbAgent.value
   let atoms = spec.atoms.value
   let topics = spec.topics.value.parseTopics(atoms)
+  echo spec.prehoc.value.split(",")
   CommandLineArgs(
     seed: spec.seed.value,
     dir: spec.dir.value,
     n: n,
     atoms: atoms,
     tick: spec.tick.value,
-    update: spec.update.value.split(",").mapIt(parseEnum[UpdatingStrategy](it.strip)),
+    update: parseAsSeqOfEnum[UpdatingStrategy](spec.update.value),
     rewriting: parseEnum[RewritingStrategy](spec.rewrite.value.strip),
-    prehoc: spec.prehoc.value.split(",").mapIt(parseEnum[UpdatingStrategy](it.strip)),
+    prehoc: parseAsSeqOfEnum[UpdatingStrategy](spec.prehoc.value),
     verbose: spec.verbose.seen,
     mu: spec.mu.value,
     alpha: spec.alpha.value,
