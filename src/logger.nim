@@ -4,9 +4,9 @@ import sequtils
 import intbrg
 import os
 import sets
+import tables
 
 let beliefHist = "belhist.csv"
-let ophist = "ophist.csv"
 let graphHist = "grhist.csv"
 let verbose = "verbose.txt"
 var dirname = ""
@@ -14,19 +14,20 @@ var isVerbose = false
 
 proc getBeliefHistPath(): string = dirname & "/" & beliefHist
 
-proc getOpinionHistPath(): string = dirname & "/" & ophist
+proc getOpinionHistPath(idx: int): string = dirname & "/" & "ophist" & $idx & ".csv"
 
 proc getGraphHistPath(): string = dirname & "/" & graphHist
 
-proc initLogger*(outputTo: string, isVerboseMode: bool) = 
+proc initLogger*(outputTo: string, isVerboseMode: bool, topics: int) = 
   ## Initialize logger. This procedure should be called before 
   ## logger procedures are called.
   dirname = outputTo
   isVerbose = isVerboseMode
   if getBeliefHistPath().fileExists():
     removeFile(getBeliefHistPath())
-  if getOpinionHistPath().fileExists():
-    removeFile(getOpinionHistPath())
+  for i in 0..<topics:
+    if getOpinionHistPath(i).fileExists():
+      removeFile(getOpinionHistPath(i))
   if getGraphHistPath().fileExists():
     removeFile(getGraphHistPath())
   if dirExists(dirname):
@@ -66,7 +67,8 @@ proc verboseLogger*(content: string, tick: int) =
 proc log*(simulator: Simulator, tick: int) =
   ## Output current opinions, beliefs and network structure.
   let beliefs = simulator.agents.mapIt($(it.belief)).join(",")
-  let opinions = simulator.agents.mapIt($(it.opinions)).join(",")
   getBeliefHistPath().appendToFile($tick & "," & beliefs)
-  getOpinionHistPath().appendToFile($tick & "," & opinions)
+  for idx, topic in simulator.topics:
+    let opinions = simulator.agents.mapIt($(it.opinions[topic])).join(",")
+    getOpinionHistPath(idx).appendToFile($tick & "," & opinions)
   simulator.graphLogger(tick)
