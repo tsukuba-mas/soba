@@ -26,6 +26,10 @@ The number of agents, i.e., $|A|$.
 ### `--tick` (positive integer, default: 100)
 The number of iterations.
 
+### `--atoms` (positive integer, default: 3)
+The number of atomic propositions.
+Strongly recommended to specify this option to check everything (e.g., beliefs) are defined correctly.
+
 ### `--update` (see below, default: oddw)
 Updating strategy.
 Following procedures are defined:
@@ -80,6 +84,8 @@ The key of JSON is the id of agents (**0-origin**), the value corresponding to t
 `-1` can be used as a key to represent the "wild card", i.e., the default configuration for all of the agents.
 If 0-origin id and `-1` appear at the same time, the  configuration corresponds to the former key is used.
 
+If nothing is specified, network is initialized as the complete graph of $|A|$ nodes.
+
 **Example 1**:
 ```json
 {
@@ -110,6 +116,8 @@ idx(I)=\sum_{i=1}^n 2^{n-i}(1-I(p_i))
 $$
 and $I(p)=1$ iff $I\models p$ and $I(p)=0$ otherwise.
 
+If nothing is specified, all of the agents share the same values initialized randomly.
+
 For example, if there are two atomic propositions $p_1$ and $p_2$,
 
 ```json
@@ -129,7 +137,9 @@ They should be specified in JSON: the key is the id of an agent (or `-1` as a wi
 Beliefs should be encoded as a string over `0` and `1` with the length of $|\mathcal M(\top)|$.
 The $idx(I)$-th character of the string corresponding to $B$ is $I(B)$.
 
-if there are two atomic propositions $p_1$ and $p_2$,
+If nothing is specified, beliefs are initialized randomly.
+
+For example, if there are two atomic propositions $p_1$ and $p_2$,
 
 ```json
 {"-1": "1001"}
@@ -141,6 +151,9 @@ means that all of the agents share the same initial beliefs $(p_1\land p_2)\lor 
 Initial opinions.
 They should be specified in JSON: the key is the id of an agent (or `-1` as a wildcard, see `--network`) and the value is the sequence of float of length $|T|$.
 The $i$-th element of the value corresponds to the initial opinion toward $i$-th topic.
+
+If nothing is specified, opinions are initialized randomly.
+
 For example, if topics (see `--topics`) are specified as
 
 ```
@@ -159,6 +172,9 @@ this means that all of the agents share the same initial opinions $0.25$ toward 
 The set of topics.
 Each of the topics should be encoded as a string over `0` and `1` (see `--beliefs`).
 If there are more than one topics, they should be concatnated by `,`.
+
+If nothing is specified, topics are initialized randomly.
+
 For example, 
 
 ```
