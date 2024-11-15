@@ -2,10 +2,10 @@
 
 version       = "0.1.0"
 author        = "Hiro KATAOKA"
-description   = "Echo chamber simulator through opinion-belief interactions"
+description   = "Simulator for Opinions-Beliefs interactions between Agents"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["belop_echo_chamber"]
+bin           = @["soba"]
 
 
 # Dependencies

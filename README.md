@@ -1,6 +1,6 @@
-# belop-echo-chamber
+# SOBA: Simulator for Opinions-Beliefs interactions between Agents
 
-This is the simulator of agent-based models which focus on opinions-beliefs alignments through values.
+This is the simulator of agent-based models which focus on opinions-beliefs interactions through values.
 
 ## Requirements
 [Nim](https://nim-lang.org/) 2.0.0 or later and gcc.
@@ -17,18 +17,18 @@ $ nimble build
 
 Appending the option `-d:release` yields faster binary.
 
-By executing the command above, you can get the binary `belop_echo_chamber`.
+By executing the command above, you can get the binary `soba`.
 This is the simulator.
 Then, launch it with some options:
 
 ```bash
-$ ./belop_echo_chamber --option1 foo --option2 bar etc.
+$ ./soba --option1 foo --option2 bar etc.
 ```
 
 You can see all of the accepted options and their descriptions by:
 
 ```bash
-$ ./belop_echo_chamber --help
+$ ./soba --help
 ```
 
 The output from the simulator will be saved under the directory which is specified in the option `--dir` (or `-d`).
