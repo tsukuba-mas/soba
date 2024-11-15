@@ -1,4 +1,9 @@
 # Accepted Options
+## Note
+Some options have default values.
+However, **it is strongly recommended to specify all of the parameters via command line and not to use the default values**.
+This is useful to understand the conditions of your experiments and reproduce the results.
+
 ## Preliminalies
 To make the descripton simpler, following notations and words are used in the following section:
 
