@@ -112,7 +112,6 @@ proc parseArguments*(): CommandLineArgs =
   let n = spec.nbAgent.value
   let atoms = spec.atoms.value
   let topics = spec.topics.value.parseTopics(atoms)
-  echo spec.prehoc.value.split(",")
   CommandLineArgs(
     seed: spec.seed.value,
     dir: spec.dir.value,
