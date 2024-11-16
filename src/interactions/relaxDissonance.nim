@@ -16,7 +16,7 @@ import nimice
 ## Here, it is assumed that all of the agents share the same cultural values.
 var opinion2beliefCache = initTable[Table[Formulae, Opinion], seq[Formulae]]()
 
-proc getBeliefBasedOpinion(belief: Formulae, values: seq[Rational], topic: Formulae): Opinion =
+proc getBeliefBasedOpinion(belief: Formulae, values: CulturalValues, topic: Formulae): Opinion =
   ## Returns opinion toward `topic` based on `belief`.
   let merged = revision(belief, @[topic])
   zip($merged, values).filterIt(it[0] == '1').mapIt(it[1]).mean()
@@ -54,7 +54,7 @@ proc argmin[T](xs: seq[T], dist: proc (x: T): float | int) : seq[T] =
 proc argmax[T](xs: seq[T], dist: proc (x: T): float | int) : seq[T] =
   argm(xs, dist, false)
 
-proc generateOpinionToBeliefCache(topics: seq[Formulae], values: seq[Rational]) = 
+proc generateOpinionToBeliefCache(topics: seq[Formulae], values: CulturalValues) = 
   ## Generate the cache of opinions to beliefs, i.e., tables from opinions to
   ## beliefs which yields the key (opinion).
   for phi in allFormulae(getNumberOfAtomicProps(values)):
@@ -74,14 +74,14 @@ proc flatten[T](xxs: seq[seq[T]]): seq[T] =
     for x in xs:
       result.add(x)
 
-proc interpretation2preference(values: seq[Rational]): seq[int] =
+proc interpretation2preference(values: CulturalValues): seq[int] =
   let allInterpretations = (0..<values.len).toSeq
   let sortedInterpretations = zip(values, allInterpretations).toSeq.sorted().mapIt(it[1])
   result = newSeqWith(values.len, 0)
   for idx, interpretation in sortedInterpretations:
     result[interpretation] = 1 shl idx
 
-proc chooseBest(candidates: seq[Formulae], values: seq[Rational]): Formulae =
+proc chooseBest(candidates: seq[Formulae], values: CulturalValues): Formulae =
   assert values.toHashSet.len == values.len, "Values should be unique"
   let preferences = values.interpretation2preference()  # i is preferable to j iff preferences[j] < preferences[j]
   let formula2preference = proc (x: Formulae): int = zip($x, preferences).toSeq.filterIt(it[0] == '1').mapIt(it[1]).sum()

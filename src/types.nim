@@ -22,13 +22,15 @@ proc `==`*(x, y: Id): bool {.borrow.}
 proc `$`*(id: Id): string {.borrow.}
 proc toId*(x: int): Id = Id(x)
 
+type CulturalValues* = seq[Rational]
+
 type Agent* = object
   id*: Id
   belief*: Formulae
   opinions*: Table[Formulae, Opinion]
   neighbors*: HashSet[Id]
   rewritingStrategy*: RewritingStrategy
-  values*: seq[Rational]
+  values*: CulturalValues
   alpha*: Rational
   mu*: Rational  # Torelance threshold for opinion dynamics
   unfollowProb*: float
@@ -62,7 +64,7 @@ type CommandLineArgs* = object
   alpha*: Rational
   unfollowProb*: float
   activationProb*: float
-  values*: Table[Id, seq[Rational]]
+  values*: Table[Id, CulturalValues]
   epsilon*: Rational
   delta*: int
   topics*: seq[Formulae]

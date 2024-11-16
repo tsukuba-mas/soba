@@ -86,7 +86,7 @@ proc parseOpinionJson(rawJson: string, agents: int, topics: seq[Formulae]): Tabl
     
     parseJson(rawJson, agents, convert)
 
-proc parseValuesJson(rawJson: string, agents: int, atoms: int): Table[Id, seq[Rational]] =
+proc parseValuesJson(rawJson: string, agents: int, atoms: int): Table[Id, CulturalValues] =
   if rawJson == "":
     # Initialize randomly if nothing is given
     let models = 1 shl atoms
@@ -94,7 +94,7 @@ proc parseValuesJson(rawJson: string, agents: int, atoms: int): Table[Id, seq[Ra
     let values = (0..<models).toSeq.mapIt(toRational(rand(0, ub), ub))
     (0..<agents).toSeq.mapIt((Id(it), values)).toTable
   else:
-    parseJson(rawJson, agents, proc (x: JsonNode): seq[Rational] = x.getElems().mapIt(it.getStr.parseRationals))
+    parseJson(rawJson, agents, proc (x: JsonNode): CulturalValues = x.getElems().mapIt(it.getStr.parseRationals))
 
 proc parseNetworkJson(rawJson: string, agents: int): Table[Id, HashSet[Id]] =
   result = initTable[Id, HashSet[Id]]()
