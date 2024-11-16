@@ -4,25 +4,24 @@ import sequtils
 import ../copyUtils
 import utils
 import intbrg
-import stats
 import options
 import ../logger
 import ../randomUtils
 import strformat
 import tables
 import algorithm
-import math
+import nimice
 
 ## Table which associates opinion to beliefs which yield opinions.
 ## Here, it is assumed that all of the agents share the same cultural values.
 var opinion2beliefCache = initTable[Table[Formulae, Opinion], seq[Formulae]]()
 
-proc getBeliefBasedOpinion(belief: Formulae, values: seq[float], topic: Formulae): float =
+proc getBeliefBasedOpinion(belief: Formulae, values: seq[Rational], topic: Formulae): Opinion =
   ## Returns opinion toward `topic` based on `belief`.
   let merged = revision(belief, @[topic])
   zip($merged, values).filterIt(it[0] == '1').mapIt(it[1]).mean()
 
-proc getBeliefBasedOpinion(agent: Agent, topic: Formulae): float =
+proc getBeliefBasedOpinion(agent: Agent, topic: Formulae): Opinion =
   ## Returns `agent`'s opinion toward `topic`.
   getBeliefBasedOpinion(agent.belief, agent.values, topic)
 
@@ -30,7 +29,15 @@ proc opinionFormation*(agent: Agent, topics: seq[Formulae], tick: int): Agent =
   ## Returns the agent after opinion formation.
   var newOpinion = initTable[Formulae, Opinion]()
   for topic in topics:
-    newOpinion[topic] = agent.opinions[topic] * agent.alpha + (1.0 - agent.alpha) * agent.getBeliefBasedOpinion(topic)
+#    if agent.id.int == 0:
+#      echo agent.alpha
+#      echo agent.opinions[topic]
+#      echo agent.getBeliefBasedOpinion(topic)
+#      echo agent.opinions[topic] * agent.alpha + ( - agent.alpha) * agent.getBeliefBasedOpinion(topic)
+    newOpinion[topic] = agent.opinions[topic] * agent.alpha + (toRational(1, 1) - agent.alpha) * agent.getBeliefBasedOpinion(topic)
+  
+  if agent.id.int == 0:
+    echo newOpinion
   verboseLogger(
     fmt"OF {tick} {agent.id} {agent.opinions} -> {newOpinion}",
     tick
@@ -54,7 +61,7 @@ proc argmin[T](xs: seq[T], dist: proc (x: T): float | int) : seq[T] =
 proc argmax[T](xs: seq[T], dist: proc (x: T): float | int) : seq[T] =
   argm(xs, dist, false)
 
-proc generateOpinionToBeliefCache(topics: seq[Formulae], values: seq[float]) = 
+proc generateOpinionToBeliefCache(topics: seq[Formulae], values: seq[Rational]) = 
   ## Generate the cache of opinions to beliefs, i.e., tables from opinions to
   ## beliefs which yields the key (opinion).
   for phi in allFormulae(getNumberOfAtomicProps(values)):
@@ -67,20 +74,21 @@ proc generateOpinionToBeliefCache(topics: seq[Formulae], values: seq[float]) =
       opinion2beliefCache[opinion].add(phi)
     else:
       opinion2beliefCache[opinion] = @[phi]
+  echo opinion2beliefCache
 
 proc flatten[T](xxs: seq[seq[T]]): seq[T] =
   for xs in xxs:
     for x in xs:
       result.add(x)
 
-proc interpretation2preference(values: seq[float]): seq[int] =
+proc interpretation2preference(values: seq[Rational]): seq[int] =
   let allInterpretations = (0..<values.len).toSeq
   let sortedInterpretations = zip(values, allInterpretations).toSeq.sorted().mapIt(it[1])
   result = newSeqWith(values.len, 0)
   for idx, interpretation in sortedInterpretations:
     result[interpretation] = 1 shl idx
 
-proc chooseBest(candidates: seq[Formulae], values: seq[float]): Formulae =
+proc chooseBest(candidates: seq[Formulae], values: seq[Rational]): Formulae =
   assert values.toHashSet.len == values.len, "Values should be unique"
   let preferences = values.interpretation2preference()  # i is preferable to j iff preferences[j] < preferences[j]
   let formula2preference = proc (x: Formulae): int = zip($x, preferences).toSeq.filterIt(it[0] == '1').mapIt(it[1]).sum()
@@ -100,7 +108,7 @@ proc selectOneBelief(candidates: seq[Formulae], by: Agent, strategy: UpdatingStr
 
 proc beliefAlignment*(agent: Agent, topics: seq[Formulae], tick: int, strategy: UpdatingStrategy): Agent =
   ## Returns agent after belief alignment.
-  var maxError = high(float)
+  var maxError = toRational(high(int), 1)
   var keys: seq[Table[Formulae, Opinion]] = @[]
   
   if opinion2beliefCache.len == 0:

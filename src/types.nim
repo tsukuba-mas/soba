@@ -2,8 +2,13 @@ import intbrg
 import sets
 import hashes
 import tables
+import bigints
+import nimice
 
-type Opinion* = float
+# To avoid comparison and addition/subtraction to floats,
+# represent opinions as rational numbers.
+type Opinion* = Rational
+export `-`, `+`, `*`, `/`, `==`, `+=`, `mod`, `abs`, `div`, `$`
 
 type UpdatingStrategy* {.pure.} = enum
   oddw = "oddw", oddg = "oddg", br = "br", `of` = "of", barc = "barc", bavm = "bavm"
@@ -23,12 +28,12 @@ type Agent* = object
   opinions*: Table[Formulae, Opinion]
   neighbors*: HashSet[Id]
   rewritingStrategy*: RewritingStrategy
-  values*: seq[float]
-  alpha*: float
-  mu*: float  # Torelance threshold for opinion dynamics
+  values*: seq[Rational]
+  alpha*: Rational
+  mu*: Rational  # Torelance threshold for opinion dynamics
   unfollowProb*: float
   activationProb*: float
-  epsilon*: float
+  epsilon*: Rational
   delta*: int
 
 type Message* = object
@@ -53,12 +58,12 @@ type CommandLineArgs* = object
   rewriting*: RewritingStrategy
   prehoc*: seq[UpdatingStrategy]
   verbose*: bool
-  mu*: float
-  alpha*: float
+  mu*: Rational
+  alpha*: Rational
   unfollowProb*: float
   activationProb*: float
-  values*: Table[Id, seq[float]]
-  epsilon*: float
+  values*: Table[Id, seq[Rational]]
+  epsilon*: Rational
   delta*: int
   topics*: seq[Formulae]
   opinions*: Table[Id, Table[Formulae, Opinion]]

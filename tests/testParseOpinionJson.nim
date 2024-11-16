@@ -14,23 +14,44 @@ suite "Opinion Json Parser":
       let id = Id(idx)
       check actual[id].len == topics.len
       for topic in topics:
-        check 0.0 <= actual[id][topic] and actual[id][topic] <= 1.0
+        check toRational(0, 1) <= actual[id][topic]
+        check actual[id][topic] <= toRational(1, 1)
   
   test "when the key is -1 only":
-    let opinions = [0.25, 0.75]
-    let json = """{"-1":""" & $opinions & """}"""
+    let opinions = [toRational(1, 4), toRational(3, 4)]
+    let json = "{\"-1\":[" & opinions.mapIt("\"" & $it & "\"").join(",") & "]}"
     let expected = zip(topics, opinions).toSeq.toTable
     check json.parseOpinionJson(agents, topics) == (0..<agents).mapIt((Id(it), expected)).toTable
   
   test "when all of the values are set":
-    let opinions = @[[0.0, 1.0], [0.25, 0.75], [0.5, 0.5], [0.75, 0.25], [1.0, 0.0]]
-    let json = "{" & (0..<agents).mapIt("\"" & $it & "\":" & $opinions[it]).join(",") & "}"
+    let opinions = @[
+      [toRational(0, 1), toRational(1, 1)], 
+      [toRational(1, 4), toRational(3, 4)], 
+      [toRational(1, 2), toRational(1, 2)], 
+      [toRational(3, 4), toRational(1, 4)], 
+      [toRational(1, 1), toRational(0, 1)],
+    ]
+    var subjson: seq[string] = @[]
+    for idx, opinion in opinions:
+      subjson.add("\"" & $idx & "\":[\"" & opinion.mapIt($it).join("\",\"") & "\"]")
+    let json = "{" & subjson.join(",") & "}"
     let ts = opinions.mapIt(zip(topics, it).toSeq.toTable)
     check json.parseOpinionJson(agents, topics) == (0..<agents).mapIt((Id(it), ts[it])).toTable
   
   test "-1 and agent id appear at the same time":
-    let wildcard = [0.0, 0.0]
-    let opinions = @[[0.0, 1.0], wildcard, [0.5, 0.5], [0.75, 0.25], wildcard]
-    let json = "{" & (0..<agents).mapIt("\"" & $it & "\":" & $opinions[it]).join(",") & "}"
+    let wildcard = [toRational(0, 1), toRational(0, 1)]
+    let opinions = @[
+      [toRational(0, 1), toRational(1, 1)], 
+      wildcard,
+      [toRational(1, 2), toRational(1, 2)], 
+      [toRational(3, 4), toRational(1, 4)], 
+      wildcard,
+    ]
+    var subjson = @["\"-1\":[\"" & wildcard.mapIt($it).join("\",\"") & "\"]"]
+    for idx, opinion in opinions:
+      if opinion == wildcard:
+        continue
+      subjson.add("\"" & $idx & "\":[\"" & opinion.mapIt($it).join("\",\"") & "\"]")
+    let json = "{" & subjson.join(",") & "}"
     let ts = opinions.mapIt(zip(topics, it).toSeq.toTable)
     check json.parseOpinionJson(agents, topics) == (0..<agents).mapIt((Id(it), ts[it])).toTable

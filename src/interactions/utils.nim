@@ -2,6 +2,8 @@ import ../types
 import ../distance
 import sequtils
 import intbrg
+import nimice
+from math import isPowerOfTwo
 
 proc isAcceptablePost*(agent: Agent, post: Message): bool =
   ## Return `true` iff `post` is acceptable for `agent`.
@@ -42,9 +44,6 @@ proc evaluateMessages*(agent: Agent, messages: seq[Message]): EvaluatedMessages 
     unacceptables: agent.getUnacceptableMessages(messages)
   )
 
-proc isPowerOfTwo(val: int): bool = 
-  val != 0 and (val and (val - 1)) == 0
-
 proc getNumberOfAtomicProps*[T](values: seq[T]): int =
   ## Return the number of atomic propositions.
   ## It is assumed that len(values) == 2^n where n is the number.
@@ -55,3 +54,6 @@ proc getNumberOfAtomicProps*[T](values: seq[T]): int =
     if interpretations == (1 shl atomicProps):
       return atomicProps
     atomicProps += 1
+
+proc mean*(xs: seq[Rational]): Rational =
+  xs.sum * toRational(1, xs.len)
