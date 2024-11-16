@@ -29,15 +29,8 @@ proc opinionFormation*(agent: Agent, topics: seq[Formulae], tick: int): Agent =
   ## Returns the agent after opinion formation.
   var newOpinion = initTable[Formulae, Opinion]()
   for topic in topics:
-#    if agent.id.int == 0:
-#      echo agent.alpha
-#      echo agent.opinions[topic]
-#      echo agent.getBeliefBasedOpinion(topic)
-#      echo agent.opinions[topic] * agent.alpha + ( - agent.alpha) * agent.getBeliefBasedOpinion(topic)
     newOpinion[topic] = agent.opinions[topic] * agent.alpha + (toRational(1, 1) - agent.alpha) * agent.getBeliefBasedOpinion(topic)
   
-  if agent.id.int == 0:
-    echo newOpinion
   verboseLogger(
     fmt"OF {tick} {agent.id} {agent.opinions} -> {newOpinion}",
     tick
