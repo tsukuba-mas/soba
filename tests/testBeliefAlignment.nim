@@ -103,12 +103,29 @@ suite "Belief Alignment (Random choose)":
 
     let alignedBelief = agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc).belief 
     check alignedBelief == toFormula("0001") or alignedBelief == toFormula("0011")
+  
+  test "if there exist some beliefs which minimize the error":
+    opinion2beliefCache.clear()
+    let cv = @[7 // 7, 3 // 7, 6 // 7, 2 // 7, 5 // 7, 1 // 7, 4 // 7, 0 // 7]
+    let topics = @[toFormula("11110000"), toFormula("00001111")]
+    let agent = Agent(
+      opinions: @[
+        (topics[0], newDecimal(7) / newDecimal(32)),
+        (topics[1], newDecimal(19) / newDecimal(28)),
+      ].toTable,
+      belief: toFormula("01001111"),
+      values: cv,
+    )
+    let actual = agent.beliefAlignment(topics, 0, UpdatingStrategy.barc).belief
+    # there two beliefs yield the same error 23/224
+    check actual == toFormula("00011010") or actual == toFormula("00011000")
     
 suite "Belief Alignment (deterministic choice with respect to values)":
   let values = @[0 // 10, 1 // 10, 8 // 10, 10 // 10]
   let topic = toFormula("1100")
   initRand(42)
   generateOpinionToBeliefCache(@[topic], values)
+  setPrec(10)  # default precise
 
   test "choose the best one wrt values":
     let b1 = toFormula("1100")
@@ -119,6 +136,7 @@ suite "Belief Alignment (deterministic choice with respect to values)":
     check @[b3, b2, b1].chooseBest(values) == b3
 
   test "belief alignment for already coherent agent":
+    opinion2beliefCache.clear()
     let agent1 = Agent(
      opinions: @[(topic, newDecimal("0.05"))].toTable, 
       belief: toFormula("1101"), 
@@ -132,4 +150,16 @@ suite "Belief Alignment (deterministic choice with respect to values)":
     )
     check agent2.beliefAlignment(@[topic], 0, UpdatingStrategy.bavm).belief == toFormula("1111")
 
-    
+  test "if there exist some beliefs which minimize the error":
+    opinion2beliefCache.clear()
+    let cv = @[7 // 7, 3 // 7, 6 // 7, 2 // 7, 5 // 7, 1 // 7, 4 // 7, 0 // 7]
+    let topics = @[toFormula("11110000"), toFormula("00001111")]
+    let agent = Agent(
+      opinions: @[
+        (topics[0], newDecimal(7) / newDecimal(32)),
+        (topics[1], newDecimal(19) / newDecimal(28)),
+      ].toTable,
+      belief: toFormula("01001111"),
+      values: cv,
+    )
+    check agent.beliefAlignment(topics, 0, UpdatingStrategy.bavm).belief == toFormula("00011010")
