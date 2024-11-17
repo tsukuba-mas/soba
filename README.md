@@ -11,13 +11,16 @@ Dependent packages listed in `.nimble` file will be installed automatically if n
 Running this program on Linux is recommended.
 
 ## How to use
+First of all, clone this repository.
+**Do not forget to add the option `--recurse-submodules` to clone sub modules the simulator depends on.**
+
 You can compile the simulator by:
 
 ```bash
 $ nimble build
 ```
 
-Appending the option `-d:release` yields faster binary.
+Compiling the option `-d:release` yields faster binary (recommended in general).
 
 By executing the command above, you can get the binary `soba`.
 This is the simulator.

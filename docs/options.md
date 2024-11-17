@@ -11,6 +11,7 @@ To make the descripton simpler, following notations and words are used in the fo
 - $E(\subseteq A\times A)$ is the set of directed edge
 - $N_a=\{b\in A;(a,b)\in E\}$
 - $T$ is the set of topics
+- rational number format refers `x/y` where `x` is integer and `y` is positive integer.
 - "$x$ to $y$ JSON" means the JSON where the keys are $x$ and values are $y$.
 
 ## Description of the Options
@@ -56,10 +57,10 @@ Prehoc procedures performed before the 1st iteration.
 Executing the simulator in verbose mode.
 It will output extra information in this mode.
 
-### `--mu` (float between 0 and 1, default: 0.5)
+### `--mu` (rational number format, default: 0.5)
 The ratio to mix opinions in `oddw`.
 
-### `--alpha` (float between 0 and 1, default: 0.5)
+### `--alpha` (rational number format, default: 0.5)
 The ratio to mix opinions in `of`.
 
 ### `--pUnfollow` (float between 0 and 1, default: 0.5)
@@ -68,7 +69,7 @@ The probability to update $N_a$ following to the rewriting strategy.
 ### `--pActive` (float between 0 and 1, default: 0.5)
 The probability to act in each tick.
 
-### `--epsilon` (non negative float, default: 0.5)
+### `--epsilon` (rational number format, default: 0.5)
 The threshould for opinions (i.e., bounded confidence).
 This is used to filter messages from other agents.
 If you do not want to filter them based on opinions, specify the value equal to or larger than $\max\mathcal O$ where $\mathcal O$ is the opinion space.
@@ -105,7 +106,7 @@ refers the network $(A,E)$ where $A=\{0,1,2\}$ and $E=\{(0,1),(1,0),(1,2),(2,1)\
 ```
 refers the network $(A,E)$ where $A=\{0,1,2\}$ and $E=\{(0, 2), (1,2), (2,0)\}$.
 
-### `--values` (id to sequence of float JSON)
+### `--values` (id to sequence of rational number format JSON)
 Cultural values which map an interpretation to a float number in $[0,1]$.
 Values should be specified in JSON: the key is the id of an agent (or `-1` as a wildcard, see `--network`) and the value is a sequence of float of JSON.
 The length of the sequence in the values should be $|\mathcal M(\top)|$.
@@ -121,15 +122,15 @@ If nothing is specified, all of the agents share the same values initialized ran
 For example, if there are two atomic propositions $p_1$ and $p_2$,
 
 ```json
-{"-1": [0.0,0.33,0.66,1.0]}
+{"-1": ["0/3", "1/3", "2/3", "3/3"]}
 ```
 
 is interpreted as:
 
 - if $I(p_1)=I(p_2)=1$, then $V(I)=0.0$ (index is 0)
-- if $I(p_1)=1$ and $I(p_2)=0$, then $V(I)=0.33$ (index is 1)
-- if $I(p_1)=0$ and $I(p_2)=1$, then $V(I)=0.66$ (index is 2)
-- if $I(p_1)=I(p_2)=0$, then $V(I)=0.1.0$ (index is 3)
+- if $I(p_1)=1$ and $I(p_2)=0$, then $V(I)=1/3$ (index is 1)
+- if $I(p_1)=0$ and $I(p_2)=1$, then $V(I)=2/3$ (index is 2)
+- if $I(p_1)=I(p_2)=0$, then $V(I)=1.0$ (index is 3)
 
 ### `--beliefs` (id to beliefs JSON)
 Initial beliefs.
@@ -147,7 +148,7 @@ For example, if there are two atomic propositions $p_1$ and $p_2$,
 
 means that all of the agents share the same initial beliefs $(p_1\land p_2)\lor (\lnot p_1\land\lnot p_2)$.
 
-### `--opinions` (id to sequence of float JSON)
+### `--opinions` (id to sequence of rational number format JSON)
 Initial opinions.
 They should be specified in JSON: the key is the id of an agent (or `-1` as a wildcard, see `--network`) and the value is the sequence of float of length $|T|$.
 The $i$-th element of the value corresponds to the initial opinion toward $i$-th topic.
@@ -163,7 +164,7 @@ For example, if topics (see `--topics`) are specified as
 and the initial opinions are specified as
 
 ```json
-{"-1": [0.25,0.75]}
+{"-1": ["1/4", "3/4"]}
 ```
 
 this means that all of the agents share the same initial opinions $0.25$ toward the topic `1000` and $0.75$ toward `0001`.
@@ -182,3 +183,9 @@ For example,
 ```
 
 means that there are two topics `1000` and `0001`.
+
+### `--precise` (positive integers, default: 10)
+The precise of the decimal numbers.
+**Be careful of setting too many numbers!**
+Due to the computational reasons, simulator may output wrong results.
+In most of the cases, the default value is enough.
