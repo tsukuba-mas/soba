@@ -32,6 +32,7 @@ let spec = (
   beliefs: newStringArg(@["--beliefs"], "initial beliefs", optional=true),
   opinions: newStringArg(@["--opinions"], "initial opinions", optional=true),
   topics: newStringArg(@["--topics"], "topics", optional=true),
+  precise: newIntArg(@["--precise"], "The number of digits of opinions", defaultVal=10),
   help: newHelpArg(@["-h", "--help"], "print help message"),
 )
 spec.parseOrQuit(prolog)
@@ -139,4 +140,5 @@ proc parseArguments*(): CommandLineArgs =
     opinions: spec.opinions.value.parseOpinionJson(n, topics),
     beliefs: spec.beliefs.value.parseBeliefJson(n, atoms),
     network: spec.network.value.parseNetworkJson(n),
+    prec: spec.precise.value,
   )

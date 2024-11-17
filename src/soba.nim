@@ -9,6 +9,7 @@ import argumentParser
 
 let parsedOptions = parseArguments()
 initLogger(parsedOptions.dir, parsedOptions.verbose, parsedOptions.topics.len)
+setPrec(parsedOptions.prec)
 var simulator = initilizeSimulator(parsedOptions)
 
 simulator = simulator.performPrehoc(parsedOptions.prehoc)

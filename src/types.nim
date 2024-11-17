@@ -113,6 +113,7 @@ type CommandLineArgs* = object
   opinions*: Table[Id, Table[Formulae, Opinion]]
   beliefs*: Table[Id, Formulae]
   network*: Table[Id, HashSet[Id]]
+  prec*: int
 
 type EvaluatedMessages* = object
   acceptables*: seq[Message]
