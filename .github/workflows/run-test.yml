@@ -17,12 +17,10 @@ jobs:
         nim-version: ["2.2.0"]
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: ${{matrix.nim-version}}
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
       - name: execute test programs
         run: nimble test
