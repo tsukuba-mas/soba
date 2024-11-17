@@ -20,6 +20,8 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Initialize submodules
+        run: git submodule update --init --recursive
       - uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: ${{matrix.nim-version}}
