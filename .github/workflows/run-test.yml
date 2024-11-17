@@ -25,5 +25,7 @@ jobs:
       - uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: ${{matrix.nim-version}}
+      - name: Check directory structure
+        run: ls -R
       - name: execute test programs
         run: nimble test
