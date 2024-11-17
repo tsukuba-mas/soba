@@ -1,0 +1,3 @@
+[submodule "nim-decimal"]
+	path = nim-decimal
+	url = https://github.com/status-im/nim-decimal

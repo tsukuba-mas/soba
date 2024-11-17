@@ -5,12 +5,11 @@ import interactions/messageReceiver
 import types
 import sets
 import tables
-import nimice
 
 proc simulatorInitializer(
   ops: seq[Opinion], 
   bels: seq[Formulae], 
-  eps: Rational, 
+  eps: DecimalType, 
   delta: int,
   neighbors: seq[HashSet[Id]],
   topic: Formulae,
@@ -32,7 +31,7 @@ proc simulatorInitializer(
   return sim
 
 suite "Message Receiver":
-  let ops = @[toRational(0, 1), toRational(1, 5), toRational(1, 1)]
+  let ops = @[newDecimal("0"), newDecimal("0.2"), newDecimal("1")]
   let bels = @[toFormula("1000"), toFormula("0100"), toFormula("0011")]
   let topic = toFormula("0001")
   let activated = @[Id(0), Id(1), Id(2)]
@@ -60,7 +59,7 @@ suite "Message Receiver":
   ]
 
   test "no filtering (i.e., all messages are acceptable)":
-    let simulator = simulatorInitializer(ops, bels, toRational(1, 1), 8, neighbors, topic)
+    let simulator = simulatorInitializer(ops, bels, newDecimal("1"), 8, neighbors, topic)
     let id2msg = simulator.receiveMessages(activated)
 
     for idx in 0..<ops.len:
@@ -77,7 +76,7 @@ suite "Message Receiver":
         check message.unacceptables.len == 0
   
   test "filtering based on opinions":
-    let simulator = simulatorInitializer(ops, bels, toRational(1, 5), 8, neighbors, topic)
+    let simulator = simulatorInitializer(ops, bels, newDecimal("0.2"), 8, neighbors, topic)
     let id2msg = simulator.receiveMessages(activated)
 
     block agent0:
@@ -103,7 +102,7 @@ suite "Message Receiver":
       check message.unacceptables.contains(expecteds[1])
 
   test "filtering based on beliefs":
-    let simulator = simulatorInitializer(ops, bels, toRational(1, 1), 2, neighbors, topic)
+    let simulator = simulatorInitializer(ops, bels, newDecimal("1"), 2, neighbors, topic)
     let id2msg = simulator.receiveMessages(activated)
 
     block agent0:
@@ -129,7 +128,7 @@ suite "Message Receiver":
       check message.unacceptables.contains(expecteds[1])
 
   test "both filtering":
-    let simulator = simulatorInitializer(ops, bels, toRational(1, 5), 1, neighbors, topic)
+    let simulator = simulatorInitializer(ops, bels, newDecimal("0.2"), 1, neighbors, topic)
     let id2msg = simulator.receiveMessages(activated)
 
     for idx in 0..<ops.len:

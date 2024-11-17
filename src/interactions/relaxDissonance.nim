@@ -10,7 +10,6 @@ import ../randomUtils
 import strformat
 import tables
 import algorithm
-import nimice
 
 ## Table which associates opinion to beliefs which yield opinions.
 ## Here, it is assumed that all of the agents share the same cultural values.
@@ -19,7 +18,7 @@ var opinion2beliefCache = initTable[Table[Formulae, Opinion], seq[Formulae]]()
 proc getBeliefBasedOpinion(belief: Formulae, values: CulturalValues, topic: Formulae): Opinion =
   ## Returns opinion toward `topic` based on `belief`.
   let merged = revision(belief, @[topic])
-  zip($merged, values).filterIt(it[0] == '1').mapIt(it[1]).mean()
+  zip($merged, values).filterIt(it[0] == '1').mapIt(it[1]).mean().toDecimal
 
 proc getBeliefBasedOpinion(agent: Agent, topic: Formulae): Opinion =
   ## Returns `agent`'s opinion toward `topic`.
@@ -29,7 +28,7 @@ proc opinionFormation*(agent: Agent, topics: seq[Formulae], tick: int): Agent =
   ## Returns the agent after opinion formation.
   var newOpinion = initTable[Formulae, Opinion]()
   for topic in topics:
-    newOpinion[topic] = agent.opinions[topic] * agent.alpha + (toRational(1, 1) - agent.alpha) * agent.getBeliefBasedOpinion(topic)
+    newOpinion[topic] = agent.opinions[topic] * agent.alpha + (newDecimal(1) - agent.alpha) * agent.getBeliefBasedOpinion(topic)
   
   verboseLogger(
     fmt"OF {tick} {agent.id} {agent.opinions} -> {newOpinion}",
@@ -67,7 +66,6 @@ proc generateOpinionToBeliefCache(topics: seq[Formulae], values: CulturalValues)
       opinion2beliefCache[opinion].add(phi)
     else:
       opinion2beliefCache[opinion] = @[phi]
-  echo opinion2beliefCache
 
 proc flatten[T](xxs: seq[seq[T]]): seq[T] =
   for xs in xxs:
@@ -101,7 +99,7 @@ proc selectOneBelief(candidates: seq[Formulae], by: Agent, strategy: UpdatingStr
 
 proc beliefAlignment*(agent: Agent, topics: seq[Formulae], tick: int, strategy: UpdatingStrategy): Agent =
   ## Returns agent after belief alignment.
-  var maxError = toRational(high(int), 1)
+  var maxError = newDecimal(high(int))
   var keys: seq[Table[Formulae, Opinion]] = @[]
   
   if opinion2beliefCache.len == 0:
@@ -109,6 +107,8 @@ proc beliefAlignment*(agent: Agent, topics: seq[Formulae], tick: int, strategy: 
   
   for opinion in opinion2beliefCache.keys:
     let diff = topics.mapIt(abs(opinion[it] - agent.opinions[it])).sum()
+    # if agent.id.int == 7:
+    #   echo diff, ", ", maxError, " by ", opinion2beliefCache[opinion]
     if diff < maxError:
       maxError = diff
       keys = @[opinion]
@@ -116,6 +116,8 @@ proc beliefAlignment*(agent: Agent, topics: seq[Formulae], tick: int, strategy: 
       keys.add(opinion)
 
   # choose one of the optimal one randomly
+  # if agent.id.int == 7:
+  #   echo keys.mapIt(opinion2beliefCache[it]).flatten()
   let updatedBelief = keys.mapIt(opinion2beliefCache[it]).flatten().selectOneBelief(agent, strategy)
   verboseLogger(
     fmt"BA {tick} {agent.id} {agent.belief} -> {updatedBelief}",

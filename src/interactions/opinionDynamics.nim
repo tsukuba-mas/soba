@@ -5,7 +5,6 @@ import sequtils
 import strformat
 import tables
 import intbrg
-import nimice
 import utils
 
 proc takeOpinions(acceptablePosts: seq[Message]): Table[Formulae, seq[Opinion]] =
@@ -29,9 +28,9 @@ proc opinionDynamicsDeGrootmodel*(agent: Agent, topics: seq[Formulae], acceptabl
   )
   agent.updateOpinion(updatedOpinion)
 
-proc getNewOpinionByDW(mine: Opinion, others: seq[Opinion], ratio: Rational): Opinion =
+proc getNewOpinionByDW(mine: Opinion, others: seq[Opinion], ratio: DecimalType): Opinion =
   if others.len > 0: 
-    (toRational(1, 1) - ratio) * mine + ratio * mean(others)
+    (newDecimal(1) - ratio) * mine + ratio * mean(others)
   else:
     mine
 

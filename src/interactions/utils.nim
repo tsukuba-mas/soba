@@ -2,7 +2,6 @@ import ../types
 import ../distance
 import sequtils
 import intbrg
-import nimice
 from math import isPowerOfTwo
 
 proc isAcceptablePost*(agent: Agent, post: Message): bool =
@@ -55,5 +54,8 @@ proc getNumberOfAtomicProps*[T](values: seq[T]): int =
       return atomicProps
     atomicProps += 1
 
+proc mean*(xs: seq[DecimalType]): DecimalType =
+  xs.sum / xs.len.newDecimal
+
 proc mean*(xs: seq[Rational]): Rational =
-  xs.sum * toRational(1, xs.len)
+  xs.sum * (1 // xs.len)

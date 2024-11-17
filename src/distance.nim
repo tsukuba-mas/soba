@@ -2,9 +2,8 @@ import types
 import intbrg
 import sequtils
 import tables
-import nimice
 
-proc distance*(x, y: Table[Formulae, Opinion]): Rational =
+proc distance*(x, y: Table[Formulae, Opinion]): DecimalType =
   ## Returns the Manhattan distance between two opinions `x` and `y`.
   assert x.keys.toSeq == y.keys.toSeq
   let topics = x.keys.toSeq

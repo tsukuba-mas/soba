@@ -4,12 +4,11 @@ import distance
 import intbrg
 import types
 import tables
-import nimice
 
 suite "Distances":
   test "between opinions":
     let t1 = toFormula("1")
-    check distance(@[(t1, toRational(3, 10))].toTable, @[(t1, toRational(4, 5))].toTable) == toRational(1, 2)
+    check distance(@[(t1, newDecimal("0.3"))].toTable, @[(t1, newDecimal("0.8"))].toTable) == newDecimal("0.5")
   
   test "between beliefs":
     check distance(toFormula("11110000"), toFormula("11101000")) == 2
@@ -17,20 +16,20 @@ suite "Distances":
 suite "Similar Opinions/Beliefs":
   let topic = toFormula("00000001")
   let agent = Agent(
-    opinions: @[(topic, toRational(1, 2))].toTable, 
+    opinions: @[(topic, newDecimal("0.5"))].toTable, 
     belief: toFormula("11110000"), 
-    epsilon: toRational(1, 10), 
+    epsilon: newDecimal("0.1"), 
     delta: 2
   )
 
   test "similar opinions":
-    check agent.hasSimilarOpinion(Message(opinions: @[(topic, toRational(1, 2))].toTable))
-    check agent.hasSimilarOpinion(Message(opinions: @[(topic, toRational(55, 100).reduce)].toTable))
-    check agent.hasSimilarOpinion(Message(opinions: @[(topic, toRational(45, 100).reduce)].toTable))
-    check agent.hasSimilarOpinion(Message(opinions: @[(topic, toRational(2, 5))].toTable))
-    check agent.hasSimilarOpinion(Message(opinions: @[(topic, toRational(3, 5))].toTable))
-    check not agent.hasSimilarOpinion(Message(opinions: @[(topic, toRational(35, 100).reduce)].toTable))
-    check not agent.hasSimilarOpinion(Message(opinions: @[(topic, toRational(65, 100).reduce)].toTable))
+    check agent.hasSimilarOpinion(Message(opinions: @[(topic, newDecimal("0.5"))].toTable))
+    check agent.hasSimilarOpinion(Message(opinions: @[(topic, newDecimal("0.55"))].toTable))
+    check agent.hasSimilarOpinion(Message(opinions: @[(topic, newDecimal("0.45"))].toTable))
+    check agent.hasSimilarOpinion(Message(opinions: @[(topic, newDecimal("0.4"))].toTable))
+    check agent.hasSimilarOpinion(Message(opinions: @[(topic, newDecimal("0.6"))].toTable))
+    check not agent.hasSimilarOpinion(Message(opinions: @[(topic, newDecimal("0.35"))].toTable))
+    check not agent.hasSimilarOpinion(Message(opinions: @[(topic, newDecimal("0.65"))].toTable))
 
   test "similar beliefs":
     check agent.hasSimilarBelief(Message(belief: toFormula("11110000")))

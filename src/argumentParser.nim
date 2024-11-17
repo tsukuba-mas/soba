@@ -9,8 +9,6 @@ import tables
 import sets
 import randomUtils
 import bigints
-import nimice
-import strformat
 
 const prolog = "SOBA: Simulator for Opinions-Beliefs interactions between Agents"
 let spec = (
@@ -43,15 +41,8 @@ proc generateBeliefRandomly(atoms: int): Formulae =
   rand(1, (1 shl models) - 1).toBin(models).toFormula
 
 proc generateOpinionRandomly(ub: int = 10000): Opinion =
-  toRational(rand(0, ub), ub).reduce
-
-proc parseRationals(rawData: string): Opinion =
-  ## Parse rational number (e.g., 2/3) and return as a value with type `Opinion`.
-  let splited = rawData.split("/")
-  assert splited.len == 2, fmt"Unknown format of rational number, {rawData} is given"
-  let num = splited[0].strip.parseInt
-  let den = splited[1].strip.parseInt
-  toRational(num, den).reduce
+  let num = rand(0, ub)
+  newDecimal(num) / newDecimal(ub)
 
 proc parseJson[T](rawJson: string, agents: int, convert: proc(x: JsonNode): T): Table[Id, T] =
   let json = parseJson(rawJson)
@@ -82,7 +73,7 @@ proc parseOpinionJson(rawJson: string, agents: int, topics: seq[Formulae]): Tabl
     (0..<agents).toSeq.mapIt((Id(it), initializeOpinions())).toTable
   else:
     let convert = proc (ops: JsonNode): Table[Formulae, Opinion] =
-      zip(topics, ops.getElems()).mapIt((it[0], parseRationals(it[1].getStr()))).toTable
+      zip(topics, ops.getElems()).mapIt((it[0], it[1].getStr().parseDecimal)).toTable
     
     parseJson(rawJson, agents, convert)
 
@@ -91,10 +82,10 @@ proc parseValuesJson(rawJson: string, agents: int, atoms: int): Table[Id, Cultur
     # Initialize randomly if nothing is given
     let models = 1 shl atoms
     let ub = 100000
-    let values = (0..<models).toSeq.mapIt(toRational(rand(0, ub), ub))
+    let values = (0..<models).toSeq.mapIt(rand(0, ub) // ub)
     (0..<agents).toSeq.mapIt((Id(it), values)).toTable
   else:
-    parseJson(rawJson, agents, proc (x: JsonNode): CulturalValues = x.getElems().mapIt(it.getStr.parseRationals))
+    parseJson(rawJson, agents, proc (x: JsonNode): CulturalValues = x.getElems().mapIt(it.getStr.parseRational))
 
 proc parseNetworkJson(rawJson: string, agents: int): Table[Id, HashSet[Id]] =
   result = initTable[Id, HashSet[Id]]()
@@ -137,12 +128,12 @@ proc parseArguments*(): CommandLineArgs =
     rewriting: parseEnum[RewritingStrategy](spec.rewrite.value.strip),
     prehoc: parseAsSeqOfEnum[UpdatingStrategy](spec.prehoc.value),
     verbose: spec.verbose.seen,
-    mu: spec.mu.value.parseRationals,
-    alpha: spec.alpha.value.parseRationals,
+    mu: spec.mu.value.parseDecimal,
+    alpha: spec.alpha.value.parseDecimal,
     unfollowProb: spec.pUnfollow.value.parseFloat,
     activationProb: spec.pActive.value.parseFloat,
     values: spec.values.value.parseValuesJson(n, atoms),
-    epsilon: spec.epsilon.value.parseRationals,
+    epsilon: spec.epsilon.value.parseDecimal,
     delta: spec.delta.value,
     topics: topics,
     opinions: spec.opinions.value.parseOpinionJson(n, topics),

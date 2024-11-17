@@ -14,44 +14,44 @@ suite "Opinion Json Parser":
       let id = Id(idx)
       check actual[id].len == topics.len
       for topic in topics:
-        check toRational(0, 1) <= actual[id][topic]
-        check actual[id][topic] <= toRational(1, 1)
+        check newDecimal(0) <= actual[id][topic]
+        check actual[id][topic] <= newDecimal(1)
   
   test "when the key is -1 only":
-    let opinions = [toRational(1, 4), toRational(3, 4)]
-    let json = "{\"-1\":[" & opinions.mapIt("\"" & $it & "\"").join(",") & "]}"
-    let expected = zip(topics, opinions).toSeq.toTable
+    let input = [1 // 4, 3 // 4]
+    let json = "{\"-1\":[" & input.mapIt("\"" & $it & "\"").join(",") & "]}"
+    let expected = zip(topics, input.map(toDecimal)).toSeq.toTable
     check json.parseOpinionJson(agents, topics) == (0..<agents).mapIt((Id(it), expected)).toTable
   
   test "when all of the values are set":
-    let opinions = @[
-      [toRational(0, 1), toRational(1, 1)], 
-      [toRational(1, 4), toRational(3, 4)], 
-      [toRational(1, 2), toRational(1, 2)], 
-      [toRational(3, 4), toRational(1, 4)], 
-      [toRational(1, 1), toRational(0, 1)],
+    let inputs = @[
+      [0 // 1, 1 // 1], 
+      [1 // 4, 3 // 4], 
+      [1 // 2, 1 // 2], 
+      [3 // 4, 1 // 4], 
+      [1 // 1, 0 // 1],
     ]
     var subjson: seq[string] = @[]
-    for idx, opinion in opinions:
-      subjson.add("\"" & $idx & "\":[\"" & opinion.mapIt($it).join("\",\"") & "\"]")
+    for idx, input in inputs:
+      subjson.add("\"" & $idx & "\":[\"" & input.mapIt($it).join("\",\"") & "\"]")
     let json = "{" & subjson.join(",") & "}"
-    let ts = opinions.mapIt(zip(topics, it).toSeq.toTable)
+    let ts = inputs.mapIt(zip(topics, it).mapIt((it[0], it[1].toDecimal)).toSeq.toTable)
     check json.parseOpinionJson(agents, topics) == (0..<agents).mapIt((Id(it), ts[it])).toTable
   
   test "-1 and agent id appear at the same time":
-    let wildcard = [toRational(0, 1), toRational(0, 1)]
-    let opinions = @[
-      [toRational(0, 1), toRational(1, 1)], 
+    let wildcard = [0 // 1, 0 // 1]
+    let inputs = @[
+      [0 // 1, 1 // 1], 
       wildcard,
-      [toRational(1, 2), toRational(1, 2)], 
-      [toRational(3, 4), toRational(1, 4)], 
+      [1 // 2, 1 // 2], 
+      [3 // 4, 1 // 4], 
       wildcard,
     ]
     var subjson = @["\"-1\":[\"" & wildcard.mapIt($it).join("\",\"") & "\"]"]
-    for idx, opinion in opinions:
-      if opinion == wildcard:
+    for idx, input in inputs:
+      if input == wildcard:
         continue
-      subjson.add("\"" & $idx & "\":[\"" & opinion.mapIt($it).join("\",\"") & "\"]")
+      subjson.add("\"" & $idx & "\":[\"" & input.mapIt($it).join("\",\"") & "\"]")
     let json = "{" & subjson.join(",") & "}"
-    let ts = opinions.mapIt(zip(topics, it).toSeq.toTable)
+    let ts = inputs.mapIt(zip(topics, it).mapIt((it[0], it[1].toDecimal)).toSeq.toTable)
     check json.parseOpinionJson(agents, topics) == (0..<agents).mapIt((Id(it), ts[it])).toTable
