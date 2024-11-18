@@ -7,6 +7,7 @@ import intbrg
 import options
 import ../logger
 import ../randomUtils
+import ../distance
 import strformat
 import tables
 import algorithm
@@ -41,16 +42,16 @@ proc hamming(x, y: Formulae): int =
   ## between two formulae `x` and `y`.
   zip($x, $y).filterIt(it[0] != it[1]).len
 
-proc argm[T](xs: seq[T], dist: proc (x: T): float | int, isMin: bool): seq[T] =
+proc argm[T, S](xs: seq[T], dist: proc (x: T): S, isMin: bool): seq[T] =
   ## Returns all of elements in `xs` which minimizes the distance function `dist`.
   let distances = xs.mapIt(dist(it))
   let minDist = if isMin: distances.min else: distances.max
   (0..<xs.len).toSeq.filterIt(distances[it] == minDist).mapIt(xs[it])
 
-proc argmin[T](xs: seq[T], dist: proc (x: T): float | int) : seq[T] =
+proc argmin[T, S](xs: seq[T], dist: proc (x: T): S) : seq[T] =
   argm(xs, dist, true)
 
-proc argmax[T](xs: seq[T], dist: proc (x: T): float | int) : seq[T] =
+proc argmax[T, S](xs: seq[T], dist: proc (x: T): S) : seq[T] =
   argm(xs, dist, false)
 
 proc generateOpinionToBeliefCache(topics: seq[Formulae], values: CulturalValues) = 
@@ -97,28 +98,17 @@ proc selectOneBelief(candidates: seq[Formulae], by: Agent, strategy: UpdatingStr
     assert false, "Performing belief alignment while the corresponding strategy is " & $strategy
     by.belief
 
+proc selectBeliefsWithMinimalError(currentOpinion: Table[Formulae, Opinion], topics: seq[Formulae], values: CulturalValues): seq[Formulae] =
+  if opinion2beliefCache.len == 0:
+    generateOpinionToBeliefCache(topics, values)
+  
+  let error = proc (opinions: Table[Formulae, Opinion]): DecimalType = distance(opinions, currentOpinion)
+  opinion2beliefCache.keys.toSeq.argmin(error).mapIt(opinion2beliefCache[it]).flatten()
+
 proc beliefAlignment*(agent: Agent, topics: seq[Formulae], tick: int, strategy: UpdatingStrategy): Agent =
   ## Returns agent after belief alignment.
-  var maxError = newDecimal(high(int))
-  var keys: seq[Table[Formulae, Opinion]] = @[]
-  
-  if opinion2beliefCache.len == 0:
-    generateOpinionToBeliefCache(topics, agent.values)
-  
-  for opinion in opinion2beliefCache.keys:
-    let diff = topics.mapIt(abs(opinion[it] - agent.opinions[it])).sum()
-    # if agent.id.int == 7:
-    #   echo diff, ", ", maxError, " by ", opinion2beliefCache[opinion]
-    if diff < maxError:
-      maxError = diff
-      keys = @[opinion]
-    elif diff == maxError:
-      keys.add(opinion)
-
-  # choose one of the optimal one randomly
-  # if agent.id.int == 7:
-  #   echo keys.mapIt(opinion2beliefCache[it]).flatten()
-  let updatedBelief = keys.mapIt(opinion2beliefCache[it]).flatten().selectOneBelief(agent, strategy)
+  let candidates = agent.opinions.selectBeliefsWithMinimalError(topics, agent.values)
+  let updatedBelief = candidates.selectOneBelief(agent, strategy)
   verboseLogger(
     fmt"BA {tick} {agent.id} {agent.belief} -> {updatedBelief}",
     tick

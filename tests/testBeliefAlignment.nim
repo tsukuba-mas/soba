@@ -103,22 +103,6 @@ suite "Belief Alignment (Random choose)":
 
     let alignedBelief = agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc).belief 
     check alignedBelief == toFormula("0001") or alignedBelief == toFormula("0011")
-  
-  test "if there exist some beliefs which minimize the error":
-    opinion2beliefCache.clear()
-    let cv = @[7 // 7, 3 // 7, 6 // 7, 2 // 7, 5 // 7, 1 // 7, 4 // 7, 0 // 7]
-    let topics = @[toFormula("11110000"), toFormula("00001111")]
-    let agent = Agent(
-      opinions: @[
-        (topics[0], newDecimal(7) / newDecimal(32)),
-        (topics[1], newDecimal(19) / newDecimal(28)),
-      ].toTable,
-      belief: toFormula("01001111"),
-      values: cv,
-    )
-    let actual = agent.beliefAlignment(topics, 0, UpdatingStrategy.barc).belief
-    # there two beliefs yield the same error 23/224
-    check actual == toFormula("00011010") or actual == toFormula("00011000")
     
 suite "Belief Alignment (deterministic choice with respect to values)":
   let values = @[0 // 10, 1 // 10, 8 // 10, 10 // 10]
@@ -162,4 +146,12 @@ suite "Belief Alignment (deterministic choice with respect to values)":
       belief: toFormula("01001111"),
       values: cv,
     )
+
+    # In theory, candidates which minimize the error should be either of them:
+    let candidates = selectBeliefsWithMinimalError(agent.opinions, topics, cv)
+    check candidates.len == 2
+    check candidates.contains(toFormula("00011010"))
+    check candidates.contains(toFormula("00011000"))
+
+    # And by choosing the best one with respect to the values, the answer is:
     check agent.beliefAlignment(topics, 0, UpdatingStrategy.bavm).belief == toFormula("00011010")
