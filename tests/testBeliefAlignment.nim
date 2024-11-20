@@ -194,6 +194,13 @@ suite "Belief Alignment (critical cases)":
     #[ C ]# (@[(topic1, newDecimal("0.45")), (topic2, newDecimal("0.45"))].toTable, @[toFormula("00000110")]),
     #[ WRONG ANSWER A ]# (@[(topic1, newDecimal("0.5")),  (topic2, newDecimal("0.39999999"))].toTable, @[toFormula("10000000")]),
     #[ WRONG ANSWER B ]# (@[(topic1, newDecimal("0.549999999")),  (topic2, newDecimal("0.599999999"))].toTable, @[toFormula("10000000")]),
+
+    # Case 3
+    #[ A ]# (@[(topic1, newDecimal("140") / newDecimal("197")), (topic2, newDecimal("138") / newDecimal("197"))].toTable, @[toFormula("00000111")]),
+    #[ B ]# (@[(topic1, newDecimal("141") / newDecimal("197")), (topic2, newDecimal("139") / newDecimal("197"))].toTable, @[toFormula("00001000")]),
+    #[ C ]# (@[(topic1, newDecimal("279") / newDecimal("394")), (topic2, newDecimal("283") / newDecimal("394"))].toTable, @[toFormula("00001001")]),
+    #[ WRONG ANSWER A ]# (@[(topic1, newDecimal("137") / newDecimal("197")), (topic2, newDecimal("140") / newDecimal("197"))].toTable, @[toFormula("10000000")]),
+    #[ WRONG ANSWER B ]# (@[(topic1, newDecimal("279") / newDecimal("394")), (topic2, newDecimal("284") / newDecimal("394"))].toTable, @[toFormula("10000000")]),
   ].toTable
   setPrec(10)  # default precise
   let possibleOpinions = opinion2BeliefCache.keys.toSeq
@@ -219,3 +226,8 @@ suite "Belief Alignment (critical cases)":
     let opinion = @[(topic1, newDecimal("0.5")), (topic2, newDecimal("0.5"))].toTable
     check selectBeliefsWithMinimalError(opinion, @[], @[]).toHashSet == 
       @[toFormula("00000100"), toFormula("00000101"), toFormula("00000110")].toHashSet
+  
+  test "case 3":
+    let opinion = @[(topic1, newDecimal("140") / newDecimal("197")), (topic2, newDecimal("140") / newDecimal("197"))].toTable
+    check selectBeliefsWithMinimalError(opinion, @[], @[]).toHashSet == 
+      @[toFormula("00000111"), toFormula("00001000"), toFormula("00001001")].toHashSet
