@@ -11,7 +11,7 @@ import strformat
 
 # installation via nimble does not work...
 # instead, importing it directly from the source code as a submodule
-import ../nim-decimal/decimal/decimal
+import ../nimdecimal/decimal/decimal
 
 # Type for opinion
 # To avoid comparison and addition/subtraction to floats,
