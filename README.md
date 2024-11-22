@@ -1,8 +1,6 @@
 # SOBA: Simulator for Opinions-Beliefs interactions between Agents
 
-<!--
 ![Status of CI](https://github.com/tsukuba-mas/soba//actions/workflows/run-test.yml/badge.svg)
--->
 
 This is the simulator of agent-based models which focus on opinions-beliefs interactions through values.
 
