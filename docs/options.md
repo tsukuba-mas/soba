@@ -57,10 +57,10 @@ Prehoc procedures performed before the 1st iteration.
 Executing the simulator in verbose mode.
 It will output extra information in this mode.
 
-### `--mu` (rational number format, default: 0.5)
+### `--mu` (float between 0 and 1, default: 0.5)
 The ratio to mix opinions in `oddw`.
 
-### `--alpha` (rational number format, default: 0.5)
+### `--alpha` (float between 0 and 1, default: 0.5)
 The ratio to mix opinions in `of`.
 
 ### `--pUnfollow` (float between 0 and 1, default: 0.5)
@@ -69,7 +69,7 @@ The probability to update $N_a$ following to the rewriting strategy.
 ### `--pActive` (float between 0 and 1, default: 0.5)
 The probability to act in each tick.
 
-### `--epsilon` (rational number format, default: 0.5)
+### `--epsilon` (float, default: 0.5)
 The threshould for opinions (i.e., bounded confidence).
 This is used to filter messages from other agents.
 If you do not want to filter them based on opinions, specify the value equal to or larger than $\max\mathcal O$ where $\mathcal O$ is the opinion space.
