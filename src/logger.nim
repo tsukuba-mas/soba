@@ -5,6 +5,7 @@ import intbrg
 import os
 import sets
 import tables
+import strformat
 
 let beliefHist = "belhist.csv"
 let graphHist = "grhist.csv"
@@ -50,7 +51,11 @@ proc graphLogger(simulator: Simulator, tick: int) =
   var idx = 0
   for agent in simulator.agents:
     for next in agent.neighbors:
-      assert(simulator.followFrom[idx] == agent.id)
+      if simulator.followFrom[idx] != agent.id:
+        raise newException(
+          SOBADefect,
+          fmt"The number of agent {agent.id}'s neighbors has changed"
+        )
       content.add($next)
       idx += 1
   saveTo.appendToFile($tick & "," & content.join(","))

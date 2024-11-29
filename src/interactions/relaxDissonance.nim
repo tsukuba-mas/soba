@@ -81,7 +81,11 @@ proc interpretation2preference(values: CulturalValues): seq[int] =
     result[interpretation] = 1 shl idx
 
 proc chooseBest(candidates: seq[Formulae], values: CulturalValues): Formulae =
-  assert values.toHashSet.len == values.len, "Values should be unique"
+  if values.toHashSet.len != values.len:
+    raise newException(
+      SOBADefect,
+      fmt"Given value {values} is not injection"
+    )
   let preferences = values.interpretation2preference()  # i is preferable to j iff preferences[j] < preferences[j]
   let formula2preference = proc (x: Formulae): int = zip($x, preferences).toSeq.filterIt(it[0] == '1').mapIt(it[1]).sum()
   # It can be assumed that it returns the seq with length 1.
@@ -95,8 +99,10 @@ proc selectOneBelief(candidates: seq[Formulae], by: Agent, strategy: UpdatingStr
   of UpdatingStrategy.bavm:
     candidates.chooseBest(by.values)
   else:
-    assert false, "Performing belief alignment while the corresponding strategy is " & $strategy
-    by.belief
+    raise newException(
+      SOBADefect,
+      fmt"Performing belief alignment while the corresponding strategy is {strategy}"
+    )
 
 proc selectBeliefsWithMinimalError(currentOpinion: Table[Formulae, Opinion], topics: seq[Formulae], values: CulturalValues): seq[Formulae] =
   if opinion2beliefCache.len == 0:

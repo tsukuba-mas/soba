@@ -2,6 +2,7 @@ import ../types
 import ../distance
 import sequtils
 import intbrg
+import strformat
 from math import isPowerOfTwo
 
 proc isAcceptablePost*(agent: Agent, post: Message): bool =
@@ -46,7 +47,11 @@ proc evaluateMessages*(agent: Agent, messages: seq[Message]): EvaluatedMessages 
 proc getNumberOfAtomicProps*[T](values: seq[T]): int =
   ## Return the number of atomic propositions.
   ## It is assumed that len(values) == 2^n where n is the number.
-  assert values.len.isPowerOfTwo
+  if not values.len.isPowerOfTwo:
+    raise newException(
+      SOBADefect,
+      fmt"the lengh of values {values} is not power if 2"
+    )
   let interpretations = values.len
   var atomicProps = 1
   while true:

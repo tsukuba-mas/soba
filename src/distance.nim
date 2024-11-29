@@ -2,10 +2,16 @@ import types
 import intbrg
 import sequtils
 import tables
+import sets
+import strformat
 
 proc distance*(x, y: Table[Formulae, Opinion]): DecimalType =
   ## Returns the Manhattan distance between two opinions `x` and `y`.
-  assert x.keys.toSeq == y.keys.toSeq
+  if x.keys.toSeq.toHashSet != y.keys.toSeq.toHashSet:
+    raise newException(
+      SOBADefect,
+      fmt"Keys of x and y differs: {x.keys.toSeq} and {y.keys.toSeq}"
+    )
   let topics = x.keys.toSeq
   topics.mapIt(abs(x[it] - y[it])).sum()
 

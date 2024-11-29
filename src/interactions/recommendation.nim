@@ -65,10 +65,26 @@ proc updateNeighbors(agent: Agent, evaluatedMessages: EvaluatedMessages, allMess
     let unfollowed = evaluatedMessages.unacceptables.getAuthors().choose()
     let newNeighbor = agent.recommendUser(agentNum, allMessages)
     if unfollowed.isSome() and newNeighbor.isSome():
-      assert agent.neighbors.contains(unfollowed.get())
-      assert not agent.neighbors.contains(newNeighbor.get())
-      assert agent.id != unfollowed.get
-      assert agent.id != newNeighbor.get
+      if not agent.neighbors.contains(unfollowed.get()):
+        raise newException(
+          SOBADefect,
+          fmt"agent {agent.id}'s neighbors are {agent.neighbors}, which do not contain {unfollowed.get()}"
+        )
+      if agent.neighbors.contains(newNeighbor.get()):
+        raise newException(
+          SOBADefect,
+          fmt"agent {agent.id} is trying to add agent {newNeighbor.get()} to neighbors, while it is already in it"
+        )
+      if agent.id == unfollowed.get:
+        raise newException(
+          SOBADefect,
+          fmt"agent {agent.id} is trying to remove itself from its neighbors"
+        )
+      if agent.id == newNeighbor.get:
+        raise newException(
+          SOBADefect,
+          fmt"agent {agent.id} is trying to add itself to its neighbors"
+        )
       verboseLogger(
         fmt"NG {tick} {agent.id} removed {unfollowed.get()} followed {newNeighbor.get()}",
         tick

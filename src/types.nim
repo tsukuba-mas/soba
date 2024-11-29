@@ -13,6 +13,9 @@ import strformat
 # instead, importing it directly from the source code as a submodule
 import ../nimdecimal/decimal/decimal
 
+# Specific defect type for this simulator
+type SOBADefect* = object of Defect
+
 # Type for opinion
 # To avoid comparison and addition/subtraction to floats,
 # represent opinions as decimal numbers.
@@ -29,7 +32,11 @@ proc hash*(x: DecimalType): Hash = hash($x)
 proc splitBySlash(rawData: string): (string, string) =
   ## Parse rational number (e.g., 2/3) and return as a value with type `Opinion`.
   let splited = rawData.split("/")
-  assert splited.len == 2, fmt"Unknown format of rational number, {rawData} is given"
+  if splited.len != 2:
+    raise newException(
+      SOBADefect,
+      fmt"Unknown format of rational number, {rawData} is given"
+    )
   let num = splited[0].strip
   let den = splited[1].strip
   return (num, den)

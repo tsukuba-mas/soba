@@ -16,10 +16,19 @@ proc generateFollowFrom(agents: seq[Agent]): seq[Id] =
   result = @[]
   var idx = 0
   for agent in agents:
+    if agent.neighbors.len == 0:
+      raise newException(
+        SOBADefect,
+        fmt"Agent {agent.id} has no neighbors (should have at least one)"
+      )
     for neighbor in agent.neighbors:
       result.add(agent.id)
       idx += 1
-  assert(result.allIt(it.int >= 0))
+  if not result.allIt(it.int >= 0):
+    raise newException(
+      SOBADefect,
+      fmt"Agent id should be non-negative"
+    )
   
 proc initilizeSimulator*(options: CommandLineArgs): Simulator =
   ## Returns simulator initialized with `options`.
@@ -29,17 +38,32 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
 
   # Verify everything is specified correctly
   let models = 1 shl atoms
-  assert options.topics.allIt(($(it)).len == models),
-    fmt"Topics are specified wrong: expected #atoms is {atoms}, given topics is {options.topics}"
+  if not options.topics.allIt(($(it)).len == models):
+    raise newException(
+      SOBADefect,
+      fmt"Topics are specified wrongly: expected #atoms is {atoms}, given topics is {options.topics}"
+    )
   for id in allIds:
-    assert ($(options.beliefs[id])).len == models,
-      fmt"Agent {id}'s beliefs are specified wrongly: expected #atoms is {atoms} but {options.beliefs[id]}"
-    assert options.opinions[id].len == options.topics.len,
-      fmt"Agent {id}'s opinions are specified wrongly: there are {options.topics.len} topics and {options.opinions[id].len} opinions"
-    assert options.topics.allIt(options.opinions[id].contains(it)),
-      fmt"Agent {id}'s opinions are specified wrongly: topics are {options.topics} but opinions are toward {options.opinions[id].keys.toSeq}"
-    assert options.values[id].len == models,
-      fmt"Agent {id}'s values are specified wrongly: values are length of {options.values[id].len} but expected length is {models}"
+    if not ($(options.beliefs[id])).len == models:
+      raise newException(
+        SOBADefect,
+        fmt"Agent {id}'s beliefs are specified wrongly: expected #atoms is {atoms} but {options.beliefs[id]}"
+      ) 
+    if not options.opinions[id].len == options.topics.len:
+      raise newException(
+        SOBADefect,
+        fmt"Agent {id}'s opinions are specified wrongly: there are {options.topics.len} topics and {options.opinions[id].len} opinions"
+      )
+    if not options.topics.allIt(options.opinions[id].contains(it)):
+      raise newException(
+        SOBADefect,
+        fmt"Agent {id}'s opinions are specified wrongly: topics are {options.topics} but opinions are toward {options.opinions[id].keys.toSeq}"
+      )
+    if not options.values[id].len == models:
+      raise newException(
+        SOBADefect,
+        fmt"Agent {id}'s values are specified wrongly: values are length of {options.values[id].len} but expected length is {models}"
+      )
 
   # initialize agents
   let allAgents = allIds.mapIt(
