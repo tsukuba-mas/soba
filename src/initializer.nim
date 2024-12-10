@@ -80,6 +80,7 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
       values: options.values[it],
       epsilon: options.epsilon,
       delta: options.delta,
+      updated: false,
     )
   )
   Simulator(

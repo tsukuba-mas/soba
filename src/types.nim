@@ -86,6 +86,7 @@ type Agent* = object
   activationProb*: float
   epsilon*: DecimalType
   delta*: int
+  updated*: bool
 
 type Message* = object
   author*: Id

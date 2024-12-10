@@ -6,6 +6,7 @@ import interactions/interactions
 import interactions/messageReceiver
 import logger
 import argumentParser
+import sequtils
 
 let parsedOptions = parseArguments()
 initLogger(parsedOptions.dir, parsedOptions.verbose, parsedOptions.topics.len)
@@ -21,3 +22,9 @@ for time in 1..parsedOptions.tick:
   simulator = simulator.performInteractions(evaluatedMessages, time)
   simulator = simulator.updateNeighbors(evaluatedMessages, time)
   simulator.log(time)
+
+if not simulator.agents.allIt(it.updated):
+  raise newException(
+    SOBADefect, 
+    "Some agents are never updated: " & $(simulator.agents.filterIt(not it.updated).mapIt(it.id))
+  )
