@@ -17,7 +17,7 @@ simulator = simulator.performPrehoc(parsedOptions.prehoc)
 simulator.log(0)
 for time in 1..parsedOptions.tick:
   # Interactions
-  let targets = chooseTargets(simulator.agents)
+  let targets = chooseTargets(simulator.agents, simulator.numberOfActivatedAgents)
   let evaluatedMessages = simulator.receiveMessages(targets)
   simulator = simulator.performInteractions(evaluatedMessages, time)
   simulator = simulator.updateNeighbors(evaluatedMessages, time)
