@@ -67,7 +67,19 @@ The ratio to mix opinions in `of`.
 The probability to update $N_a$ following to the rewriting strategy.
 
 ### `--pActive` (float between 0 and 1, default: 0.5)
-The probability to act in each tick.
+The probability to act in each tick, that is:
+```
+activatedAgents = []
+for agent in agents:
+   if random() <= p:
+       activatedAgents.add(agent)
+```
+in pseudocode.
+**This is only useful if `--nbActivatedAgents` is unspecified.**
+
+### `--nbActivatedAgents` (positive integer)
+The number of activated agents in each iteration.
+If `n` is passed to this option, the number is always equal to `n`.
 
 ### `--epsilon` (float, default: 0.5)
 The threshould for opinions (i.e., bounded confidence).
