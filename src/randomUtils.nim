@@ -36,7 +36,7 @@ proc takeN*[T](xs: seq[T], n: int): Option[seq[T]] =
     while idx.len < n:
       ## Specify the module to avoid conflict
       idx.incl(randomUtils.rand(0, xs.len - 1))
-    some(idx.toSeq.sorted.mapIt(xs[it]))
+    some(idx.items.toSeq.sorted.mapIt(xs[it]))
 
 proc choose*[T](xs: seq[T]): Option[T] =
   ## Returns one element in `xs` randomly.
