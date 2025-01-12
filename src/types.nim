@@ -99,6 +99,7 @@ type Simulator* = object
   verbose*: bool
   followFrom*: seq[Id]
   updatingProcesses*: seq[UpdatingStrategy]
+  numberOfActivatedAgents*: int
 
 type CommandLineArgs* = object
   seed*: int
@@ -122,6 +123,7 @@ type CommandLineArgs* = object
   beliefs*: Table[Id, Formulae]
   network*: Table[Id, HashSet[Id]]
   prec*: int
+  activatedAgents*: int
 
 type EvaluatedMessages* = object
   acceptables*: seq[Message]

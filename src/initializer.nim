@@ -89,4 +89,5 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
     verbose: options.verbose,
     followFrom: allAgents.generateFollowFrom(),
     updatingProcesses: options.update,
+    numberOfActivatedAgents: options.activatedAgents,
   )
