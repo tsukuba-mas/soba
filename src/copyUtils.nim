@@ -11,6 +11,7 @@ proc copy*(simulator: Simulator): Simulator =
     verbose: simulator.verbose,
     followFrom: simulator.followFrom,
     updatingProcesses: simulator.updatingProcesses,
+    numberOfActivatedAgents: simulator.numberOfActivatedAgents,
   )
 
 proc copy(agent: Agent): Agent =
