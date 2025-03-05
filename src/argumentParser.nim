@@ -35,6 +35,8 @@ let spec = (
   precise: newIntArg(@["--precise"], "The number of digits of opinions", defaultVal=10),
   activatedAgents: newIntArg(@["--nbActivatedAgents"], "number of activated agents", optional=true),
   help: newHelpArg(@["-h", "--help"], "print help message"),
+  doPrehocUntilStability: newFlagArg(@["--doPrehocUntilStability"], "perform prehoc until opinions and beliefs stabilize"),
+  prehocOpinionsThreshold: newStringArg(@["--prehocTheta"], "threshold for opinions used for prehoc", defaultVal="0.00001"),
 )
 spec.parseOrQuit(prolog)
 
@@ -143,4 +145,6 @@ proc parseArguments*(): CommandLineArgs =
     network: spec.network.value.parseNetworkJson(n),
     prec: spec.precise.value,
     activatedAgents: spec.activatedAgents.value,
+    doPrehocUntilStability: spec.doPrehocUntilStability.seen,
+    prehocOpinionsThreshold: spec.prehocOpinionsThreshold.value.newDecimal,
   )

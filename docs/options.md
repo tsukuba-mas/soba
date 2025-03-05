@@ -201,3 +201,13 @@ The precise of the decimal numbers.
 **Be careful of setting too many numbers!**
 Due to the computational reasons, simulator may output wrong results.
 In most of the cases, the default value is enough.
+
+### `----doPrehocUntilStability`
+If this is specified, the prehoc is performed until all agents stabilize, i.e., performing more prehoc does not change agents' beliefs and and modifies their opinions only slightly (more precisely the difference is less than a threshold $\theta$).
+$\theta$ can be configured with `--prehocTheta`.
+
+### `--prehocTheta` (positive float, default: 0.00001)
+The threshold for opinions used to repeat performing prehoc until stability.
+**If `--doPrehocUtilStability` is not specified, configuring this parameter does not affect.**
+
+Note: if you want to configure the threshold for opinions used during the interactions, use `--epsilon`.

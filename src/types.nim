@@ -124,6 +124,8 @@ type CommandLineArgs* = object
   network*: Table[Id, HashSet[Id]]
   prec*: int
   activatedAgents*: int
+  doPrehocUntilStability*: bool
+  prehocOpinionsThreshold*: DecimalType
 
 type EvaluatedMessages* = object
   acceptables*: seq[Message]

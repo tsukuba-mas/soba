@@ -13,7 +13,7 @@ initLogger(parsedOptions.dir, parsedOptions.verbose, parsedOptions.topics.len)
 setPrec(parsedOptions.prec)
 var simulator = initilizeSimulator(parsedOptions)
 
-simulator = simulator.performPrehoc(parsedOptions.prehoc)
+simulator = simulator.performPrehoc(parsedOptions.prehoc, parsedOptions.doPrehocUntilStability, parsedOptions.prehocOpinionsThreshold)
 simulator.log(0)
 for time in 1..parsedOptions.tick:
   # Interactions

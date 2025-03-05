@@ -1,5 +1,6 @@
 import ../types
 import ../copyUtils
+import ../distance
 import sequtils
 import opinionDynamics
 import brg
@@ -39,9 +40,25 @@ proc performPrehoc(agent: Agent, prehocs: seq[UpdatingStrategy], topics: seq[For
       newAgent = newAgent.doOnestep(strategy, @[], topics, 0)
   return newAgent
 
-proc performPrehoc*(simulator: Simulator, prehocs: seq[UpdatingStrategy]): Simulator = 
-  let newAgents = simulator.agents.mapIt(it.performPrehoc(prehocs, simulator.topics))
-  simulator.updateAgents(newAgents)
+proc performPrehoc*(simulator: Simulator, prehocs: seq[UpdatingStrategy], canPerformUntilStabilize: bool, theta: DecimalType): Simulator = 
+  ## Perform prehoc procedures.
+  result = simulator.copy()
+  while true:
+    let newAgents = result.agents.mapIt(it.performPrehoc(prehocs, simulator.topics))
+    let newSimulator = simulator.updateAgents(newAgents)
+
+    # If the prehoc should be done only once, exit
+    if not canPerformUntilStabilize:
+      return newSimulator
+
+    # If agents stabilize, exit
+    let hasOpinionsStabilized = result.agents.zip(newSimulator.agents).allIt(distance(it[0].opinions, it[1].opinions) <= theta)
+    let hasBeliefsStabilized = result.agents.zip(newSimulator.agents).allIt(distance(it[0].belief, it[1].belief) == 0)
+    if hasOpinionsStabilized and hasBeliefsStabilized:
+      return newSimulator
+
+    # Otherwise continue
+    result = newSimulator
 
 proc performInteractions*(simulator: Simulator, id2evaluatedMessages: Table[Id, EvaluatedMessages], tick: int): Simulator =
   ## Returns the simulator with agents after interactions.
