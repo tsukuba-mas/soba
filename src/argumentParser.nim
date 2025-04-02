@@ -37,6 +37,7 @@ let spec = (
   help: newHelpArg(@["-h", "--help"], "print help message"),
   doPrehocUntilStability: newFlagArg(@["--doPrehocUntilStability"], "perform prehoc until opinions and beliefs stabilize"),
   prehocOpinionsThreshold: newStringArg(@["--prehocTheta"], "threshold for opinions used for prehoc", defaultVal="0.00001"),
+  edges: newIntArg(@["--nbEdges"], "number of edges", defaultVal=400),
 )
 spec.parseOrQuit(prolog)
 
@@ -91,13 +92,34 @@ proc parseValuesJson(rawJson: string, agents: int, atoms: int): Table[Id, Cultur
   else:
     parseJson(rawJson, agents, proc (x: JsonNode): CulturalValues = x.getElems().mapIt(it.getStr.parseRational))
 
-proc parseNetworkJson(rawJson: string, agents: int): Table[Id, HashSet[Id]] =
+proc generateRandomGraph(agents: int, edges: int): Table[Id, HashSet[Id]] = 
+  result = initTable[Id, HashSet[Id]]()
+
+  # Add edges (a, b) for all agent a
+  for i in 0..<agents:
+    while true:
+      let next = rand(0, agents - 1)
+      if next == i:
+        continue
+      result[Id(i)] = [Id(next)].toHashSet
+      break
+  
+  # Add the rest of the edges
+  var existingEdges = agents
+  while existingEdges < edges:
+    let u = Id(rand(0, agents - 1))
+    let v = Id(rand(0, agents - 1))
+    if u == v:
+      continue
+    if result[u].contains(v):
+      continue
+    existingEdges += 1
+    result[u].incl(v)
+
+proc parseNetworkJson(rawJson: string, agents: int, edges: int): Table[Id, HashSet[Id]] =
   result = initTable[Id, HashSet[Id]]()
   if rawJson == "":
-    # Initialize as the complete graph if nothing is given
-    let allIds = (0..<agents).toSeq.mapIt(Id(it)).toHashSet
-    for id in allIds:
-      result[id] = allIds - [id].toHashSet
+    return generateRandomGraph(agents, edges)
   else:
     let json = parseJson(rawJson)
     for i in 0..<agents:
@@ -122,6 +144,7 @@ proc parseArguments*(): CommandLineArgs =
   let n = spec.nbAgent.value
   let atoms = spec.atoms.value
   let topics = spec.topics.value.parseTopics(atoms)
+  let edges = spec.edges.value
   CommandLineArgs(
     seed: spec.seed.value,
     dir: spec.dir.value,
@@ -142,7 +165,7 @@ proc parseArguments*(): CommandLineArgs =
     topics: topics,
     opinions: spec.opinions.value.parseOpinionJson(n, topics),
     beliefs: spec.beliefs.value.parseBeliefJson(n, atoms),
-    network: spec.network.value.parseNetworkJson(n),
+    network: spec.network.value.parseNetworkJson(n, edges),
     prec: spec.precise.value,
     activatedAgents: spec.activatedAgents.value,
     doPrehocUntilStability: spec.doPrehocUntilStability.seen,
