@@ -14,7 +14,7 @@ proc copy*(simulator: Simulator): Simulator =
     numberOfActivatedAgents: simulator.numberOfActivatedAgents,
   )
 
-proc copy(agent: Agent): Agent =
+proc copy*(agent: Agent): Agent =
   ## Copy `agent` explicitly.
   Agent(
     id: agent.id,

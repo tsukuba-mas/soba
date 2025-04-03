@@ -46,7 +46,8 @@ proc parseDecimal*(rawData: string): DecimalType =
   newDecimal(num) / newDecimal(den)
 
 type UpdatingStrategy* {.pure.} = enum
-  oddw = "oddw", oddg = "oddg", br = "br", `of` = "of", barc = "barc", bavm = "bavm"
+  oddw = "oddw", oddg = "oddg", br = "br", `of` = "of", barc = "barc", bavm = "bavm",
+  ofbarc = "ofbarc*"
 
 type RewritingStrategy* {.pure.} = enum
   none, random, oprecommendation, belrecommendation, bothrecommendation
@@ -124,8 +125,7 @@ type CommandLineArgs* = object
   network*: Table[Id, HashSet[Id]]
   prec*: int
   activatedAgents*: int
-  doPrehocUntilStability*: bool
-  prehocOpinionsThreshold*: DecimalType
+  maximalOpinionChange*: DecimalType
 
 type EvaluatedMessages* = object
   acceptables*: seq[Message]

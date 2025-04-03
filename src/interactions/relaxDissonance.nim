@@ -120,3 +120,14 @@ proc beliefAlignment*(agent: Agent, topics: seq[Formulae], tick: int, strategy: 
     tick
   )
   agent.updateBelief(updatedBelief)
+
+proc doOfAndBarcUntilStable*(agent: Agent, topics: seq[Formulae], tick: int, threshold: DecimalType): Agent = 
+  var oldAgent = agent.copy()
+  while true:
+    let afterOf = opinionFormation(oldAgent, topics, tick)
+    let newAgent = beliefAlignment(afterOf, topics, tick, UpdatingStrategy.barc)
+    let haveOpinionsConverged = distance(oldAgent.opinions, newAgent.opinions) <= threshold
+    let haveBeliefsConverged = distance(oldAgent.belief, newAgent.belief) == 0
+    if haveOpinionsConverged and haveBeliefsConverged:
+      return newAgent
+    oldAgent = newAgent
