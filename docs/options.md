@@ -41,6 +41,7 @@ Following procedures are defined:
 - `of`: opinion formation
 - `barc`: belief alignment, choosing randomly from the candidates
 - `bavm`: belief alignment, choosing deterministically with respect to values
+- `ofbarc`: perform `of` and `barc` in this order until opinions and beliefs reach stability
 
 If agents follow more than one procedures, pass the sequence of the symbols above as a string.
 Each of the symbols (e.g., `oddg` or `oddw`) should be concatnated with `,`.
@@ -97,7 +98,8 @@ The key of JSON is the id of agents (**0-origin**), the value corresponding to t
 `-1` can be used as a key to represent the "wild card", i.e., the default configuration for all of the agents.
 If 0-origin id and `-1` appear at the same time, the  configuration corresponds to the former key is used.
 
-If nothing is specified, network is initialized as the complete graph of $|A|$ nodes.
+If nothing is specified, network is initialized as a random graph of $|A|$ nodes and $|E|$ edges.
+$|E|$ can be configured with the option `--edges`.
 
 **Example 1**:
 ```json
@@ -117,6 +119,9 @@ refers the network $(A,E)$ where $A=\{0,1,2\}$ and $E=\{(0,1),(1,0),(1,2),(2,1)\
 }
 ```
 refers the network $(A,E)$ where $A=\{0,1,2\}$ and $E=\{(0, 2), (1,2), (2,0)\}$.
+
+### `--edges` (positive integer, default: 400)
+The number of edges of a random graph which is generated when no initial graph is specified.
 
 ### `--values` (id to sequence of rational number format JSON)
 Cultural values which map an interpretation to a float number in $[0,1]$.
@@ -202,12 +207,8 @@ The precise of the decimal numbers.
 Due to the computational reasons, simulator may output wrong results.
 In most of the cases, the default value is enough.
 
-### `----doPrehocUntilStability`
-If this is specified, the prehoc is performed until all agents stabilize, i.e., performing more prehoc does not change agents' beliefs and and modifies their opinions only slightly (more precisely the difference is less than a threshold $\theta$).
-$\theta$ can be configured with `--prehocTheta`.
-
-### `--prehocTheta` (positive float, default: 0.00001)
-The threshold for opinions used to repeat performing prehoc until stability.
-**If `--doPrehocUtilStability` is not specified, configuring this parameter does not affect.**
+### `--maximalOpinionChange` (positive float, default: 0.00001)
+The threshold for opinions used to repeat performing process until stability.
+**If `ofbarc` is not included in the updating strategies, this does not affect the results.**
 
 Note: if you want to configure the threshold for opinions used during the interactions, use `--epsilon`.
