@@ -141,6 +141,8 @@ proc parseArguments*(): CommandLineArgs =
   ## Parse command line argument.
   initRand(spec.seed.value)
   let n = spec.nbAgent.value
+  initAgentsRng((0..<n).toSeq.mapIt(rand(1, high(int))))
+
   let atoms = spec.atoms.value
   let topics = spec.topics.value.parseTopics(atoms)
   let edges = spec.edges.value
