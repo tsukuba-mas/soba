@@ -6,8 +6,8 @@ import randomUtils
 import sequtils
 
 suite "Choose targets":
-  initRand(42)
   let n = 10
+  initRand(42, n)
   let allIds = (0..<n).toSeq.mapIt(Id(it))
 
   test "The number of activated agents should be constant if the second argument is positive":

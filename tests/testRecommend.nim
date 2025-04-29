@@ -4,7 +4,7 @@ include interactions/recommendation
 import intbrg
 
 suite "Recommendation":
-  initRand(42)
+  initRand(42, 1)
   test "is not following":
     let agent = Agent(id: Id(0), neighbors: @[Id(1), Id(2)].toHashSet)
     check not agent.isNotFollowing(Id(0))

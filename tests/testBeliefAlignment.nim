@@ -52,7 +52,7 @@ suite "utility procedure: argmin":
 suite "Belief Alignment (Random choose)":
   let values = @[0 // 10, 1 // 10, 8 // 10, 10 // 10]
   let topic = toFormula("1100")
-  initRand(42)
+  initRand(42, 1)
 
   test "get atomic props":
     check values.getNumberOfAtomicProps() == 2
