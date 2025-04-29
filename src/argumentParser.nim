@@ -139,9 +139,8 @@ proc parseAsSeqOfEnum[T: enum](raw: string): seq[T] =
 
 proc parseArguments*(): CommandLineArgs =
   ## Parse command line argument.
-  initRand(spec.seed.value)
   let n = spec.nbAgent.value
-  initAgentsRng((0..<n).toSeq.mapIt(rand(1, high(int))))
+  initRand(spec.seed.value, n)
 
   let atoms = spec.atoms.value
   let topics = spec.topics.value.parseTopics(atoms)

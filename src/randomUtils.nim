@@ -8,6 +8,9 @@ import types
 var globalRng = random.initRand()
 var agentsRng: seq[Rand]
 
+# Prototype
+proc rand*[T: int or float](lb, ub: T): T
+
 proc initAgentsRng*(seeds: seq[int]) =
   agentsRng = seeds.mapIt(random.initRand(it))
 
@@ -18,6 +21,10 @@ proc initRand*(seed: int) =
   ## Even if this is not called, the generator is initialized with the default
   ## `random.initRand()` procedure.
   globalRng = random.initRand(seed)
+
+proc initRand*(seed: int, agents: int) =
+  initRand(seed)
+  initAgentsRng((0..<agents).toSeq.mapIt(rand(1, high(int))))
 
 
 #
