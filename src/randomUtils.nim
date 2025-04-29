@@ -48,7 +48,8 @@ proc rand*[T: int or float](agents: Agent, lb, ub: T): T =
 
 proc shuffle[T](rng: var Rand, xs: seq[T]): seq[T] = 
   var ys = xs
-  discard rng.shuffle(ys)
+  # Specify the library so that below does not call this proc infinitely
+  random.shuffle(rng, ys)
   return ys
 
 proc shuffle*[T](xs: seq[T]): seq[T] =
