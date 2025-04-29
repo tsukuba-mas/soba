@@ -95,7 +95,7 @@ proc selectOneBelief(candidates: seq[Formulae], by: Agent, strategy: UpdatingStr
   case strategy
   of UpdatingStrategy.barc:
     let hammingWithCurrentBelief = proc (x: Formulae): int = hamming(by.belief, x)
-    candidates.argmin(hammingWithCurrentBelief).choose().get
+    by.choose(candidates.argmin(hammingWithCurrentBelief)).get
   of UpdatingStrategy.bavm:
     candidates.chooseBest(by.values)
   else:

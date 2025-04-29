@@ -16,7 +16,7 @@ proc chooseTargets*(agents: seq[Agent], n: int): seq[Id] =
       return @[]
   
   for agent in agents:
-    withProbability(agent.activationProb):
+    agent.withProbability(agent.activationProb):
       result.add(agent.id)
   if result.len == 0:
     agents.chooseTargets(n)

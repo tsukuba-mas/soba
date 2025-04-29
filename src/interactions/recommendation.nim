@@ -17,7 +17,7 @@ proc isNotFollowing(by: Agent, id: Id): bool =
 proc recommendRandomly(target: Agent, agentNum: int): Option[Id] = 
   ## Returns recommended agent that is chosen randomly from the agents who are not followed by `target`.
   let notFollowes = (0..<agentNum).toSeq.map(toId).filterIt(target.isNotFollowing(it))
-  notFollowes.choose()
+  target.choose(notFollowes)
 
 proc filterRecommendedPosts(target: Agent, posts: seq[Message], myMostRecentPost: Message): seq[Message] = 
   ## Fileter messages in `posts` and returns some of them that are regarded as concordant 
@@ -61,8 +61,9 @@ proc getAuthors(posts: seq[Message]): seq[Id] =
 proc updateNeighbors(agent: Agent, evaluatedMessages: EvaluatedMessages, allMessages: seq[Message], agentNum: int, tick: int): Agent =
   ## Returns an agent after it revises the set of neighbors (i.e., the set of agents it follows) if it does; 
   ## if it does not, `agent` itself is returned.
-  withProbability(agent.unfollowProb):
-    let unfollowed = evaluatedMessages.unacceptables.getAuthors().choose()
+  agent.withProbability(agent.unfollowProb):
+    let unfollowCandidates = evaluatedMessages.unacceptables.getAuthors()
+    let unfollowed = agent.choose(unfollowCandidates)
     let newNeighbor = agent.recommendUser(agentNum, allMessages)
     if unfollowed.isSome() and newNeighbor.isSome():
       if not agent.neighbors.contains(unfollowed.get()):
