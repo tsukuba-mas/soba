@@ -212,3 +212,52 @@ The threshold for opinions used to repeat performing process until stability.
 **If `ofbarc` is not included in the updating strategies, this does not affect the results.**
 
 Note: if you want to configure the threshold for opinions used during the interactions, use `--epsilon`.
+
+### `--networkInitAlgo` (string, `random` or `randomLowerMOD`, default: `random`)
+The algorithm to initialize the network.
+
+#### `random`
+The algorithm in pseudocode is as follows:
+
+```
+for each a in agents do
+    b <- one agent in agents such that a != b
+    add directed edge (a, b)
+done
+while true then
+    if #current edges == #desired edges then
+        break
+    end if
+
+    a <- one agent in agents
+    b <- one agent in agents such that a != b
+    e <- directed edge (a, b)
+    if e does not exist then
+        add e
+    end if
+end while
+```
+
+#### `randomLowerMOD`
+The algorithm in pseudocode is as follows:
+
+```
+while true then
+    if #current edges == #desired edges then
+        break
+    end if
+
+    a <- one agent in agents
+    b <- one agent in agents such that a != b
+    e <- directed edge (a, b)
+    if e does not exist then
+        add e
+    end if
+end while
+
+while there exists agent a s.t. with no neighbors then
+    b <- one agent s.t. #neighbors is maximal
+    remove b's one neighbor
+    add agent c s.t. a != c to a's neighbor
+end while
+```
