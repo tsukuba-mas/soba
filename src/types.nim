@@ -52,6 +52,9 @@ type UpdatingStrategy* {.pure.} = enum
 type RewritingStrategy* {.pure.} = enum
   none, random, oprecommendation, belrecommendation, bothrecommendation
 
+type InitNetworkConfig* {.pure.} = enum
+  random, randomLowerMOD
+
 type Id* = distinct int
 proc hash*(id: Id): Hash {.borrow.}
 proc `==`*(x, y: Id): bool {.borrow.}

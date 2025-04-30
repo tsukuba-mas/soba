@@ -105,6 +105,9 @@ proc choose*[T](xs: seq[T]): Option[T] =
 proc choose*[T](agent: Agent, xs: seq[T]): Option[T] = 
   agentsRng[int(agent.id)].choose(xs)
 
+proc choose*[T](agentId: Id, xs: seq[T]): Option[T] = 
+  agentsRng[int(agentId)].choose(xs)
+
 
 #
 # Do something probabilistically

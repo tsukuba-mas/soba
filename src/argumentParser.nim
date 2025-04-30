@@ -9,6 +9,7 @@ import tables
 import sets
 import randomUtils
 import bigints
+import options
 
 const prolog = "SOBA: Simulator for Opinions-Beliefs interactions between Agents"
 let spec = (
@@ -37,6 +38,7 @@ let spec = (
   help: newHelpArg(@["-h", "--help"], "print help message"),
   maximalOpinionChange: newStringArg(@["--maximalOpinionChange"], "threshold for opinions stability", defaultVal="0.00001"),
   edges: newIntArg(@["--nbEdges"], "number of edges", defaultVal=400),
+  networkInitAlgo: newStringArg(@["--networkInitAlgo"], "algorithm to initialize network", defaultVal="random"),
 )
 spec.parseOrQuit(prolog)
 
@@ -115,10 +117,62 @@ proc generateRandomGraph(agents: int, edges: int): Table[Id, HashSet[Id]] =
     existingEdges += 1
     result[u].incl(v)
 
-proc parseNetworkJson(rawJson: string, agents: int, edges: int): Table[Id, HashSet[Id]] =
+proc findAgentWithNoNeighbors(network: Table[Id, HashSet[Id]]): Option[Id] =
+  for agent in network.keys:
+    if network[agent].len == 0:
+      return some(agent)
+  return none(Id)
+
+proc findAgentWithMaxNeighbors(network: Table[Id, HashSet[Id]]): Id =
+  var maxNeighbors = 0
+  for agent in network.keys:
+    if network[agent].len > maxNeighbors:
+      result = agent
+      maxNeighbors = network[agent].len
+
+proc generateRandomGraphWithLowerMaxOutDegree(agents: int, edges: int): Table[Id, HashSet[Id]] =
+  var count = 0
+  for a in 0..<agents:
+    result[Id(a)] = initHashSet[Id]()
+  
+  # Generate all edges randomly
+  while count < edges:
+    let u = Id(rand(0, agents - 1))
+    let v = Id(rand(0, agents - 1))
+    if u == v:
+      continue
+    if result[u].contains(v):
+      continue
+    result[u].incl(v)
+    count += 1
+  
+  # Choose one edge with maximal neighbors, remove one, and 
+  # add one neighbor to agents with no neighbors
+  # until all agents have at least one neighbor
+  while true:
+    let agentWithNoNeighborsOption = result.findAgentWithNoNeighbors()
+    if agentWithNoNeighborsOption.isNone():
+      break
+
+    let agentWithNoNeighbors = agentWithNoNeighborsOption.get()
+    let agentWithMaxNeighbors = result.findAgentWithMaxNeighbors()
+    let removed = agentWithMaxNeighbors.choose(result[agentWithMaxNeighbors].toSeq).get()
+    let candidates = (0..<agents).toSeq.filterIt(Id(it) != agentWithNoNeighbors)
+    let added = Id(agentWithNoNeighbors.choose(candidates).get())
+    result[agentWithMaxNeighbors].excl(removed)
+    result[agentWithNoNeighbors].incl(added)
+  
+proc generateInitialGraph(agents: int, edges: int, networkType: InitNetworkConfig): Table[Id, HashSet[Id]] =
+  case networkType
+  of InitNetworkConfig.random:
+    return generateRandomGraph(agents, edges)
+  of InitNetworkConfig.randomLowerMOD:
+    return generateRandomGraphWithLowerMaxOutDegree(agents, edges)
+
+proc parseNetworkJson(rawJson: string, agents: int, edges: int, networkType: InitNetworkConfig): Table[Id, HashSet[Id]] =
   result = initTable[Id, HashSet[Id]]()
   if rawJson == "":
-    return generateRandomGraph(agents, edges)
+    return generateInitialGraph(agents, edges, networkType)
   else:
     let json = parseJson(rawJson)
     for i in 0..<agents:
@@ -145,6 +199,7 @@ proc parseArguments*(): CommandLineArgs =
   let atoms = spec.atoms.value
   let topics = spec.topics.value.parseTopics(atoms)
   let edges = spec.edges.value
+  let networkType = parseEnum[InitNetworkConfig](spec.networkInitAlgo.value.strip)
   CommandLineArgs(
     seed: spec.seed.value,
     dir: spec.dir.value,
@@ -165,7 +220,7 @@ proc parseArguments*(): CommandLineArgs =
     topics: topics,
     opinions: spec.opinions.value.parseOpinionJson(n, topics),
     beliefs: spec.beliefs.value.parseBeliefJson(n, atoms),
-    network: spec.network.value.parseNetworkJson(n, edges),
+    network: spec.network.value.parseNetworkJson(n, edges, networkType),
     prec: spec.precise.value,
     activatedAgents: spec.activatedAgents.value,
     maximalOpinionChange: spec.maximalOpinionChange.value.newDecimal,
