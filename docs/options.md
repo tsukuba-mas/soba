@@ -4,8 +4,8 @@ Some options have default values.
 However, **it is strongly recommended to specify all of the parameters via command line and not to use the default values**.
 This is useful to understand the conditions of your experiments and reproduce the results.
 
-## Preliminalies
-To make the descripton simpler, following notations and words are used in the following section:
+## Preliminaries
+To make the description simpler, following notations and words are used in the following section:
 
 - $A$ is the (finite) set of agents
 - $E(\subseteq A\times A)$ is the set of directed edge
@@ -31,7 +31,7 @@ The number of iterations.
 The number of atomic propositions.
 Strongly recommended to specify this option to check everything (e.g., beliefs) are defined correctly.
 
-### `--update` (see below, default: oddw)
+### `--update` (see below, default: `oddw`)
 Updating strategy.
 Following procedures are defined:
 
@@ -44,7 +44,7 @@ Following procedures are defined:
 - `ofbarc`: perform `of` and `barc` in this order until opinions and beliefs reach stability
 
 If agents follow more than one procedures, pass the sequence of the symbols above as a string.
-Each of the symbols (e.g., `oddg` or `oddw`) should be concatnated with `,`.
+Each of the symbols (e.g., `oddg` or `oddw`) should be concatenated with `,`.
 The symbols should appear in the order that they should be performed.
 For example, `oddg, br` means "`br` is performed after `oddg` is executed".
 
