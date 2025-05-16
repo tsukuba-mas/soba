@@ -225,5 +225,5 @@ proc parseArguments*(): CommandLineArgs =
     prec: spec.precise.value,
     activatedAgents: spec.activatedAgents.value,
     maximalOpinionChange: spec.maximalOpinionChange.value.newDecimal,
-    opDistWeight: spec.opDistWeight.value.parseDecimal,
+    opDistWeight: spec.opDistWeight.value.newDecimal,
   )
