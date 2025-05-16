@@ -48,8 +48,12 @@ Each of the symbols (e.g., `oddg` or `oddw`) should be concatnated with `,`.
 The symbols should appear in the order that they should be performed.
 For example, `oddg, br` means "`br` is performed after `oddg` is executed".
 
-### `--rewrite` (`none` or `random`, default: `none`)
+### `--rewrite` (see the list below, default: `none`)
 Rewriting strategy.
+
+- `none`: agents never update their sets of neighbors.
+- `random`: agents try to choose one discordant agent from their neighbors and one agent from agents who are not neighbors. If both are possible, neighbors are updated.
+- `swapMaxMin`: agents exclude the most furthest discordant neighbor and include the most closest agent if this helps them to reduce the distances between agents and their neighbors.
 
 ### `--prehoc` (string, in the format of `--update`)
 Prehoc procedures performed before the 1st iteration.
