@@ -53,19 +53,71 @@ proc recommendUser(target: Agent, agentNum: int, allPosts: seq[Message]): Option
         target.recommendRandomly(agentNum)
       else:
         candidates.choose()
+    of RewritingStrategy.swapMaxMin:
+      let messageFromNonNeighbors = allPosts.filterIt(target.isNotFollowing(it.author))
+      let minDistNonNeighbors = messageFromNonNeighbors.argmin(
+        proc (message: Message): DecimalType = distance(target, message)
+      ).mapIt(it.author)
+      target.choose(minDistNonNeighbors)
   
 proc getAuthors(posts: seq[Message]): seq[Id] =
   ## Get authors of given posts.
   posts.mapIt(it.author)
+
+proc getUnfollowedAgent(agent: Agent, allMessages: seq[Message], unacceptables: seq[Message]): Option[Id] =
+  case agent.rewritingStrategy
+  of RewritingStrategy.swapMaxMin:
+    let messagesFromNeighbors = allMessages.filterIt(agent.neighbors.contains(it.author))
+    let maxDistNeighbors = messagesFromNeighbors.argmax(
+      proc (message: Message): DecimalType = distance(agent, message)
+    ).mapIt(it.author)
+    agent.choose(maxDistNeighbors)
+  of RewritingStrategy.random, RewritingStrategy.oprecommendation,
+     RewritingStrategy.belrecommendation, RewritingStrategy.bothrecommendation:
+    agent.choose(unacceptables.getAuthors())
+  of RewritingStrategy.none:
+    none(Id)
+
+proc canUpdateNeighbors(
+  agent: Agent,
+  unfollowedAgentMessage: Option[Message],
+  followedAgentMessage: Option[Message],
+): bool =
+  case agent.rewritingStrategy
+  of RewritingStrategy.none:
+    return false
+  of RewritingStrategy.swapMaxMin:
+    let isSucceededInChoosingAgents = unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
+    if not isSucceededInChoosingAgents:
+      return false
+    else:
+      return agent.distance(unfollowedAgentMessage.get()) > agent.distance(followedAgentMessage.get())
+  of RewritingStrategy.oprecommendation, RewritingStrategy.belrecommendation,
+     RewritingStrategy.bothrecommendation, RewritingStrategy.random:
+    return unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
+
+proc getMessagesOption(messages: seq[Message], id: Option[Id]): Option[Message] =
+  if id.isSome():
+    return some(messages[id.get.int])
+  else:
+    return none(Message)
   
-proc updateNeighbors(agent: Agent, evaluatedMessages: EvaluatedMessages, allMessages: seq[Message], agentNum: int, tick: int): Agent =
+  
+proc updateNeighbors(
+  agent: Agent,
+  evaluatedMessages: EvaluatedMessages,
+  allMessages: seq[Message],
+  agentNum: int,
+  tick: int
+): Agent =
   ## Returns an agent after it revises the set of neighbors (i.e., the set of agents it follows) if it does; 
   ## if it does not, `agent` itself is returned.
   agent.withProbability(agent.unfollowProb):
-    let unfollowCandidates = evaluatedMessages.unacceptables.getAuthors()
-    let unfollowed = agent.choose(unfollowCandidates)
+    let unfollowed = agent.getUnfollowedAgent(allMessages, evaluatedMessages.unacceptables)
     let newNeighbor = agent.recommendUser(agentNum, allMessages)
-    if unfollowed.isSome() and newNeighbor.isSome():
+    let unfollowedAgentMessage = getMessagesOption(allMessages, unfollowed)
+    let newlyFollowedAgentMessage = getMessagesOption(allMessages, newNeighbor)
+    if canUpdateNeighbors(agent, unfollowedAgentMessage, newlyFollowedAgentMessage):
       if not agent.neighbors.contains(unfollowed.get()):
         raise newException(
           SOBADefect,
@@ -99,7 +151,7 @@ proc updateNeighbors*(simulator: Simulator, id2evaluatedMessages: Table[Id, Eval
   let allMessages = simulator.agents.writeMessage()
   let updatedAgents = simulator.agents.mapIt(
     if id2evaluatedMessages.contains(it.id): 
-      it.updateNeighbors(id2evaluatedMessages[it.id], allMessages, simulator.agents.len, time) 
+     it.updateNeighbors(id2evaluatedMessages[it.id], allMessages, simulator.agents.len, time) 
     else: 
       it
   )

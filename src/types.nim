@@ -50,7 +50,8 @@ type UpdatingStrategy* {.pure.} = enum
   ofbarc = "ofbarc*"
 
 type RewritingStrategy* {.pure.} = enum
-  none, random, oprecommendation, belrecommendation, bothrecommendation
+  none, random, oprecommendation, belrecommendation, bothrecommendation,
+  swapMaxMin
 
 type InitNetworkConfig* {.pure.} = enum
   random, randomLowerMOD
@@ -91,6 +92,7 @@ type Agent* = object
   epsilon*: DecimalType
   delta*: int
   updated*: bool
+  opDistWeight*: DecimalType
 
 type Message* = object
   author*: Id
@@ -129,6 +131,7 @@ type CommandLineArgs* = object
   prec*: int
   activatedAgents*: int
   maximalOpinionChange*: DecimalType
+  opDistWeight*: DecimalType
 
 type EvaluatedMessages* = object
   acceptables*: seq[Message]

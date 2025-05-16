@@ -261,3 +261,12 @@ while there exists agent a s.t. with no neighbors then
     add agent c s.t. a != c to a's neighbor
 end while
 ```
+
+### `--opDistWeight` (numbers between 0 and 1, default: 0.5)
+The ratio of the distance between two agents' opinions on the distance between the agents.
+More precisely, this option set the parameter $\beta$ in the definition of the distance between two agents $d_A(a,a')$:
+
+$$
+d_A(a,a') = \beta d_O(O_a,O_{a'}) + (1-\beta) \frac{d_B(B_a,B_{a'})}{|\mathcal{M}(\top)|}.
+$$
+

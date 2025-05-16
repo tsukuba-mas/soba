@@ -42,18 +42,6 @@ proc hamming(x, y: Formulae): int =
   ## between two formulae `x` and `y`.
   zip($x, $y).filterIt(it[0] != it[1]).len
 
-proc argm[T, S](xs: seq[T], dist: proc (x: T): S, isMin: bool): seq[T] =
-  ## Returns all of elements in `xs` which minimizes the distance function `dist`.
-  let distances = xs.mapIt(dist(it))
-  let minDist = if isMin: distances.min else: distances.max
-  (0..<xs.len).toSeq.filterIt(distances[it] == minDist).mapIt(xs[it])
-
-proc argmin[T, S](xs: seq[T], dist: proc (x: T): S) : seq[T] =
-  argm(xs, dist, true)
-
-proc argmax[T, S](xs: seq[T], dist: proc (x: T): S) : seq[T] =
-  argm(xs, dist, false)
-
 proc generateOpinionToBeliefCache(topics: seq[Formulae], values: CulturalValues) = 
   ## Generate the cache of opinions to beliefs, i.e., tables from opinions to
   ## beliefs which yields the key (opinion).
