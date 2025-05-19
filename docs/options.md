@@ -87,9 +87,11 @@ The number of activated agents in each iteration.
 If `n` is passed to this option, the number is always equal to `n`.
 
 ### `--epsilon` (float, default: 0.5)
-The threshould for opinions (i.e., bounded confidence).
+**If `each` (the default value) is specified for `--acceptanceDescision`**, this sets the threshould for opinions (i.e., bounded confidence).
 This is used to filter messages from other agents.
 If you do not want to filter them based on opinions, specify the value equal to or larger than $\max\mathcal O$ where $\mathcal O$ is the opinion space.
+
+**If `unified` is specified for the option**, this sets the threshold for the unified measure.
 
 ### `--delta` (non-negative integer, default: 4)
 The threshould for beliefs.
@@ -273,4 +275,11 @@ More precisely, this option set the parameter $\beta$ in the definition of the d
 $$
 d_A(a,a') = \beta d_O(O_a,O_{a'}) + (1-\beta) \frac{d_B(B_a,B_{a'})}{|\mathcal{M}(\top)|}.
 $$
+
+### `--acceptanceDescision` (see below, default: `each`)
+The algorithm to decide whether other agents are considered as concordant.
+Possible options are as follows:
+
+- `each`: if opinions (resp. beliefs) are close enough, others are concordant.
+- `unified`: if $d_A(a,a')\leq\varepsilon$, others are concordant.
 

@@ -82,6 +82,7 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
       delta: options.delta,
       updated: false,
       opDistWeight: options.opDistWeight,
+      acceptanceDescision: options.acceptanceDescision,
     )
   )
   Simulator(

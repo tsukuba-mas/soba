@@ -4,6 +4,7 @@ import distance
 import intbrg
 import types
 import tables
+import sequtils
 
 suite "Distances":
   test "between opinions":
@@ -19,7 +20,8 @@ suite "Similar Opinions/Beliefs":
     opinions: @[(topic, newDecimal("0.5"))].toTable, 
     belief: toFormula("11110000"), 
     epsilon: newDecimal("0.1"), 
-    delta: 2
+    delta: 2,
+    acceptanceDescision: AcceptanceDescision.each,
   )
 
   test "similar opinions":
@@ -39,3 +41,47 @@ suite "Similar Opinions/Beliefs":
     check agent.hasSimilarBelief(Message(belief: toFormula("10010000")))
     check not agent.hasSimilarBelief(Message(belief: toFormula("00001111")))
     check not agent.hasSimilarBelief(Message(belief: toFormula("10001000")))
+
+suite "configure descision algorithm":
+  let topic = toFormula("11110000")
+  let messages = @[
+    Message(opinions: @[(topic, newDecimal("0.5"))].toTable, belief: toFormula("11000000")),
+    Message(opinions: @[(topic, newDecimal("0.9"))].toTable, belief: toFormula("11000000")),
+    Message(opinions: @[(topic, newDecimal("0.5"))].toTable, belief: toFormula("00001111")),
+    Message(opinions: @[(topic, newDecimal("0.7"))].toTable, belief: toFormula("11110000")),
+  ]
+  let opinions = @[(topic, newDecimal("0.5"))].toTable
+  let beliefs = "11000000".toFormula
+  let epsilon = newDecimal("0.2")
+  let delta = 2
+  let opdistWeight = newDecimal("0.5")
+
+  test "each":
+    let agent = Agent(
+      opinions: opinions,
+      belief: beliefs,
+      epsilon: epsilon,
+      delta: delta,
+      acceptanceDescision: AcceptanceDescision.each,
+      opdistWeight: opdistWeight,
+    )
+    let expecteds = @[true, false, false, true]
+    let zero = newDecimal("0")
+    for (msg, expected) in zip(messages, expecteds):
+      let now = agent.distance(msg) == zero
+      check now == expected
+
+  test "unified":
+    let agent = Agent(
+      opinions: opinions,
+      belief: beliefs,
+      epsilon: epsilon,
+      delta: delta,
+      acceptanceDescision: AcceptanceDescision.unified,
+      opdistWeight: opdistWeight,
+    )
+    let expecteds = @[true, true, false, false]
+    for i, (msg, expected) in zip(messages, expecteds):
+      let now = agent.distance(msg) <= agent.epsilon
+      check now == expected
+    

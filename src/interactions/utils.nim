@@ -8,7 +8,12 @@ from math import isPowerOfTwo
 
 proc isAcceptablePost*(agent: Agent, post: Message): bool =
   ## Return `true` iff `post` is acceptable for `agent`.
-  agent.hasSimilarOpinion(post) and agent.hasSimilarBelief(post)
+  let dist = agent.distance(post)
+  case agent.acceptanceDescision
+  of AcceptanceDescision.each:
+    dist == newDecimal(0)
+  of AcceptanceDescision.unified:
+    dist <= agent.epsilon
 
 proc revision*(self: Formulae, others: seq[Formulae]): Formulae = 
   ## Returns the formulae which merge `self` and `others`.

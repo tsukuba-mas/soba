@@ -40,6 +40,7 @@ let spec = (
   edges: newIntArg(@["--nbEdges"], "number of edges", defaultVal=400),
   networkInitAlgo: newStringArg(@["--networkInitAlgo"], "algorithm to initialize network", defaultVal="random"),
   opDistWeight: newStringArg(@["--opDistWeight"], "weight for opinion distance", defaultVal="0.5"),
+  acceptanceDescision: newStringArg(@["--acceptanceDescision"], "algorithm to decide whether messages are accepted", defaultVal="each"),
 )
 spec.parseOrQuit(prolog)
 
@@ -226,4 +227,5 @@ proc parseArguments*(): CommandLineArgs =
     activatedAgents: spec.activatedAgents.value,
     maximalOpinionChange: spec.maximalOpinionChange.value.newDecimal,
     opDistWeight: spec.opDistWeight.value.newDecimal,
+    acceptanceDescision: parseEnum[AcceptanceDescision](spec.acceptanceDescision.value.strip),
   )
