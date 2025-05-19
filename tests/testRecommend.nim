@@ -48,7 +48,8 @@ suite "Recommendation":
       # discordant non-neighbor
       Message(opinions: @[(topic, "0.9".newDecimal)].toTable, belief: "00000001".toFormula, author: Id(6))
     ]
+    let t_messages = messages.mapIt((it.author, it)).toTable
 
-    check agent.getUnfollowedAgent(messages, @[]) == some(Id(3))
-    check agent.recommendUser(7, messages) == some(Id(5))
+    check agent.getUnfollowedAgent(t_messages, @[]) == some(Id(3))
+    check agent.recommendUser(7, t_messages) == some(Id(5))
     check agent.canUpdateNeighbors(some(messages[3]), some(messages[5]))

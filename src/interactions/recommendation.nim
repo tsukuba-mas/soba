@@ -35,8 +35,9 @@ proc filterRecommendedPosts(target: Agent, posts: seq[Message], myMostRecentPost
     # NOT expected to reach here
     @[]
 
-proc recommendUser(target: Agent, agentNum: int, allPosts: seq[Message]): Option[Id] =
+proc recommendUser(target: Agent, agentNum: int, allPosts: Table[Id, Message]): Option[Id] =
   ## Recommend a user to be followed.
+  let allMessagesSeq = (0..<agentNum).toSeq.mapIt(allPosts[Id(it)])
   result = 
     case target.rewritingStrategy
     of RewritingStrategy.none:
@@ -47,14 +48,14 @@ proc recommendUser(target: Agent, agentNum: int, allPosts: seq[Message]): Option
        RewritingStrategy.belrecommendation, 
        RewritingStrategy.bothrecommendation:
       let myMessage = target.writeMessage()
-      let recommendedUsers = target.filterRecommendedPosts(allPosts, myMessage).mapIt(it.author)
+      let recommendedUsers = target.filterRecommendedPosts(allMessagesSeq, myMessage).mapIt(it.author)
       let candidates = recommendedUsers.filterIt(target.isNotFollowing(it))
       if candidates.len == 0:
         target.recommendRandomly(agentNum)
       else:
         candidates.choose()
     of RewritingStrategy.swapMaxMin:
-      let messageFromNonNeighbors = allPosts.filterIt(target.isNotFollowing(it.author))
+      let messageFromNonNeighbors = allMessagesSeq.filterIt(target.isNotFollowing(it.author))
       let minDistNonNeighbors = messageFromNonNeighbors.argmin(
         proc (message: Message): DecimalType = distance(target, message)
       ).mapIt(it.author)
@@ -64,10 +65,10 @@ proc getAuthors(posts: seq[Message]): seq[Id] =
   ## Get authors of given posts.
   posts.mapIt(it.author)
 
-proc getUnfollowedAgent(agent: Agent, allMessages: seq[Message], unacceptables: seq[Message]): Option[Id] =
+proc getUnfollowedAgent(agent: Agent, allMessages: Table[Id, Message], unacceptables: seq[Message]): Option[Id] =
   case agent.rewritingStrategy
   of RewritingStrategy.swapMaxMin:
-    let messagesFromNeighbors = allMessages.filterIt(agent.neighbors.contains(it.author))
+    let messagesFromNeighbors = agent.neighbors.toSeq.mapIt(allMessages[it])
     let maxDistNeighbors = messagesFromNeighbors.argmax(
       proc (message: Message): DecimalType = distance(agent, message)
     ).mapIt(it.author)
@@ -96,9 +97,9 @@ proc canUpdateNeighbors(
      RewritingStrategy.bothrecommendation, RewritingStrategy.random:
     return unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
 
-proc getMessagesOption(messages: seq[Message], id: Option[Id]): Option[Message] =
+proc getMessagesOption(messages: Table[Id, Message], id: Option[Id]): Option[Message] =
   if id.isSome():
-    return some(messages[id.get.int])
+    return some(messages[id.get])
   else:
     return none(Message)
   
@@ -106,7 +107,7 @@ proc getMessagesOption(messages: seq[Message], id: Option[Id]): Option[Message] 
 proc updateNeighbors(
   agent: Agent,
   evaluatedMessages: EvaluatedMessages,
-  allMessages: seq[Message],
+  allMessages: Table[Id, Message],
   agentNum: int,
   tick: int
 ): Agent =

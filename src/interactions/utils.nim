@@ -3,6 +3,7 @@ import ../distance
 import sequtils
 import intbrg
 import strformat
+import tables
 from math import isPowerOfTwo
 
 proc isAcceptablePost*(agent: Agent, post: Message): bool =
@@ -25,9 +26,9 @@ proc writeMessage*(agent: Agent): Message =
     opinions: agent.opinions,
   )
 
-proc writeMessage*(agents: seq[Agent]): seq[Message] =
+proc writeMessage*(agents: seq[Agent]): Table[Id, Message] =
   ## Returns messages from all of the agents.
-  agents.map(writeMessage)
+  agents.mapIt((it.id, it.writeMessage)).toTable
 
 proc getAcceptableMessages(agent: Agent, messages: seq[Message]): seq[Message] =
   ## Returns acceptable messages for `agent` in `messages`.

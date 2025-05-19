@@ -12,6 +12,6 @@ proc receiveMessages*(simulator: Simulator, activated: seq[Id]): Table[Id, Evalu
   for agent in simulator.agents:
     if not activated.contains(agent.id):
       continue
-    let messagesFromNeighbors = agent.neighbors.toSeq.mapIt(messages[int(it)])
+    let messagesFromNeighbors = agent.neighbors.toSeq.mapIt(messages[it])
     id2msgs[agent.id] = agent.evaluateMessages(messagesFromNeighbors)
   return id2msgs
