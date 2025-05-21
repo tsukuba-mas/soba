@@ -57,7 +57,7 @@ proc recommendUser(target: Agent, agentNum: int, allPosts: Table[Id, Message]): 
     of RewritingStrategy.swapMaxMin:
       let messageFromNonNeighbors = allMessagesSeq.filterIt(target.isNotFollowing(it.author))
       let minDistNonNeighbors = messageFromNonNeighbors.argmin(
-        proc (message: Message): DecimalType = distance(target, message)
+        proc (message: Message): DecimalType = unifiedDistance(target, message)
       ).mapIt(it.author)
       target.choose(minDistNonNeighbors)
   
@@ -70,7 +70,7 @@ proc getUnfollowedAgent(agent: Agent, allMessages: Table[Id, Message], unaccepta
   of RewritingStrategy.swapMaxMin:
     let messagesFromNeighbors = agent.neighbors.toSeq.mapIt(allMessages[it])
     let maxDistNeighbors = messagesFromNeighbors.argmax(
-      proc (message: Message): DecimalType = distance(agent, message)
+      proc (message: Message): DecimalType = unifiedDistance(agent, message)
     ).mapIt(it.author)
     agent.choose(maxDistNeighbors)
   of RewritingStrategy.random, RewritingStrategy.oprecommendation,

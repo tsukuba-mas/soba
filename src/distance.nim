@@ -28,7 +28,7 @@ proc hasSimilarOpinion*(agent: Agent, post: Message): bool =
 proc hasSimilarBelief*(agent: Agent, post: Message): bool =
   distance(agent.belief, post.belief) <= agent.delta
 
-proc unifiedDistance(agent: Agent, message: Message): DecimalType =
+proc unifiedDistance*(agent: Agent, message: Message): DecimalType =
   ## Measure the distance between `agent` and `message` with unified distance.
   let opdist = distance(agent.opinions, message.opinions)
   let beldist = distance(agent.belief, message.belief).newDecimal / agent.belief.getPossibleModels.newDecimal
