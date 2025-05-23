@@ -30,8 +30,6 @@ proc copy*(agent: Agent): Agent =
     epsilon: agent.epsilon,
     delta: agent.delta,
     updated: agent.updated,
-    opDistWeight: agent.opDistWeight,
-    acceptanceDescision: agent.acceptanceDescision,
     agentOrder: agent.agentOrder,
   )
 

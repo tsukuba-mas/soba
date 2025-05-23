@@ -19,20 +19,11 @@ proc distance*(x, y: Formulae): int =
   ## Returns the Hamming distance between two beliefs `x` and `y`.
   zip($x, $y).filterIt(it[0] != it[1]).len
 
-proc getPossibleModels(beliefs: Formulae): int =
-  ($beliefs).len
-
 proc hasSimilarOpinion*(agent: Agent, post: Message): bool =
   distance(agent.opinions, post.opinions) <= agent.epsilon
 
 proc hasSimilarBelief*(agent: Agent, post: Message): bool =
   distance(agent.belief, post.belief) <= agent.delta
-
-proc unifiedDistance*(agent: Agent, message: Message): DecimalType =
-  ## Measure the distance between `agent` and `message` with unified distance.
-  let opdist = distance(agent.opinions, message.opinions)
-  let beldist = distance(agent.belief, message.belief).newDecimal / agent.belief.getPossibleModels.newDecimal
-  agent.opDistWeight * opdist + (newDecimal(1) - agent.opDistWeight) * beldist
 
 proc eachDistance(agent: Agent, message: Message): DecimalType =
   ## Measure the distance between `agent` and `message` by evaluating whether opinions (resp. beliefs) are
@@ -44,11 +35,7 @@ proc eachDistance(agent: Agent, message: Message): DecimalType =
     newDecimal(1)
 
 proc distance*(agent: Agent, message: Message): DecimalType =
-  case agent.acceptanceDescision
-  of AcceptanceDescision.each:
-    agent.eachDistance(message)
-  of AcceptanceDescision.unified:
-    agent.unifiedDistance(message)
+  agent.eachDistance(message)
 
 proc opinionCmp*(d1, d2: DifferenceInfo): int =
   ## Compare `d1` and `d2` just based on opinions:

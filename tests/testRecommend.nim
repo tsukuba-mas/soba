@@ -93,7 +93,7 @@ suite "Recommendation":
       belief: "11110000".toFormula,
       epsilon: "0.1".newDecimal,
       delta: 2,
-      opDistWeight: "0.5".newDecimal,
+      agentOrder: AgentOrder.opinion,
       rewritingStrategy: RewritingStrategy.swapMaxMin,
     )
     let messages = @[

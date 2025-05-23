@@ -58,9 +58,6 @@ type AgentOrder* {.pure.} = enum
 type InitNetworkConfig* {.pure.} = enum
   random, randomLowerMOD
 
-type AcceptanceDescision* {.pure.} = enum
-  each, unified
-
 type Id* = distinct int
 proc hash*(id: Id): Hash {.borrow.}
 proc `==`*(x, y: Id): bool {.borrow.}
@@ -97,8 +94,6 @@ type Agent* = object
   epsilon*: DecimalType
   delta*: int
   updated*: bool
-  opDistWeight*: DecimalType
-  acceptanceDescision*: AcceptanceDescision
   agentOrder*: AgentOrder
 
 type Message* = object
@@ -143,8 +138,6 @@ type CommandLineArgs* = object
   prec*: int
   activatedAgents*: int
   maximalOpinionChange*: DecimalType
-  opDistWeight*: DecimalType
-  acceptanceDescision*: AcceptanceDescision
   agentOrder*: AgentOrder
 
 type EvaluatedMessages* = object
