@@ -50,8 +50,7 @@ type UpdatingStrategy* {.pure.} = enum
   ofbarc = "ofbarc*"
 
 type RewritingStrategy* {.pure.} = enum
-  none, random, oprecommendation, belrecommendation, bothrecommendation,
-  swapMaxMin
+  none, random, swapMaxMin
 
 type AgentOrder* {.pure.} = enum
   opinion, belief, opbel, belop

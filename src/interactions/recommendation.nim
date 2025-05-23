@@ -19,22 +19,6 @@ proc recommendRandomly(target: Agent, agentNum: int): Option[Id] =
   let notFollowes = (0..<agentNum).toSeq.map(toId).filterIt(target.isNotFollowing(it))
   target.choose(notFollowes)
 
-proc filterRecommendedPosts(target: Agent, posts: seq[Message], myMostRecentPost: Message): seq[Message] = 
-  ## Fileter messages in `posts` and returns some of them that are regarded as concordant 
-  ## (i.e., similar to `target`'s opinions and/or beliefs).
-  case target.rewritingStrategy
-  of RewritingStrategy.oprecommendation:
-    posts.filterIt(target.hasSimilarOpinion(it))
-  of RewritingStrategy.belrecommendation:
-    posts.filterIt(target.hasSimilarBelief(it))
-  of RewritingStrategy.bothrecommendation:
-    posts.filterIt(
-      target.hasSimilarOpinion(it) and target.hasSimilarBelief(it)
-    )
-  else:
-    # NOT expected to reach here
-    @[]
-
 proc recommendUser(target: Agent, agentNum: int, allPosts: Table[Id, Message]): Option[Id] =
   ## Recommend a user to be followed.
   let allMessagesSeq = (0..<agentNum).toSeq.mapIt(allPosts[Id(it)])
@@ -44,16 +28,6 @@ proc recommendUser(target: Agent, agentNum: int, allPosts: Table[Id, Message]): 
       none(Id)
     of RewritingStrategy.random:
       target.recommendRandomly(agentNum)
-    of RewritingStrategy.oprecommendation, 
-       RewritingStrategy.belrecommendation, 
-       RewritingStrategy.bothrecommendation:
-      let myMessage = target.writeMessage()
-      let recommendedUsers = target.filterRecommendedPosts(allMessagesSeq, myMessage).mapIt(it.author)
-      let candidates = recommendedUsers.filterIt(target.isNotFollowing(it))
-      if candidates.len == 0:
-        target.recommendRandomly(agentNum)
-      else:
-        candidates.choose()
     of RewritingStrategy.swapMaxMin:
       let messageFromNonNeighbors = allMessagesSeq.filterIt(target.isNotFollowing(it.author))
       let differenceInfos = messageFromNonNeighbors.toDifferenceInfo(target)
@@ -71,8 +45,7 @@ proc getUnfollowedAgent(agent: Agent, allMessages: Table[Id, Message], unaccepta
     let differenceInfos = messagesFromNeighbors.todifferenceInfo(agent)
     let maxDistNeighbors = differenceInfos.argmax(agent)
     agent.choose(maxDistNeighbors)
-  of RewritingStrategy.random, RewritingStrategy.oprecommendation,
-     RewritingStrategy.belrecommendation, RewritingStrategy.bothrecommendation:
+  of RewritingStrategy.random:
     agent.choose(unacceptables.getAuthors())
   of RewritingStrategy.none:
     none(Id)
@@ -91,8 +64,7 @@ proc canUpdateNeighbors(
       return false
     else:
       return agent.distance(unfollowedAgentMessage.get()) > agent.distance(followedAgentMessage.get())
-  of RewritingStrategy.oprecommendation, RewritingStrategy.belrecommendation,
-     RewritingStrategy.bothrecommendation, RewritingStrategy.random:
+  of RewritingStrategy.random:
     return unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
 
 proc getMessagesOption(messages: Table[Id, Message], id: Option[Id]): Option[Message] =
