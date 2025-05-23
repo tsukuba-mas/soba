@@ -3,6 +3,75 @@ import unittest
 include interactions/recommendation
 import intbrg
 
+suite "argmin/argmax for DifferenceInfo":
+  let infos = @[
+    DifferenceInfo(
+      opinions: newDecimal("0.2"),
+      beliefs: 2,
+      id: Id(0),
+    ),
+    DifferenceInfo(
+      opinions: newDecimal("0.2"),
+      beliefs: 4,
+      id: Id(1),
+    ),
+    DifferenceInfo(
+      opinions: newDecimal("0.4"),
+      beliefs: 2,
+      id: Id(2),
+    ),
+    DifferenceInfo(
+      opinions: newDecimal("0.4"),
+      beliefs: 4,
+      id: Id(3),
+    ),
+  ]
+
+  test "argmin + oponly":
+    let selected = infos.argmin(Agent(agentOrder: AgentOrder.opinion))
+    check selected.len == 2
+    check Id(0) in selected
+    check Id(1) in selected
+
+  test "argmax + oponly":
+    let selected = infos.argmax(Agent(agentOrder: AgentOrder.opinion))
+    check selected.len == 2
+    check Id(2) in selected
+    check Id(3) in selected
+
+  test "argmin + bronly":
+    let selected = infos.argmin(Agent(agentOrder: AgentOrder.belief))
+    check selected.len == 2
+    check Id(0) in selected
+    check Id(2) in selected
+
+  test "argmax + bronly":
+    let selected = infos.argmax(Agent(agentOrder: AgentOrder.belief))
+    check selected.len == 2
+    check Id(1) in selected
+    check Id(3) in selected
+
+  test "argmin + opinion -> belief":
+    let selected = infos.argmin(Agent(agentOrder: AgentOrder.opbel))
+    check selected.len == 1
+    check Id(0) in selected
+
+  test "argmax + opinion -> belief":
+    let selected = infos.argmax(Agent(agentOrder: AgentOrder.opbel))
+    check selected.len == 1
+    check Id(3) in selected
+
+  test "argmin + belief -> opinion":
+    let selected = infos.argmin(Agent(agentOrder: AgentOrder.belop))
+    check selected.len == 1
+    check Id(0) in selected
+
+  test "argmax + belief -> opinion":
+    let selected = infos.argmax(Agent(agentOrder: AgentOrder.belop))
+    check selected.len == 1
+    check Id(3) in selected
+
+
 suite "Recommendation":
   initRand(42, 1)
   test "is not following":

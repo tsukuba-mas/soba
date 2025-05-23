@@ -53,6 +53,9 @@ type RewritingStrategy* {.pure.} = enum
   none, random, oprecommendation, belrecommendation, bothrecommendation,
   swapMaxMin
 
+type AgentOrder* {.pure.} = enum
+  opinion, belief, opbel, belop
+
 type InitNetworkConfig* {.pure.} = enum
   random, randomLowerMOD
 
@@ -97,11 +100,17 @@ type Agent* = object
   updated*: bool
   opDistWeight*: DecimalType
   acceptanceDescision*: AcceptanceDescision
+  agentOrder*: AgentOrder
 
 type Message* = object
   author*: Id
   belief*: Formulae
   opinions*: Table[Formulae, Opinion]
+
+type DifferenceInfo* = object
+  opinions*: DecimalType
+  beliefs*: int
+  id*: Id
 
 type Simulator* = object
   agents*: seq[Agent]
@@ -137,6 +146,7 @@ type CommandLineArgs* = object
   maximalOpinionChange*: DecimalType
   opDistWeight*: DecimalType
   acceptanceDescision*: AcceptanceDescision
+  agentOrder*: AgentOrder
 
 type EvaluatedMessages* = object
   acceptables*: seq[Message]

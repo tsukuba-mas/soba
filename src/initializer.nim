@@ -83,6 +83,7 @@ proc initilizeSimulator*(options: CommandLineArgs): Simulator =
       updated: false,
       opDistWeight: options.opDistWeight,
       acceptanceDescision: options.acceptanceDescision,
+      agentOrder: options.agentOrder,
     )
   )
   Simulator(

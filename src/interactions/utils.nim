@@ -4,6 +4,7 @@ import sequtils
 import intbrg
 import strformat
 import tables
+import algorithm
 from math import isPowerOfTwo
 
 proc isAcceptablePost*(agent: Agent, post: Message): bool =
@@ -77,8 +78,31 @@ proc argm[T, S](xs: seq[T], dist: proc (x: T): S, isMin: bool): seq[T] =
   let minDist = if isMin: distances.min else: distances.max
   (0..<xs.len).toSeq.filterIt(distances[it] == minDist).mapIt(xs[it])
 
+proc argm(infos: seq[DifferenceInfo], agent: Agent, order: SortOrder): seq[Id] =
+  assert infos.len > 0
+  let cmpFunc = case agent.agentOrder
+                of AgentOrder.opinion: opinionCmp
+                of AgentOrder.belief:  beliefCmp
+                of AgentOrder.opbel:   opbelCmp
+                of AgentOrder.belop:   belopCmp
+  let sortedInfos = infos.sorted(cmp=cmpFunc, order=order)
+  var lb = 0
+  while true:
+    if cmpFunc(sortedInfos[0], sortedInfos[lb]) != 0:
+      break
+    lb += 1
+  (0..<lb).toSeq.mapIt(sortedInfos[it].id)
+
+
 proc argmin*[T, S](xs: seq[T], dist: proc (x: T): S) : seq[T] =
   argm(xs, dist, true)
 
+proc argmin*(infos: seq[DifferenceInfo], agent: Agent): seq[Id] =
+  argm(infos, agent, SortOrder.Ascending)
+
 proc argmax*[T, S](xs: seq[T], dist: proc (x: T): S) : seq[T] =
   argm(xs, dist, false)
+
+proc argmax*(infos: seq[DifferenceInfo], agent: Agent): seq[Id] =
+  argm(infos, agent, SortOrder.Descending)
+

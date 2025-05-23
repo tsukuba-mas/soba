@@ -50,3 +50,47 @@ proc distance*(agent: Agent, message: Message): DecimalType =
   of AcceptanceDescision.unified:
     agent.unifiedDistance(message)
 
+proc opinionCmp*(d1, d2: DifferenceInfo): int =
+  ## Compare `d1` and `d2` just based on opinions:
+  if d1.opinions < d2.opinions:
+    -1
+  elif d1.opinions == d2.opinions:
+    0
+  else:
+    1
+
+proc beliefCmp*(d1, d2: DifferenceInfo): int =
+  ## Compare `d1` and `d2` just based on beliefs.
+  if d1.beliefs < d2.beliefs:
+    -1
+  elif d1.beliefs == d2.beliefs:
+    0
+  else:
+    1
+
+proc opbelCmp*(d1, d2: DifferenceInfo): int =
+  ## Compare `d1` and `d2` with the lexicographical order (opinions -> beliefs).
+  if d1.opinions < d2.opinions or (d1.opinions == d2.opinions and d1.beliefs < d2.beliefs):
+    -1
+  elif d1.opinions == d2.opinions and d1.beliefs == d2.beliefs:
+    0
+  else:
+    1
+
+proc belopCmp*(d1, d2: DifferenceInfo): int =
+  ## Compare `d1` and `d2` with the lexicographical order (beliefs -> opinions).
+  if d1.beliefs < d2.beliefs or (d1.beliefs == d2.beliefs and d1.opinions < d2.opinions):
+    -1
+  elif d1.opinions == d2.opinions and d1.beliefs == d2.beliefs:
+    0
+  else:
+    1
+
+proc toDifferenceInfo*(messages: seq[Message], agent: Agent): seq[DifferenceInfo] =
+  messages.mapIt(
+    DifferenceInfo(
+      opinions: distance(agent.opinions, it.opinions),
+      beliefs: distance(agent.belief, it.belief),
+      id: it.author,
+    )
+  )

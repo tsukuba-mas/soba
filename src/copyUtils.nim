@@ -32,6 +32,7 @@ proc copy*(agent: Agent): Agent =
     updated: agent.updated,
     opDistWeight: agent.opDistWeight,
     acceptanceDescision: agent.acceptanceDescision,
+    agentOrder: agent.agentOrder,
   )
 
 proc updateOpinion*(agent: Agent, opinions: Table[Formulae, Opinion]): Agent =

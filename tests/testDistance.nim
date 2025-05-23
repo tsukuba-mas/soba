@@ -84,4 +84,58 @@ suite "configure descision algorithm":
     for i, (msg, expected) in zip(messages, expecteds):
       let now = agent.distance(msg) <= agent.epsilon
       check now == expected
-    
+
+suite "order between diffrence info":
+  let infos = @[
+    DifferenceInfo(
+      opinions: newDecimal("0.2"),
+      beliefs: 2,
+      id: Id(0),
+    ),
+    DifferenceInfo(
+      opinions: newDecimal("0.2"),
+      beliefs: 4,
+      id: Id(1),
+    ),
+    DifferenceInfo(
+      opinions: newDecimal("0.4"),
+      beliefs: 2,
+      id: Id(2),
+    ),
+    DifferenceInfo(
+      opinions: newDecimal("0.4"),
+      beliefs: 4,
+      id: Id(3),
+    ),
+  ]
+
+  test "opinion only":
+    # 0 == 1 < 2 == 3
+    check opinionCmp(infos[0], infos[1]) == 0  # ==
+    check opinionCmp(infos[2], infos[3]) == 0  # ==
+    check opinionCmp(infos[0], infos[2]) < 0   # <
+    check opinionCmp(infos[3], infos[1]) > 0   # >
+
+  test "beliefs only":
+    # 0 == 2 < 1 == 3
+    check beliefCmp(infos[0], infos[2]) == 0   # ==
+    check beliefCmp(infos[1], infos[3]) == 0   # ==
+    check beliefCmp(infos[0], infos[1]) < 0    # <
+    check beliefCmp(infos[3], infos[2]) > 0    # >
+
+  test "opinion -> belief":
+    # 0 < 1 < 2 < 3
+    check opbelCmp(infos[0], infos[1]) < 0
+    check opbelCmp(infos[3], infos[2]) > 0
+    check opbelCmp(infos[0], infos[2]) < 0
+    check opbelCmp(infos[3], infos[1]) > 0
+    check opbelCmp(infos[0], infos[0]) == 0
+
+  test "belief -> opinion":
+    # 0 < 2 < 1 < 3
+    check belopCmp(infos[0], infos[2]) < 0
+    check belopCmp(infos[3], infos[1]) > 0
+    check belopCmp(infos[2], infos[1]) < 0
+    check belopCmp(infos[3], infos[0]) > 0
+    check belopCmp(infos[0], infos[0]) == 0
+
