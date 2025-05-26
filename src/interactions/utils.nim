@@ -86,7 +86,7 @@ proc argm(infos: seq[DifferenceInfo], agent: Agent, order: SortOrder): seq[Id] =
   let cmpFunc = agent.getCmpFunc()
   let sortedInfos = infos.sorted(cmp=cmpFunc, order=order)
   var lb = 0
-  while true:
+  while lb < sortedInfos.len:
     if cmpFunc(sortedInfos[0], sortedInfos[lb]) != 0:
       break
     lb += 1
