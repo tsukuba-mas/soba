@@ -63,7 +63,10 @@ proc canUpdateNeighbors(
     if not isSucceededInChoosingAgents:
       return false
     else:
-      return agent.distance(unfollowedAgentMessage.get()) > agent.distance(followedAgentMessage.get())
+      let unfollowed = unfollowedAgentMessage.get().toDifferenceInfo(agent)
+      let followed = followedAgentMessage.get().toDifferenceInfo(agent)
+      let cmpFunc = agent.getCmpFunc()
+      cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
   of RewritingStrategy.random:
     return unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
 

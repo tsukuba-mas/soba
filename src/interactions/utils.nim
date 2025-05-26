@@ -74,13 +74,16 @@ proc argm[T, S](xs: seq[T], dist: proc (x: T): S, isMin: bool): seq[T] =
   let minDist = if isMin: distances.min else: distances.max
   (0..<xs.len).toSeq.filterIt(distances[it] == minDist).mapIt(xs[it])
 
+proc getCmpFunc*(agent: Agent): proc (d1, d2: DifferenceInfo): int =
+  case agent.agentOrder
+  of AgentOrder.opinion: opinionCmp
+  of AgentOrder.belief:  beliefCmp
+  of AgentOrder.opbel:   opbelCmp
+  of AgentOrder.belop:   belopCmp
+
 proc argm(infos: seq[DifferenceInfo], agent: Agent, order: SortOrder): seq[Id] =
   assert infos.len > 0
-  let cmpFunc = case agent.agentOrder
-                of AgentOrder.opinion: opinionCmp
-                of AgentOrder.belief:  beliefCmp
-                of AgentOrder.opbel:   opbelCmp
-                of AgentOrder.belop:   belopCmp
+  let cmpFunc = agent.getCmpFunc()
   let sortedInfos = infos.sorted(cmp=cmpFunc, order=order)
   var lb = 0
   while true:

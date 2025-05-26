@@ -72,53 +72,83 @@ suite "argmin/argmax for DifferenceInfo":
     check Id(3) in selected
 
 
+proc genAgent(msg: Message, agentOrder: AgentOrder, rewriting: RewritingStrategy): Agent =
+  Agent(
+    id: Id(0),
+    neighbors: @[Id(1), Id(2), Id(3)].toHashSet,
+    opinions: msg.opinions,
+    belief: msg.belief,
+    epsilon: "0.1".newDecimal,
+    delta: 2,
+    agentOrder: AgentOrder.opinion,
+    rewritingStrategy: rewriting,
+  )
+
 suite "Recommendation":
   initRand(42, 1)
+  let topic = "11110000".toFormula
+  let messages = @[
+    Message(opinions: @[(topic, "0.5".newDecimal)].toTable, belief: "11110000".toFormula, author: Id(0)),
+
+    # Neighbors
+    Message(opinions: @[(topic, "0.25".newDecimal)].toTable, belief: "11100000".toFormula, author: Id(1)),
+    Message(opinions: @[(topic, "0.75".newDecimal)].toTable, belief: "10000000".toFormula, author: Id(2)),
+    Message(opinions: @[(topic, "1.0".newDecimal)].toTable, belief: "00001111".toFormula, author: Id(3)),
+
+    # Non-neighbors
+    Message(opinions: @[(topic, "0.4".newDecimal)].toTable, belief: "11101000".toFormula, author: Id(4)),
+    Message(opinions: @[(topic, "0.45".newDecimal)].toTable, belief: "1110000".toFormula, author: Id(5)),
+    Message(opinions: @[(topic, "0.9".newDecimal)].toTable, belief: "00000001".toFormula, author: Id(6))
+  ]
+  let t_messages = messages.mapIt((it.author, it)).toTable
+  let n = messages.len
+
+  
   test "is not following":
-    let agent = Agent(id: Id(0), neighbors: @[Id(1), Id(2)].toHashSet)
-    check not agent.isNotFollowing(Id(0))
+    let agent = messages[0].genAgent(AgentOrder.opinion, RewritingStrategy.random)
     check not agent.isNotFollowing(Id(1))
-    check agent.isNotFollowing(Id(3))
+    check not agent.isNotFollowing(Id(2))
+    check agent.isNotFollowing(Id(4))
+
+  test "none":
+    let agent = messages[0].genAgent(AgentOrder.opinion, RewritingStrategy.none)
+    check agent.recommendUser(n, t_messages).isNone()
   
   test "randomly":
-    let agent = Agent(id: Id(0), neighbors: @[Id(1), Id(2)].toHashSet)
-    check agent.recommendRandomly(4).get == Id(3)
+    let agent = messages[0].genAgent(AgentOrder.opinion, RewritingStrategy.random)
+    check agent.recommendRandomly(n).get in @[Id(4), Id(5), Id(6)]
 
-  test "swapMaxMin":
-    let topic = "11110000".toFormula
-    let agent = Agent(
-      id: Id(0),
-      neighbors: @[Id(1), Id(2), Id(3)].toHashSet,
-      opinions: @[(topic, "0.5".newDecimal)].toTable,
-      belief: "11110000".toFormula,
-      epsilon: "0.1".newDecimal,
-      delta: 2,
-      agentOrder: AgentOrder.opinion,
-      rewritingStrategy: RewritingStrategy.swapMaxMin,
-    )
-    let messages = @[
-      Message(opinions: agent.opinions, belief: agent.belief, author: Id(0)),
-
-      # concordant neighbor (distance (0 + 1/8) * 0.5 = 0.0625)
-      Message(opinions: @[(topic, "0.5".newDecimal)].toTable, belief: "11100000".toFormula, author: Id(1)),
-
-      # discordant neighbor (distance (0.25 + 3/8) * 0.5 = 0.3125)
-      Message(opinions: @[(topic, "0.75".newDecimal)].toTable, belief: "10000000".toFormula, author: Id(2)),
-
-      # discordant neighbor (distance (0.5 + 8/8) * 0.5 = 0.75)
-      Message(opinions: @[(topic, "1.0".newDecimal)].toTable, belief: "00001111".toFormula, author: Id(3)),
-
-      # concordant non-neighbor (distance (0.1 + 2/8) * 0.5 = 0.175)
-      Message(opinions: @[(topic, "0.4".newDecimal)].toTable, belief: "11101000".toFormula, author: Id(4)),
-
-      # concordant non-neighbor (distance (0.05 + 1/8) * 0.5 = 0.0875)
-      Message(opinions: @[(topic, "0.45".newDecimal)].toTable, belief: "1110000".toFormula, author: Id(5)),
-
-      # discordant non-neighbor
-      Message(opinions: @[(topic, "0.9".newDecimal)].toTable, belief: "00000001".toFormula, author: Id(6))
-    ]
-    let t_messages = messages.mapIt((it.author, it)).toTable
-
+  test "swapMaxMin (opinion)":
+    let agent = messages[0].genAgent(AgentOrder.opinion, RewritingStrategy.swapMaxMin)
     check agent.getUnfollowedAgent(t_messages, @[]) == some(Id(3))
-    check agent.recommendUser(7, t_messages) == some(Id(5))
+    check agent.recommendUser(n, t_messages) == some(Id(5))
     check agent.canUpdateNeighbors(some(messages[3]), some(messages[5]))
+
+  test "swapMaxMin (belief)":
+    let agent = messages[0].genAgent(AgentOrder.belief, RewritingStrategy.swapMaxMin)
+    check agent.getUnfollowedAgent(t_messages, @[]) == some(Id(3))
+    check agent.recommendUser(n, t_messages) in @[some(Id(4)), some(Id(5))]
+    check agent.canUpdateNeighbors(some(messages[3]), some(messages[4]))
+    check agent.canUpdateNeighbors(some(messages[3]), some(messages[5]))
+
+  test "swapMaxMin (opbel)":
+    let agent = messages[0].genAgent(AgentOrder.opbel, RewritingStrategy.swapMaxMin)
+    check agent.getUnfollowedAgent(t_messages, @[]) == some(Id(3))
+    check agent.recommendUser(n, t_messages) == some(Id(5))
+    # distance between 0 and 3: opinions 0.5, beliefs: 8
+    # distance between 0 and 5: opinions 0.05, beliefs: 1
+    # Hence (distance 0-1) > (distance 0-5) where > is the order based on opbel
+    check agent.canUpdateNeighbors(some(messages[3]), some(messages[5]))
+
+  test "swapMaxMin(belop)":
+    let agent = messages[0].genAgent(AgentOrder.belop, RewritingStrategy.swapMaxMin)
+    check agent.getUnfollowedAgent(t_messages, @[]) == some(Id(3))
+    check agent.recommendUser(n, t_messages) == some(Id(5))
+    # distance between 0 and 3: opinions 0.5, beliefs: 8
+    # distance between 0 and 5: opinions 0.05, beliefs: 1
+    # Hence (distance 0-3) > (distance 0-5) where > is the order based on belop
+    check agent.canUpdateNeighbors(some(messages[3]), some(messages[5]))
+
+
+    
+    

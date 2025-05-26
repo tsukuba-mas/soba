@@ -73,11 +73,13 @@ proc belopCmp*(d1, d2: DifferenceInfo): int =
   else:
     1
 
-proc toDifferenceInfo*(messages: seq[Message], agent: Agent): seq[DifferenceInfo] =
-  messages.mapIt(
-    DifferenceInfo(
-      opinions: distance(agent.opinions, it.opinions),
-      beliefs: distance(agent.belief, it.belief),
-      id: it.author,
-    )
+proc toDifferenceInfo*(message: Message, agent: Agent): DifferenceInfo =
+  DifferenceInfo(
+    opinions: distance(agent.opinions, message.opinions),
+    beliefs: distance(agent.belief, message.belief),
+    id: message.author,
   )
+
+proc toDifferenceInfo*(messages: seq[Message], agent: Agent): seq[DifferenceInfo] =
+  messages.mapIt(it.toDifferenceInfo(agent))
+  
