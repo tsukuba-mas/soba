@@ -268,18 +268,12 @@ while there exists agent a s.t. with no neighbors then
 end while
 ```
 
-### `--opDistWeight` (numbers between 0 and 1, default: 0.5)
-The ratio of the distance between two agents' opinions on the distance between the agents.
-More precisely, this option set the parameter $\beta$ in the definition of the distance between two agents $d_A(a,a')$:
+### `--agentOrder` (see below, default: `opinion`)
+Set the order between agents.
+**This is useful only `swapMaxMin` is passed for `--rewrite`.**
 
-$$
-d_A(a,a') = \beta d_O(O_a,O_{a'}) + (1-\beta) \frac{d_B(B_a,B_{a'})}{|\mathcal{M}(\top)|}.
-$$
-
-### `--acceptanceDescision` (see below, default: `each`)
-The algorithm to decide whether other agents are considered as concordant.
-Possible options are as follows:
-
-- `each`: if opinions (resp. beliefs) are close enough, others are concordant.
-- `unified`: if $d_A(a,a')\leq\varepsilon$, others are concordant.
+- `opinion`: $b<_a c$ iff $d_O(O_a,O_b)<d_O(O_a,O_c)$;
+- `belief`: $b <_a c$ iff $d_B(B_a,B_b)<d_B(B_a,B_c)$;
+- `opbel`: lexicographical order (checking opinions and then beliefs);
+- `belop`: lexicographical order (checking beliefs and then opinions).
 
