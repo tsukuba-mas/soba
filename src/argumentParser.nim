@@ -11,7 +11,9 @@ import randomUtils
 import bigints
 import options
 
-const prolog = "SOBA: Simulator for Opinions-Beliefs interactions between Agents"
+const gitHash {.strdefine.} = "unknown"
+
+const prolog = "SOBA: Simulator for Opinions-Beliefs interactions between Agents (" & gitHash & ")"
 let spec = (
   seed: newIntArg(@["--seed"], "seed", defaultVal=42),
   dir: newStringArg(@["-d", "--dir"], "directory to output files", defaultVal="results/tmp"),
