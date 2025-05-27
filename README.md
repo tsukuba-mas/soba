@@ -5,7 +5,12 @@
 This is the simulator of agent-based models which focus on opinions-beliefs interactions through values.
 
 ## Requirements
-[Nim](https://nim-lang.org/) 2.0.0 or later and gcc.
+You will need:
+
+- [Nim](https://nim-lang.org/) 2.0.0 or later;
+- gcc;
+- Git.
+
 Dependent packages listed in `.nimble` file will be installed automatically if necessary when you compile this project.
 
 Running this program on Linux is recommended.
@@ -19,21 +24,16 @@ $ git clone --recurse-submodules https://github.com/tsukuba-mas/soba.git
 
 **Do not forget to add the option `--recurse-submodules` to clone sub modules the simulator depends on.**
 
-You can compile the simulator by:
+After you have cloned, you can compile the simulator.
+**It is recommended to compile it by:**
 
 ```bash
-$ nimble build
+$ nimble build -d:release -d:gitHash=`bash gethash.sh`
 ```
 
-Compiling the option `-d:release` yields faster binary (recommended in general).
-It is recommended to embed the Git hash.
-This can be obtained by executing `gethash.sh` and passing the output by:
-
-```bash
-$ nimble build -d:gitHash=`bash gethash.sh`
-```
-
-If something has been modified from the HEAD of Git, the sign `+` is appended at the end.
+The option `-d:release` yields faster binaries than debugging build.
+The option ``-d:gitHash=`bash gethash.sh` `` embeds the commit hash of the software to the binary (the sign `+` is appended at the end of hash if something has been modified).
+Of course, you can add/remove options to the command above if you want.
 
 By executing the command above, you can get the binary `soba`.
 This is the simulator.
@@ -48,9 +48,6 @@ You can see all of the accepted options and their descriptions by:
 ```bash
 $ ./soba --help
 ```
-
-If you have passed the Git hash when compiling, it appears at the end of the prolog.
-If nothing has been passed, `unknown` is shown.
 
 The output from the simulator will be saved under the directory which is specified in the option `--dir` (or `-d`).
 
