@@ -2,7 +2,6 @@ import unittest
 
 include interactions/chooseTargets
 import types
-import randomUtils
 import sequtils
 
 suite "Choose targets":
