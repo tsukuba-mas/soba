@@ -71,9 +71,10 @@ proc parseValuesJson(rawJson: string, agents: int, atoms: int): Table[Id, Cultur
 
 proc parseNetworkJson(rawJson: string, agents: int, edges: int, networkType: InitNetworkConfig): Table[Id, HashSet[Id]] =
   result = initTable[Id, HashSet[Id]]()
-  let json = parseJson(rawJson)
-  for i in 0..<agents:
-    result[i.toId] =  json[intToStr(i)].getElems().mapIt(it.getInt.toId).toHashSet
+  if rawJson.len > 0:
+    let json = parseJson(rawJson)
+    for i in 0..<agents:
+      result[i.toId] =  json[intToStr(i)].getElems().mapIt(it.getInt.toId).toHashSet
 
 proc parseTopics(val: string, atoms: int): seq[Formulae] =
   if val.len == 0:
