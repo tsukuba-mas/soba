@@ -93,7 +93,6 @@ type Agent* = object
   activationProb*: float
   epsilon*: DecimalType
   delta*: int
-  updated*: bool
   agentOrder*: AgentOrder
 
 type Message* = object
