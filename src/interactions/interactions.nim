@@ -71,7 +71,7 @@ proc performInteractions*(
   ## they do them according to their updating strategy. Otherwise, do nothing.
   for process in simulator.updatingProcesses:
     let messages = simulator.receiveMessages(id2evaluatedMessages.keys.toSeq)
-    for idx, _ in simulator.agents:
-      let acceptableMessages = messages[Id(idx)].acceptables
-      doOnestep(simulator.agents[idx], process, acceptableMessages, simulator.topics, tick, theta)
+    for id in id2evaluatedMessages.keys:
+      let acceptableMessages = messages[id].acceptables
+      doOnestep(simulator.agents[int(id)], process, acceptableMessages, simulator.topics, tick, theta)
 
