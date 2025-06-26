@@ -85,7 +85,8 @@ proc genAgent(msg: Message, agentOrder: AgentOrder, rewriting: RewritingStrategy
   )
 
 suite "Recommendation":
-  initRand(42, 1)
+  rngInitializer(@[42])
+  
   let topic = "11110000".toFormula
   let messages = @[
     Message(opinions: @[(topic, "0.5".newDecimal)].toTable, belief: "11110000".toFormula, author: Id(0)),

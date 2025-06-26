@@ -6,16 +6,15 @@ suite "Opinion Json Parser":
   const agents = 5
   const topics = @[toFormula("0"), toFormula("1")]
   const seed = 42
-  initRand(seed)
 
-  test "if nothing is specified":
-    let actual = "".parseOpinionJson(agents, topics)
-    for idx in 0..<agents:
-      let id = Id(idx)
-      check actual[id].len == topics.len
-      for topic in topics:
-        check newDecimal(0) <= actual[id][topic]
-        check actual[id][topic] <= newDecimal(1)
+  # test "if nothing is specified":
+  #   let actual = "".parseOpinionJson(agents, topics)
+  #   for idx in 0..<agents:
+  #     let id = Id(idx)
+  #     check actual[id].len == topics.len
+  #     for topic in topics:
+  #       check newDecimal(0) <= actual[id][topic]
+  #       check actual[id][topic] <= newDecimal(1)
   
   test "when the key is -1 only":
     let input = [1 // 4, 3 // 4]

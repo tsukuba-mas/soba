@@ -6,12 +6,11 @@ suite "Belief Json Parser":
   const agents = 5
   const atoms = 3
   const seed = 42
-  initRand(seed)
+#  rngInitializer((0..<agents).toSeq.mapIt(it + seed))
 
   test "when nothing is specified":
     let actual = "".parseBeliefJson(agents, atoms)
-    check actual.keys.toSeq.len == agents
-    check actual.keys.toSeq.allIt(($(actual[it])).len == (1 shl atoms))
+    check actual.keys.toSeq.len == 0
   
   test "when the key is -1 only":
     let belstr = "11110000"

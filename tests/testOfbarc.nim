@@ -12,7 +12,8 @@ test "ofbarc and performing of and barc until stability yield the same results":
   let theta = newDecimal("0.00001")
   const seed = 42
   
-  initRand(seed, 1)
+  rngInitializer(@[seed])
+
   let ofbarcAgent = Agent(
     id: Id(0),
     opinions: @[(topic, newDecimal("0"))].toTable,
@@ -21,7 +22,7 @@ test "ofbarc and performing of and barc until stability yield the same results":
     alpha: alpha,
   ).doOfAndBarcUntilStable(@[topic], 0, theta)
 
-  initRand(seed, 1)  # reset it
+  rngInitializer(@[seed])  # reset it
   var agent = Agent(
     id: Id(0),
     opinions: @[(topic, newDecimal("0"))].toTable,

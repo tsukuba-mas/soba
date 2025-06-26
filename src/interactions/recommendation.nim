@@ -1,5 +1,5 @@
 import ../types
-import ../randomUtils
+from ../randomUtils import InitRNGs, Rand
 import ../copyUtils
 import ../logger
 import ../distance
@@ -9,6 +9,11 @@ import sets
 import options
 import strformat
 import tables
+
+InitRNGs()
+
+proc recommendationRNGinitializer*(rng: var Rand, n: int) =
+  rngInitializer(rng, n)
 
 proc isNotFollowing(by: Agent, id: Id): bool =
   ## Returns true iff the agent with the `id` is not followed by the agent `by`.

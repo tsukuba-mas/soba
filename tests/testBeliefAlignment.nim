@@ -52,7 +52,8 @@ suite "utility procedure: argmin":
 suite "Belief Alignment (Random choose)":
   let values = @[0 // 10, 1 // 10, 8 // 10, 10 // 10]
   let topic = toFormula("1100")
-  initRand(42, 1)
+
+  rngInitializer(@[42])
 
   test "get atomic props":
     check values.getNumberOfAtomicProps() == 2
@@ -118,7 +119,8 @@ suite "Belief Alignment (Random choose)":
 suite "Belief Alignment (deterministic choice with respect to values)":
   let values = @[0 // 10, 1 // 10, 8 // 10, 10 // 10]
   let topic = toFormula("1100")
-  initRand(42)
+  rngInitializer(@[42])
+
   generateOpinionToBeliefCache(@[topic], values)
   setPrec(10)  # default precise
 
@@ -179,7 +181,8 @@ suite "Belief Alignment (critical cases)":
   # the outputs can be different from the theory.
   let topic1 = toFormula("11000000")
   let topic2 = toFormula("00000011")
-  initRand(42)
+  rngInitializer(@[42])
+  
   opinion2BeliefCache = @[
     # Case 1
     #[ A ]# (@[(topic1, newDecimal("0.1")), (topic2, newDecimal("1.0"))].toTable, @[toFormula("00000001")]),

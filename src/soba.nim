@@ -17,7 +17,7 @@ simulator = simulator.performPrehoc(parsedOptions.prehoc, parsedOptions.maximalO
 simulator.log(0)
 for time in 1..parsedOptions.tick:
   # Interactions
-  let targets = chooseTargets(simulator.agents, simulator.numberOfActivatedAgents)
+  let targets = chooseTargets(simulator.agents)
   let evaluatedMessages = simulator.receiveMessages(targets)
   simulator = simulator.performInteractions(evaluatedMessages, time, parsedOptions.maximalOpinionChange)
   simulator = simulator.updateNeighbors(evaluatedMessages, time)

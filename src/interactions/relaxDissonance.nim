@@ -6,11 +6,16 @@ import utils
 import intbrg
 import options
 import ../logger
-import ../randomUtils
+from ../randomUtils import InitRNGs, Rand
 import ../distance
 import strformat
 import tables
 import algorithm
+
+InitRNGs()
+
+proc relaxDissonanceRNGinitializer*(rng: var Rand, n: int) =
+  rngInitializer(rng, n)
 
 ## Table which associates opinion to beliefs which yield opinions.
 ## Here, it is assumed that all of the agents share the same cultural values.

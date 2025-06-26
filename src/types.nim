@@ -118,6 +118,8 @@ type CommandLineArgs* = object
   seed*: int
   dir*: string
   n*: int
+  edges*: int
+  networkType*: InitNetworkConfig
   atoms*: int
   tick*: int
   update*: seq[UpdatingStrategy]
