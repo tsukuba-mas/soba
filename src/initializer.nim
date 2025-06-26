@@ -12,20 +12,22 @@ from interactions/recommendation import recommendationRNGinitializer
 from interactions/relaxDissonance import relaxDissonanceRNGinitializer
 
 InitRNGs()
-var rngs: seq[Rand]  # To avoid compile error
+# var rngs: seq[Rand]  # To avoid compile error
+
+let rngAccessor = Agent(id: Id(0))
 
 proc generateBeliefRandomly(atoms: int): Formulae =
   let models = 1 shl atoms
-  rngs[0].rand(1, (1 shl models) - 1).toBin(models).toFormula
+  rngAccessor.rand(1, (1 shl models) - 1).toBin(models).toFormula
 
 proc generateOpinionRandomly(ub: int = 10000): Opinion =
-  let num = rngs[0].rand(0, ub)
+  let num = rngAccessor.rand(0, ub)
   newDecimal(num) / newDecimal(ub)
 
 proc generateValuesRandomly(agents: int, atoms: int): Table[Id, CulturalValues] =
   let models = 1 shl atoms
   let ub = 100000
-  let values = (0..<models).toSeq.mapIt(rngs[0].rand(0, ub) // ub)
+  let values = (0..<models).toSeq.mapIt(rngAccessor.rand(0, ub) // ub)
   (0..<agents).toSeq.mapIt((Id(it), values)).toTable
 
 proc generateRandomGraph(agents: int, edges: int): Table[Id, HashSet[Id]] = 
@@ -34,7 +36,7 @@ proc generateRandomGraph(agents: int, edges: int): Table[Id, HashSet[Id]] =
   # Add edges (a, b) for all agent a
   for i in 0..<agents:
     while true:
-      let next = rngs[0].rand(0, agents - 1)
+      let next = rngAccessor.rand(0, agents - 1)
       if next == i:
         continue
       result[Id(i)] = [Id(next)].toHashSet
@@ -43,8 +45,8 @@ proc generateRandomGraph(agents: int, edges: int): Table[Id, HashSet[Id]] =
   # Add the rest of the edges
   var existingEdges = agents
   while existingEdges < edges:
-    let u = Id(rngs[0].rand(0, agents - 1))
-    let v = Id(rngs[0].rand(0, agents - 1))
+    let u = Id(rngAccessor.rand(0, agents - 1))
+    let v = Id(rngAccessor.rand(0, agents - 1))
     if u == v:
       continue
     if result[u].contains(v):
@@ -72,8 +74,8 @@ proc generateRandomGraphWithLowerMaxOutDegree(agents: int, edges: int): Table[Id
   
   # Generate all edges randomly
   while count < edges:
-    let u = Id(rngs[0].rand(0, agents - 1))
-    let v = Id(rngs[0].rand(0, agents - 1))
+    let u = Id(rngAccessor.rand(0, agents - 1))
+    let v = Id(rngAccessor.rand(0, agents - 1))
     if u == v:
       continue
     if result[u].contains(v):
@@ -91,9 +93,9 @@ proc generateRandomGraphWithLowerMaxOutDegree(agents: int, edges: int): Table[Id
 
     let agentWithNoNeighbors = agentWithNoNeighborsOption.get()
     let agentWithMaxNeighbors = result.findAgentWithMaxNeighbors()
-    let removed = rngs[0].choose(result[agentWithMaxNeighbors].toSeq).get()
+    let removed = rngAccessor.choose(result[agentWithMaxNeighbors].toSeq).get()
     let candidates = (0..<agents).toSeq.filterIt(Id(it) != agentWithNoNeighbors)
-    let added = Id(rngs[0].choose(candidates).get())
+    let added = Id(rngAccessor.choose(candidates).get())
     result[agentWithMaxNeighbors].excl(removed)
     result[agentWithNoNeighbors].incl(added)
 
@@ -164,19 +166,21 @@ proc fillOptions(options: CommandLineArgs): CommandLineArgs =
       SOBADefect,
       fmt"{agentsWithNoNeighbors} out of {options.n} agents have no neighbors following your specification"
     )
+
+proc generateSeeds(n: int): seq[int] =
+  (0..<n).toSeq.mapIt(rngAccessor.rand(0, high(int)))
   
 proc initilizeSimulator*(rawOptions: CommandLineArgs): Simulator =
   ## Returns simulator initialized with `options`.
   rngInitializer(@[rawOptions.seed])
-
   let options = rawOptions.fillOptions()
   let agents = options.n
   let atoms = options.atoms
   let allIds = (0..<agents).toSeq.map(toId)
 
-  chooseTargetsRNGinitializer(rngs[0], agents)
-  recommendationRNGinitializer(rngs[0], agents)
-  relaxDissonanceRNGinitializer(rngs[0], agents)
+  chooseTargetsRNGinitializer(generateSeeds(agents))
+  recommendationRNGinitializer(generateSeeds(agents))
+  relaxDissonanceRNGinitializer(generateSeeds(agents))
 
   # Verify everything is specified correctly
   let models = 1 shl atoms

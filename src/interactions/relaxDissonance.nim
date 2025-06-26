@@ -14,8 +14,8 @@ import algorithm
 
 InitRNGs()
 
-proc relaxDissonanceRNGinitializer*(rng: var Rand, n: int) =
-  rngInitializer(rng, n)
+proc relaxDissonanceRNGinitializer*(seeds: seq[int]) =
+  rngInitializer(seeds)
 
 ## Table which associates opinion to beliefs which yield opinions.
 ## Here, it is assumed that all of the agents share the same cultural values.

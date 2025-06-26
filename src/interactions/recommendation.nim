@@ -12,8 +12,8 @@ import tables
 
 InitRNGs()
 
-proc recommendationRNGinitializer*(rng: var Rand, n: int) =
-  rngInitializer(rng, n)
+proc recommendationRNGinitializer*(seeds: seq[int]) =
+  rngInitializer(seeds)
 
 proc isNotFollowing(by: Agent, id: Id): bool =
   ## Returns true iff the agent with the `id` is not followed by the agent `by`.

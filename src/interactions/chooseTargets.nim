@@ -5,8 +5,8 @@ import sequtils
 
 InitRNGs()
 
-proc chooseTargetsRNGinitializer*(rng: var Rand, n: int) =
-  rngInitializer(rng, n)
+proc chooseTargetsRNGinitializer*(seeds: seq[int]) =
+  rngInitializer(seeds)
 
 proc chooseTargets*(agents: seq[Agent]): seq[Id] = 
   ## Choose one or more agents who will act in the iteration randomly.
