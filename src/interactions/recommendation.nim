@@ -1,6 +1,5 @@
 import ../types
 from ../randomUtils import InitRNGs, Rand
-import ../copyUtils
 import ../logger
 import ../distance
 import utils
@@ -83,12 +82,12 @@ proc getMessagesOption(messages: Table[Id, Message], id: Option[Id]): Option[Mes
   
   
 proc updateNeighbors(
-  agent: Agent,
+  agent: var Agent,
   evaluatedMessages: EvaluatedMessages,
   allMessages: Table[Id, Message],
   agentNum: int,
   tick: int
-): Agent =
+) =
   ## Returns an agent after it revises the set of neighbors (i.e., the set of agents it follows) if it does; 
   ## if it does not, `agent` itself is returned.
   agent.withProbability(agent.unfollowProb):
@@ -121,17 +120,14 @@ proc updateNeighbors(
         fmt"NG {tick} {agent.id} removed {unfollowed.get()} followed {newNeighbor.get()}",
         tick
       )
-      return agent.updateNeighbors(unfollowed.get(), newNeighbor.get())
+      agent.neighbors.excl(unfollowed.get())
+      agent.neighbors.incl(newNeighbor.get())
 
-  return agent
-
-proc updateNeighbors*(simulator: Simulator, id2evaluatedMessages: Table[Id, EvaluatedMessages], time: int): Simulator =
+proc updateNeighbors*(simulator: var Simulator, id2evaluatedMessages: Table[Id, EvaluatedMessages], time: int) =
   ## Returns a simulator with agents after their updates on their neighbors (i.e., the agents they follow).
   let allMessages = simulator.agents.writeMessage()
-  let updatedAgents = simulator.agents.mapIt(
-    if id2evaluatedMessages.contains(it.id): 
-     it.updateNeighbors(id2evaluatedMessages[it.id], allMessages, simulator.agents.len, time) 
-    else: 
-      it
-  )
-  simulator.updateAgents(updatedAgents)
+  for idx, _ in simulator.agents:
+    let id = Id(idx)
+    if id2evaluatedMessages.contains(id): 
+     simulator.agents[idx].updateNeighbors(id2evaluatedMessages[id], allMessages, simulator.agents.len, time) 
+

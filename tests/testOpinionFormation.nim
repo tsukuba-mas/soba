@@ -17,6 +17,7 @@ suite "Opinion Formation":
   test "opinion formation":
     let alpha = newDecimal("0.2")
     let oldOpinion = newDecimal("1")
-    let agent = Agent(opinions: @[(topic, oldOpinion)].toTable, belief: belief, values: values, alpha: alpha)
+    var agent = Agent(opinions: @[(topic, oldOpinion)].toTable, belief: belief, values: values, alpha: alpha)
     let expected = alpha * oldOpinion + (newDecimal(1)  - alpha) / newDecimal(2)
-    check agent.opinionFormation(@[topic], 0).opinions[topic] == expected
+    agent.opinionFormation(@[topic], 0)
+    check agent.opinions[topic] == expected

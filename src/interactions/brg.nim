@@ -1,11 +1,10 @@
 import ../types
-import ../copyUtils
 import ../logger
 import sequtils
 import utils
 import strformat
 
-proc beliefRevisionGames*(agent: Agent, acceptablePosts: seq[Message], tick: int): Agent =
+proc beliefRevisionGames*(agent: var Agent, acceptablePosts: seq[Message], tick: int) =
   ## Perform belief revision games (BRG).
   let neighborBeliefs = acceptablePosts.mapIt(it.belief)
   let updatedBelief = revision(agent.belief, neighborBeliefs)
@@ -13,4 +12,4 @@ proc beliefRevisionGames*(agent: Agent, acceptablePosts: seq[Message], tick: int
     fmt"BR {tick} {agent.id} {agent.belief} -> {updatedBelief}",
     tick
   )
-  agent.updateBelief(updatedBelief)
+  agent.belief = updatedBelief

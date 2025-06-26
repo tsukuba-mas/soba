@@ -1,5 +1,4 @@
 import ../types
-import ../copyUtils
 import ../logger
 import sequtils
 import strformat
@@ -17,7 +16,7 @@ proc takeOpinions(acceptablePosts: seq[Message]): Table[Formulae, seq[Opinion]] 
       else:
         result[topic] = @[op]
 
-proc opinionDynamicsDeGrootmodel*(agent: Agent, topics: seq[Formulae], acceptablePosts: seq[Message], tick: int): Agent =
+proc opinionDynamicsDeGrootmodel*(agent: var Agent, topics: seq[Formulae], acceptablePosts: seq[Message], tick: int) =
   ## Perform opinion dynamics based on the DeGroot model.
   ## Here, the weight for the agent itself and its neighbors are the same.
   let neighbors = acceptablePosts.takeOpinions()
@@ -26,7 +25,7 @@ proc opinionDynamicsDeGrootmodel*(agent: Agent, topics: seq[Formulae], acceptabl
     fmt"ODDG {tick} {agent.id} {agent.opinions} -> {updatedOpinion}",
     tick
   )
-  agent.updateOpinion(updatedOpinion)
+  agent.opinions = updatedOpinion
 
 proc getNewOpinionByDW(mine: Opinion, others: seq[Opinion], ratio: DecimalType): Opinion =
   if others.len > 0: 
@@ -34,7 +33,7 @@ proc getNewOpinionByDW(mine: Opinion, others: seq[Opinion], ratio: DecimalType):
   else:
     mine
 
-proc opinionDynamicsDWmodel*(agent: Agent, topics: seq[Formulae], acceptablePosts: seq[Message], tick: int): Agent =
+proc opinionDynamicsDWmodel*(agent: var Agent, topics: seq[Formulae], acceptablePosts: seq[Message], tick: int) =
   ## Perform opinion dynamics based on a bounded confidence model.
   let neighbors = acceptablePosts.takeOpinions()
   let updatedOpinion = topics.mapIt(
@@ -45,4 +44,4 @@ proc opinionDynamicsDWmodel*(agent: Agent, topics: seq[Formulae], acceptablePost
     fmt"ODDW {tick} {agent.id} {agent.opinions} -> {updatedOpinion}",
     tick
   )
-  agent.updateOpinion(updatedOpinion)
+  agent.opinions = updatedOpinion

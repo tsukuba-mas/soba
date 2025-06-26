@@ -13,14 +13,14 @@ initLogger(parsedOptions.dir, parsedOptions.verbose, parsedOptions.topics.len)
 setPrec(parsedOptions.prec)
 var simulator = initilizeSimulator(parsedOptions)
 
-simulator = simulator.performPrehoc(parsedOptions.prehoc, parsedOptions.maximalOpinionChange)
+simulator.performPrehoc(parsedOptions.prehoc, parsedOptions.maximalOpinionChange)
 simulator.log(0)
 for time in 1..parsedOptions.tick:
   # Interactions
   let targets = chooseTargets(simulator.agents)
   let evaluatedMessages = simulator.receiveMessages(targets)
-  simulator = simulator.performInteractions(evaluatedMessages, time, parsedOptions.maximalOpinionChange)
-  simulator = simulator.updateNeighbors(evaluatedMessages, time)
+  simulator.performInteractions(evaluatedMessages, time, parsedOptions.maximalOpinionChange)
+  simulator.updateNeighbors(evaluatedMessages, time)
   simulator.log(time)
 
 if not simulator.agents.allIt(it.updated):

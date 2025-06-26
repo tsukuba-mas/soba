@@ -1,7 +1,6 @@
 import ../types
 import sets
 import sequtils
-import ../copyUtils
 import utils
 import intbrg
 import options
@@ -30,7 +29,7 @@ proc getBeliefBasedOpinion(agent: Agent, topic: Formulae): Opinion =
   ## Returns `agent`'s opinion toward `topic`.
   getBeliefBasedOpinion(agent.belief, agent.values, topic)
 
-proc opinionFormation*(agent: Agent, topics: seq[Formulae], tick: int): Agent =
+proc opinionFormation*(agent: var Agent, topics: seq[Formulae], tick: int) =
   ## Returns the agent after opinion formation.
   var newOpinion = initTable[Formulae, Opinion]()
   for topic in topics:
@@ -40,7 +39,7 @@ proc opinionFormation*(agent: Agent, topics: seq[Formulae], tick: int): Agent =
     fmt"OF {tick} {agent.id} {agent.opinions} -> {newOpinion}",
     tick
   )
-  agent.updateOpinion(newOpinion)
+  agent.opinions = newOpinion
 
 proc hamming(x, y: Formulae): int =
   ## Returns the hamming distance (i.e., the number of interpretations that are also model of `x` xor `y`) 
@@ -104,7 +103,7 @@ proc selectBeliefsWithMinimalError(currentOpinion: Table[Formulae, Opinion], top
   let error = proc (opinions: Table[Formulae, Opinion]): DecimalType = distance(opinions, currentOpinion)
   opinion2beliefCache.keys.toSeq.argmin(error).mapIt(opinion2beliefCache[it]).flatten()
 
-proc beliefAlignment*(agent: Agent, topics: seq[Formulae], tick: int, strategy: UpdatingStrategy): Agent =
+proc beliefAlignment*(agent: var Agent, topics: seq[Formulae], tick: int, strategy: UpdatingStrategy) = 
   ## Returns agent after belief alignment.
   let candidates = agent.opinions.selectBeliefsWithMinimalError(topics, agent.values)
   let updatedBelief = candidates.selectOneBelief(agent, strategy)
@@ -112,15 +111,16 @@ proc beliefAlignment*(agent: Agent, topics: seq[Formulae], tick: int, strategy: 
     fmt"BA {tick} {agent.id} {agent.belief} -> {updatedBelief}",
     tick
   )
-  agent.updateBelief(updatedBelief)
+  agent.belief = updatedBelief
 
-proc doOfAndBarcUntilStable*(agent: Agent, topics: seq[Formulae], tick: int, threshold: DecimalType): Agent = 
-  var oldAgent = agent.copy()
+proc doOfAndBarcUntilStable*(agent: var Agent, topics: seq[Formulae], tick: int, threshold: DecimalType) = 
   while true:
-    let afterOf = opinionFormation(oldAgent, topics, tick)
-    let newAgent = beliefAlignment(afterOf, topics, tick, UpdatingStrategy.barc)
-    let haveOpinionsConverged = distance(oldAgent.opinions, newAgent.opinions) <= threshold
-    let haveBeliefsConverged = distance(oldAgent.belief, newAgent.belief) == 0
+    let oldOpinion = agent.opinions
+    let oldBelief = agent.belief
+    opinionFormation(agent, topics, tick)
+    beliefAlignment(agent, topics, tick, UpdatingStrategy.barc)
+    let haveOpinionsConverged = distance(oldOpinion, agent.opinions) <= threshold
+    let haveBeliefsConverged = distance(oldBelief, agent.belief) == 0
     if haveOpinionsConverged and haveBeliefsConverged:
-      return newAgent
-    oldAgent = newAgent
+      break
+

@@ -70,36 +70,40 @@ suite "Belief Alignment (Random choose)":
 
   test "belief alignment for already coherent agent":
     let expected = toFormula("1101")
-    let agent = Agent(
+    var agent = Agent(
       opinions: @[(topic, newDecimal("0.05"))].toTable, 
       belief: expected
     )
     check selectBeliefsWithMinimalError(agent.opinions, @[topic], values).toHashSet == 
       @[toFormula("1100"), toFormula("1101"), toFormula("1110"), toFormula("1111")].toHashSet
-    check agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc).belief == expected
+    
+    agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc)
+    check agent.belief == expected
   
   test "belief alignment without distance sorting and random choice":
-    let agent = Agent(
+    var agent = Agent(
       opinions: @[(topic, newDecimal("0.5"))].toTable,
       belief: toFormula("1111")
     )
     let expected = toFormula("0011")
-    check selectBeliefsWithMinimalError(agent.opinions, @[topic], values).toHashSet == 
-      @[expected].toHashSet
-    check agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc).belief == expected
+    check selectBeliefsWithMinimalError(agent.opinions, @[topic], values).toHashSet == @[expected].toHashSet
+    
+    agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc)
+    check agent.belief == expected
   
   test "belief alignment with sorting with distance sorting and without random choice":
-    let agent = Agent(
+    var agent = Agent(
       opinions: @[(topic, newDecimal("0.4375"))].toTable, # 0.4375 = (0.5 + 0.475) / 2
       belief: toFormula("0010")
     )
     let expected = toFormula("0010")
-    check selectBeliefsWithMinimalError(agent.opinions, @[topic], values).toHashSet == 
-      @[expected, toFormula("0011")].toHashSet
-    check agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc).belief == expected
+    check selectBeliefsWithMinimalError(agent.opinions, @[topic], values).toHashSet == @[expected, toFormula("0011")].toHashSet
+
+    agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc)
+    check agent.belief == expected
   
   test "belief alignment with sorting with distance sorting and random choice":
-    let agent = Agent(
+    var agent = Agent(
       opinions: @[(topic, newDecimal("0.03"))].toTable, 
       belief: toFormula("1101")
     )
@@ -113,7 +117,9 @@ suite "Belief Alignment (Random choose)":
 
     let expected = @[toFormula("0001"), toFormula("0011"), toFormula("0010")]
     check selectBeliefsWithMinimalError(agent.opinions, @[topic], v2).toHashSet == expected.toHashSet
-    let alignedBelief = agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc).belief 
+
+    agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc)
+    let alignedBelief = agent.belief 
     check expected.contains(alignedBelief)
     
 suite "Belief Alignment (deterministic choice with respect to values)":
@@ -134,29 +140,32 @@ suite "Belief Alignment (deterministic choice with respect to values)":
 
   test "belief alignment for already coherent agent":
     opinion2beliefCache.clear()
-    let agent1 = Agent(
+    var agent1 = Agent(
      opinions: @[(topic, newDecimal("0.05"))].toTable, 
       belief: toFormula("1101"), 
       values: values
     )
     let shouldBeSelected = @[toFormula("1111"), toFormula("1110"), toFormula("1101"), toFormula("1100")]
     check selectBeliefsWithMinimalError(agent1.opinions, @[topic], values).toHashSet == shouldBeSelected.toHashSet
-    check agent1.beliefAlignment(@[topic], 0, UpdatingStrategy.bavm).belief == toFormula("1111")
+
+    agent1.beliefAlignment(@[topic], 0, UpdatingStrategy.bavm)
+    check agent1.belief == toFormula("1111")
 
     # another test ...
-    let agent2 = Agent(
+    var agent2 = Agent(
       opinions: @[(topic, newDecimal("0.05"))].toTable, 
       belief: toFormula("1111"), 
       values: values
     )
     check selectBeliefsWithMinimalError(agent2.opinions, @[topic], values).toHashSet == shouldBeSelected.toHashSet
-    check agent2.beliefAlignment(@[topic], 0, UpdatingStrategy.bavm).belief == toFormula("1111")
+    agent2.beliefAlignment(@[topic], 0, UpdatingStrategy.bavm)
+    check agent2.belief == toFormula("1111")
 
   test "if there exist some beliefs which minimize the error":
     opinion2beliefCache.clear()
     let cv = @[7 // 7, 3 // 7, 6 // 7, 2 // 7, 5 // 7, 1 // 7, 4 // 7, 0 // 7]
     let topics = @[toFormula("11110000"), toFormula("00001111")]
-    let agent = Agent(
+    var agent = Agent(
       opinions: @[
         (topics[0], newDecimal(7) / newDecimal(32)),
         (topics[1], newDecimal(19) / newDecimal(28)),
@@ -172,7 +181,8 @@ suite "Belief Alignment (deterministic choice with respect to values)":
     check candidates.contains(toFormula("00011000"))
 
     # And by choosing the best one with respect to the values, the answer is:
-    check agent.beliefAlignment(topics, 0, UpdatingStrategy.bavm).belief == toFormula("00011010")
+    agent.beliefAlignment(topics, 0, UpdatingStrategy.bavm)
+    check agent.belief == toFormula("00011010")
 
 suite "Belief Alignment (critical cases)":
   # Here, 'critical case' is when there exists more than one opinions based on beliefs

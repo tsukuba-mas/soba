@@ -1,5 +1,4 @@
 import ../types
-import ../copyUtils
 import sequtils
 import opinionDynamics
 import brg
@@ -9,13 +8,13 @@ import tables
 import messageReceiver
 
 proc doOnestep(
-  agent: Agent, 
+  agent: var Agent, 
   strategy: UpdatingStrategy, 
   messages: seq[Message], 
   topics: seq[Formulae], 
   tick: int,
   threshold: DecimalType,
-): Agent =
+) =
   case strategy
   of UpdatingStrategy.oddw:
     agent.opinionDynamicsDWmodel(topics, messages, tick)
@@ -39,49 +38,40 @@ proc isInternalProcess(strategy: UpdatingStrategy): bool =
     false
 
 proc performPrehoc(
-  agent: Agent, 
+  agent: var Agent, 
   prehocs: seq[UpdatingStrategy], 
   topics: seq[Formulae], 
   threshold: DecimalType
-): Agent =
+) =
   ## Perform the four procedures (ba or of) following to the array of updating strategy.
   ## The execution order will be the same with the order in the array.
   ## **Note that only internal processes are allowed in this procedure.**
   ## If the social processes (i.e., od or br) are passed, they are ignored.
-  var newAgent = agent
   for strategy in prehocs:
     if strategy.isInternalProcess():
-      newAgent = newAgent.doOnestep(strategy, @[], topics, 0, threshold)
-  return newAgent
+      agent.doOnestep(strategy, @[], topics, 0, threshold)
 
 proc performPrehoc*(
-  simulator: Simulator, 
+  simulator: var Simulator, 
   prehocs: seq[UpdatingStrategy], 
   theta: DecimalType,
-): Simulator = 
+) =
   ## Perform prehoc procedures.
-  let newAgents = simulator.agents.mapIt(performPrehoc(it, prehocs, simulator.topics, theta))
-  simulator.updateAgents(newAgents)
+  for idx, _ in simulator.agents:
+    performPrehoc(simulator.agents[idx], prehocs, simulator.topics, theta)
 
 proc performInteractions*(
-  simulator: Simulator, 
+  simulator: var Simulator, 
   id2evaluatedMessages: Table[Id, EvaluatedMessages], 
   tick: int,
   theta: DecimalType,
-): Simulator =
+) =
   ## Returns the simulator with agents after interactions.
   ## If an agent is activated to perform (possibly some of) the four procedures (od, br, ba, of),
   ## they do them according to their updating strategy. Otherwise, do nothing.
-  var newSimulator = simulator.copy()
   for process in simulator.updatingProcesses:
-    let messages = newSimulator.receiveMessages(id2evaluatedMessages.keys.toSeq)
-    let newAgents = newSimulator.agents.mapIt(
-      if messages.contains(it.id):
-        # for od and br, use acceptable messages only.
-        let acceptableMessages = messages[it.id].acceptables
-        doOnestep(it, process, acceptableMessages, simulator.topics, tick, theta)
-      else:
-        it
-    )
-    newSimulator = newSimulator.updateAgents(newAgents)
-  return newSimulator
+    let messages = simulator.receiveMessages(id2evaluatedMessages.keys.toSeq)
+    for idx, _ in simulator.agents:
+      let acceptableMessages = messages[Id(idx)].acceptables
+      doOnestep(simulator.agents[idx], process, acceptableMessages, simulator.topics, tick, theta)
+

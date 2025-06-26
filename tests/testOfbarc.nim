@@ -14,13 +14,14 @@ test "ofbarc and performing of and barc until stability yield the same results":
   
   rngInitializer(@[seed])
 
-  let ofbarcAgent = Agent(
+  var ofbarcAgent = Agent(
     id: Id(0),
     opinions: @[(topic, newDecimal("0"))].toTable,
     belief: toFormula("11110000"),
     values: values,
     alpha: alpha,
-  ).doOfAndBarcUntilStable(@[topic], 0, theta)
+  )
+  ofbarcAgent.doOfAndBarcUntilStable(@[topic], 0, theta)
 
   rngInitializer(@[seed])  # reset it
   var agent = Agent(
@@ -32,11 +33,12 @@ test "ofbarc and performing of and barc until stability yield the same results":
   )
   
   while true:
-    let mid = agent.opinionFormation(@[topic], 0)
-    let updated = mid.beliefAlignment(@[topic], 0, UpdatingStrategy.barc)
-    let haveOpinionsConverged = distance(agent.opinions, updated.opinions) <= theta
-    let haveBeliefsConverged = distance(agent.belief, updated.belief) == 0
-    agent = updated
+    let oldOpinions = agent.opinions
+    let oldBeliefs = agent.belief
+    agent.opinionFormation(@[topic], 0)
+    agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc)
+    let haveOpinionsConverged = distance(agent.opinions, oldOpinions) <= theta
+    let haveBeliefsConverged = distance(agent.belief, oldBeliefs) == 0
     if haveOpinionsConverged and haveBeliefsConverged:
       break
   
