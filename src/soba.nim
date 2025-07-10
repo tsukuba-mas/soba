@@ -9,7 +9,7 @@ import argumentParser
 
 let parsedOptions = parseArguments()
 initLogger(parsedOptions.dir, parsedOptions.verbose, parsedOptions.topics.len)
-setPrec(parsedOptions.prec)
+# setPrec(parsedOptions.prec)
 var simulator = initilizeSimulator(parsedOptions)
 
 simulator.performPrehoc(parsedOptions.prehoc, parsedOptions.maximalOpinionChange)
@@ -21,4 +21,3 @@ for time in 1..parsedOptions.tick:
   simulator.performInteractions(evaluatedMessages, time, parsedOptions.maximalOpinionChange)
   simulator.updateNeighbors(evaluatedMessages, time)
   simulator.log(time)
-

@@ -19,10 +19,8 @@ Running this program on Linux is recommended.
 First of all, clone this repository:
 
 ```bash
-$ git clone --recurse-submodules https://github.com/tsukuba-mas/soba.git
+$ git clone https://github.com/tsukuba-mas/soba.git
 ```
-
-**Do not forget to add the option `--recurse-submodules` to clone sub modules the simulator depends on.**
 
 After you have cloned, you can compile the simulator.
 **It is recommended to compile it by:**

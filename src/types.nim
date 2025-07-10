@@ -11,7 +11,14 @@ import strformat
 
 # installation via nimble does not work...
 # instead, importing it directly from the source code as a submodule
-import ../nimdecimal/decimal/decimal
+# import ../nimdecimal/decimal/decimal
+# Apparently the memory allocated by the wrapped C library is not freed...
+# This leads to fuge consumption of memory.
+# Hence so far standard `float` is used.
+# Most of the codes are preserved intentionally so that better decimal number library
+# can be applied easily.
+
+type DecimalType* = float
 
 # Specific defect type for this simulator
 type SOBADefect* = object of Defect
@@ -20,14 +27,18 @@ type SOBADefect* = object of Defect
 # To avoid comparison and addition/subtraction to floats,
 # represent opinions as decimal numbers.
 type Opinion* = DecimalType
-export DecimalType, decimal.`-`, decimal.`+`, decimal.`*`, 
-  decimal.`/`, decimal.`==`, decimal.`+=`, decimal.`abs`, 
-  decimal.`$`, decimal.newDecimal, decimal.`<`, decimal.`<=`,
-  decimal.setPrec
+# export DecimalType, decimal.`-`, decimal.`+`, decimal.`*`, 
+#   decimal.`/`, decimal.`==`, decimal.`+=`, decimal.`abs`, 
+#   decimal.`$`, decimal.newDecimal, decimal.`<`, decimal.`<=`,
+#   decimal.setPrec
 
+proc newDecimal*(x: int): DecimalType = float(x)
+proc newDecimal*(x: string): DecimalType = parseFloat(x)
+proc newDecimal*(x: float): DecimalType = float(x)
+proc setPrec*(x: int) = discard
 proc sum[T](xs: seq[T], init: T): T = xs.foldl(a + b, init)
 proc sum*(xs: seq[DecimalType]): DecimalType = xs.sum(newDecimal(0))
-proc hash*(x: DecimalType): Hash = hash($x)
+# proc hash*(x: DecimalType): Hash = hash($x)
 
 proc splitBySlash(rawData: string): (string, string) =
   ## Parse rational number (e.g., 2/3) and return as a value with type `Opinion`.
