@@ -88,7 +88,6 @@ proc makeNetworkConnected(network: Table[Id, HashSet[Id]], components: seq[HashS
 
 proc generateRandomGraph(agents: int, edges: int, connected: bool): Table[Id, HashSet[Id]] = 
   var network = initTable[Id, HashSet[Id]]()
-  echo edges
 
   # Add edges (a, b) for all agent a
   for i in 0..<agents:
