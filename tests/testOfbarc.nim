@@ -3,7 +3,7 @@ import unittest
 import randomUtils
 include interactions/relaxDissonance
 
-test "ofbarc and performing of and barc until stability yield the same results":
+template ofbaCheck(algorithm: UpdatingStrategy) =
   let values = @[
     7//7, 6//7, 5//7, 4//7, 3//7, 2//7, 1//7, 0//7,
   ]
@@ -21,7 +21,7 @@ test "ofbarc and performing of and barc until stability yield the same results":
     values: values,
     alpha: alpha,
   )
-  ofbarcAgent.doOfAndBarcUntilStable(@[topic], 0, theta)
+  ofbarcAgent.doOfAndBaUntilStable(@[topic], 0, theta, algorithm)
 
   rngInitializer(@[seed])  # reset it
   var agent = Agent(
@@ -36,7 +36,7 @@ test "ofbarc and performing of and barc until stability yield the same results":
     let oldOpinions = agent.opinions
     let oldBeliefs = agent.belief
     agent.opinionFormation(@[topic], 0)
-    agent.beliefAlignment(@[topic], 0, UpdatingStrategy.barc)
+    agent.beliefAlignment(@[topic], 0, algorithm)
     let haveOpinionsConverged = distance(agent.opinions, oldOpinions) <= theta
     let haveBeliefsConverged = distance(agent.belief, oldBeliefs) == 0
     if haveOpinionsConverged and haveBeliefsConverged:
@@ -44,3 +44,12 @@ test "ofbarc and performing of and barc until stability yield the same results":
   
   check distance(agent.opinions, ofbarcAgent.opinions) <= theta
   check distance(agent.belief, ofbarcAgent.belief) == 0
+
+
+suite "ofba## and performing of and ba## until stability yield the same results":
+  test "## = rc":
+    ofbaCheck(UpdatingStrategy.barc)
+
+  test "## = vm":
+    ofbaCheck(UpdatingStrategy.bavm)
+    

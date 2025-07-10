@@ -113,12 +113,13 @@ proc beliefAlignment*(agent: var Agent, topics: seq[Formulae], tick: int, strate
   )
   agent.belief = updatedBelief
 
-proc doOfAndBarcUntilStable*(agent: var Agent, topics: seq[Formulae], tick: int, threshold: DecimalType) = 
+proc doOfAndBaUntilStable*(agent: var Agent, topics: seq[Formulae], tick: int, threshold: DecimalType, baAlgorithm: UpdatingStrategy) =
+  assert baAlgorithm == UpdatingStrategy.barc or baAlgorithm == UpdatingStrategy.bavm
   while true:
     let oldOpinion = agent.opinions
     let oldBelief = agent.belief
     opinionFormation(agent, topics, tick)
-    beliefAlignment(agent, topics, tick, UpdatingStrategy.barc)
+    beliefAlignment(agent, topics, tick, baAlgorithm)
     let haveOpinionsConverged = distance(oldOpinion, agent.opinions) <= threshold
     let haveBeliefsConverged = distance(oldBelief, agent.belief) == 0
     if haveOpinionsConverged and haveBeliefsConverged:

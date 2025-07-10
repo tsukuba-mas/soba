@@ -27,12 +27,18 @@ proc doOnestep(
   of UpdatingStrategy.`of`:
     agent.opinionFormation(topics, tick)
   of UpdatingStrategy.ofbarc:
-    agent.doOfAndBarcUntilStable(topics, tick, threshold)
+    agent.doOfAndBaUntilStable(topics, tick, threshold, UpdateingStrategy.barc)
+  of UpdateingStrategy.ofbavm:
+    agent.doOfAndBaUntilStable(topics, tick, threshold, UpdatingStrategy.bavm)
 
 
 proc isInternalProcess(strategy: UpdatingStrategy): bool = 
   case strategy
-  of UpdatingStrategy.barc, UpdatingStrategy.bavm, UpdatingStrategy.`of`, UpdatingStrategy.ofbarc:
+  of UpdatingStrategy.barc,
+     UpdatingStrategy.bavm,
+     UpdatingStrategy.`of`,
+     UpdatingStrategy.ofbarc,
+     UpdatingStrategy.ofbavm:
     true
   else:
     false
