@@ -27,8 +27,8 @@ proc doOnestep(
   of UpdatingStrategy.`of`:
     agent.opinionFormation(topics, tick)
   of UpdatingStrategy.ofbarc:
-    agent.doOfAndBaUntilStable(topics, tick, threshold, UpdateingStrategy.barc)
-  of UpdateingStrategy.ofbavm:
+    agent.doOfAndBaUntilStable(topics, tick, threshold, UpdatingStrategy.barc)
+  of UpdatingStrategy.ofbavm:
     agent.doOfAndBaUntilStable(topics, tick, threshold, UpdatingStrategy.bavm)
 
 
