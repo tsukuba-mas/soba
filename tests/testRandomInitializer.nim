@@ -33,7 +33,7 @@ suite "Random initializers":
   test "random graph":
     let vs = 10
     let edges = 20
-    let graph = generateRandomGraph(vs, edges)
+    let graph = generateRandomGraph(vs, edges, true)
     let agents = (0..<vs).toSeq.mapIt(Id(it))
     check agents.allIt(graph[it].len > 0)
     check agents.mapIt(graph[it].len).sum() == edges
