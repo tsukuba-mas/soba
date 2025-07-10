@@ -61,6 +61,7 @@ type InitNetworkConfig* {.pure.} = enum
 type Id* = distinct int
 proc hash*(id: Id): Hash {.borrow.}
 proc `==`*(x, y: Id): bool {.borrow.}
+proc `<`*(x, y: Id): bool {.borrow.}
 proc `$`*(id: Id): string {.borrow.}
 proc toId*(x: int): Id = Id(x)
 
@@ -140,6 +141,7 @@ type CommandLineArgs* = object
   activatedAgents*: int
   maximalOpinionChange*: DecimalType
   agentOrder*: AgentOrder
+  forceConnectedNetwork*: bool
 
 type EvaluatedMessages* = object
   acceptables*: seq[Message]

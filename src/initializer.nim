@@ -6,6 +6,7 @@ import sequtils
 import tables
 import strutils
 import options
+import deques
 from randomUtils import InitRNGs, Rand
 from interactions/chooseTargets import chooseTargetsRNGinitializer
 from interactions/recommendation import recommendationRNGinitializer
@@ -30,8 +31,64 @@ proc generateValuesRandomly(agents: int, atoms: int): Table[Id, CulturalValues] 
   let values = (0..<models).toSeq.mapIt(rngAccessor.rand(0, ub) // ub)
   (0..<agents).toSeq.mapIt((Id(it), values)).toTable
 
-proc generateRandomGraph(agents: int, edges: int): Table[Id, HashSet[Id]] = 
-  result = initTable[Id, HashSet[Id]]()
+proc getWCCs(network: Table[Id, HashSet[Id]]): seq[HashSet[Id]] =
+  ## Return weakly connected components.
+
+  # Make the network underected one at first.
+  var undirected = network
+  for u in network.keys:
+    for v in network[u]:
+      undirected[v].incl(u)
+  
+  var nodes = network.keys.toSeq.toHashSet
+  var components: seq[HashSet[Id]]
+  
+  while nodes.len > 0:
+    # Search weakly connected component
+    var startFrom = nodes.toSeq.min
+    var component = @[startFrom].toHashSet
+    var q = @[startFrom].toDeque
+    nodes.excl(startFrom)
+
+    while q.len > 0:
+      let now = q.popFirst
+      component.incl(now)
+      for next in undirected[now]:
+        if nodes.contains(next):
+          q.addLast(next)
+          nodes.excl(next)
+
+    components.add(component)
+
+  return components
+
+proc makeNetworkConnected(network: Table[Id, HashSet[Id]], components: seq[HashSet[Id]]): Table[Id, HashSet[Id]] =
+  ## Make the given network connected.
+  ## This can be achieved by 1) finding the node(s) with maximal out-degrees, 2) removing one edge from the node,
+  ## 3) and add it to another node in different component.
+  var connected = network
+  var mergedTo = newSeqWith(components.len, false)
+  let largestComponentMembers = (0..<components.len).toSeq.mapIt(components[it].len).max
+  let largestComponentIdx = (0..<components.len).toSeq.filterIt(components[it].len == largestComponentMembers)[0]
+  mergedTo[largestComponentIdx] = true
+
+  for idx, component in components:
+    if idx == largestCOmponentIdx:
+      continue
+    let maxOutDeg = components[largestComponentIdx].toSeq.mapIt(connected[it].len).max
+    let maxOutDegNodes = components[largestComponentIdx].toSeq.filterIt(connected[it].len == maxOutDeg)
+    block addConnection:
+      for u in maxOutDegNodes:
+        for removed in network[u].toSeq.filterIt(not components[largestComponentIdx].contains(it)):
+          connected[u].excl(removed)
+          let added = rngAccessor.choose(component.toSeq)
+          connected[u].incl(added.get)
+          break addConnection
+  return connected
+
+proc generateRandomGraph(agents: int, edges: int, connected: bool): Table[Id, HashSet[Id]] = 
+  var network = initTable[Id, HashSet[Id]]()
+  echo edges
 
   # Add edges (a, b) for all agent a
   for i in 0..<agents:
@@ -39,7 +96,7 @@ proc generateRandomGraph(agents: int, edges: int): Table[Id, HashSet[Id]] =
       let next = rngAccessor.rand(0, agents - 1)
       if next == i:
         continue
-      result[Id(i)] = [Id(next)].toHashSet
+      network[Id(i)] = [Id(next)].toHashSet
       break
   
   # Add the rest of the edges
@@ -49,10 +106,19 @@ proc generateRandomGraph(agents: int, edges: int): Table[Id, HashSet[Id]] =
     let v = Id(rngAccessor.rand(0, agents - 1))
     if u == v:
       continue
-    if result[u].contains(v):
+    if network[u].contains(v):
       continue
     existingEdges += 1
-    result[u].incl(v)
+    network[u].incl(v)
+
+  if connected:
+    let components = getWCCs(network)
+    if components.len == 1:
+      return network
+    else:
+      return makeNetworkConnected(network, components)
+  else:
+    return network
 
 proc findAgentWithNoNeighbors(network: Table[Id, HashSet[Id]]): Option[Id] =
   for agent in network.keys:
@@ -67,10 +133,12 @@ proc findAgentWithMaxNeighbors(network: Table[Id, HashSet[Id]]): Id =
       result = agent
       maxNeighbors = network[agent].len
 
-proc generateRandomGraphWithLowerMaxOutDegree(agents: int, edges: int): Table[Id, HashSet[Id]] =
+proc generateRandomGraphWithLowerMaxOutDegree(agents: int, edges: int, connected: bool): Table[Id, HashSet[Id]] =
   var count = 0
+  var network = initTable[Id, HashSet[Id]]()
+
   for a in 0..<agents:
-    result[Id(a)] = initHashSet[Id]()
+    network[Id(a)] = initHashSet[Id]()
   
   # Generate all edges randomly
   while count < edges:
@@ -78,33 +146,42 @@ proc generateRandomGraphWithLowerMaxOutDegree(agents: int, edges: int): Table[Id
     let v = Id(rngAccessor.rand(0, agents - 1))
     if u == v:
       continue
-    if result[u].contains(v):
+    if network[u].contains(v):
       continue
-    result[u].incl(v)
+    network[u].incl(v)
     count += 1
   
   # Choose one edge with maximal neighbors, remove one, and 
   # add one neighbor to agents with no neighbors
   # until all agents have at least one neighbor
   while true:
-    let agentWithNoNeighborsOption = result.findAgentWithNoNeighbors()
+    let agentWithNoNeighborsOption = network.findAgentWithNoNeighbors()
     if agentWithNoNeighborsOption.isNone():
       break
 
     let agentWithNoNeighbors = agentWithNoNeighborsOption.get()
-    let agentWithMaxNeighbors = result.findAgentWithMaxNeighbors()
-    let removed = rngAccessor.choose(result[agentWithMaxNeighbors].toSeq).get()
+    let agentWithMaxNeighbors = network.findAgentWithMaxNeighbors()
+    let removed = rngAccessor.choose(network[agentWithMaxNeighbors].toSeq).get()
     let candidates = (0..<agents).toSeq.filterIt(Id(it) != agentWithNoNeighbors)
     let added = Id(rngAccessor.choose(candidates).get())
-    result[agentWithMaxNeighbors].excl(removed)
-    result[agentWithNoNeighbors].incl(added)
+    network[agentWithMaxNeighbors].excl(removed)
+    network[agentWithNoNeighbors].incl(added)
 
-proc generateInitialGraph(agents: int, edges: int, networkType: InitNetworkConfig): Table[Id, HashSet[Id]] =
+  if connected:
+    let components = getWCCs(network)
+    if components.len == 1:
+      return network
+    else:
+      return makeNetworkConnected(network, components)
+  else:
+    return network
+
+proc generateInitialGraph(agents: int, edges: int, networkType: InitNetworkConfig, connected: bool): Table[Id, HashSet[Id]] =
   case networkType
   of InitNetworkConfig.random:
-    return generateRandomGraph(agents, edges)
+    return generateRandomGraph(agents, edges, connected)
   of InitNetworkConfig.randomLowerMOD:
-    return generateRandomGraphWithLowerMaxOutDegree(agents, edges)
+    return generateRandomGraphWithLowerMaxOutDegree(agents, edges, connected)
 
 proc generateFollowFrom(agents: seq[Agent]): seq[Id] =
   ## Returns sequence of the agents corresponding to the network they form.
@@ -157,7 +234,7 @@ proc fillOptions(options: CommandLineArgs): CommandLineArgs =
     discard result.values.hasKeyOrPut(a, candidate[a])
 
   # Initial network
-  let network = generateInitialGraph(options.n, options.edges, options.networkType)
+  let network = generateInitialGraph(options.n, options.edges, options.networkType, options.forceConnectedNetwork)
   let agentsWithNoNeighbors = allAgents.mapIt(if options.network.hasKey(it): 0 else: 1).sum
   if agentsWithNoNeighbors == options.n:
     result.network = network

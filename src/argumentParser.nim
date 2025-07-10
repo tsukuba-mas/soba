@@ -40,7 +40,8 @@ let spec = (
   maximalOpinionChange: newStringArg(@["--maximalOpinionChange"], "threshold for opinions stability", defaultVal="0.00001"),
   edges: newIntArg(@["--nbEdges"], "number of edges", defaultVal=400),
   networkInitAlgo: newStringArg(@["--networkInitAlgo"], "algorithm to initialize network", defaultVal="random"),
-  agentOrder: newStringArg(@["--agentOrder"], "order between agents", defaultVal="opinion")
+  agentOrder: newStringArg(@["--agentOrder"], "order between agents", defaultVal="opinion"),
+  forceConnectedNetwork: newFlagArg(@["--forceConnectedNetwork"], "force the initial network to be connected"),
 )
 spec.parseOrQuit(prolog)
 
@@ -100,6 +101,7 @@ proc parseArguments*(): CommandLineArgs =
     seed: spec.seed.value,
     dir: spec.dir.value,
     n: n,
+    edges: edges,
     atoms: atoms,
     tick: spec.tick.value,
     update: parseAsSeqOfEnum[UpdatingStrategy](spec.update.value),
@@ -121,4 +123,5 @@ proc parseArguments*(): CommandLineArgs =
     activatedAgents: spec.activatedAgents.value,
     maximalOpinionChange: spec.maximalOpinionChange.value.newDecimal,
     agentOrder: parseEnum[AgentOrder](spec.agentOrder.value.strip),
+    forceConnectedNetwork: spec.forceConnectedNetwork.seen,
   )
