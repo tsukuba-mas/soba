@@ -40,7 +40,8 @@ proc isInternalProcess(strategy: UpdatingStrategy): bool =
      UpdatingStrategy.bavm,
      UpdatingStrategy.`of`,
      UpdatingStrategy.ofbarc,
-     UpdatingStrategy.ofbavm:
+     UpdatingStrategy.ofbavm,
+     UpdatingStrategy.us:
     true
   else:
     false
