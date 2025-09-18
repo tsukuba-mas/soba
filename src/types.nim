@@ -58,7 +58,8 @@ proc parseDecimal*(rawData: string): DecimalType =
 
 type UpdatingStrategy* {.pure.} = enum
   oddw = "oddw", oddg = "oddg", br = "br", `of` = "of", barc = "barc", bavm = "bavm",
-  ofbarc = "ofbarc*", ofbavm = "ofbavm*"
+  ofbarc = "ofbarc*", ofbavm = "ofbavm*",
+  us = "us"
 
 type RewritingStrategy* {.pure.} = enum
   none, random, swapMaxMin
@@ -105,6 +106,7 @@ type Agent* = object
   activationProb*: float
   epsilon*: DecimalType
   delta*: int
+  gamma*: float
   agentOrder*: AgentOrder
 
 type Message* = object
@@ -144,6 +146,7 @@ type CommandLineArgs* = object
   values*: Table[Id, CulturalValues]
   epsilon*: DecimalType
   delta*: int
+  gamma*: float
   topics*: seq[Formulae]
   opinions*: Table[Id, Table[Formulae, Opinion]]
   beliefs*: Table[Id, Formulae]

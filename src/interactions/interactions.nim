@@ -30,6 +30,8 @@ proc doOnestep(
     agent.doOfAndBaUntilStable(topics, tick, threshold, UpdatingStrategy.barc)
   of UpdatingStrategy.ofbavm:
     agent.doOfAndBaUntilStable(topics, tick, threshold, UpdatingStrategy.bavm)
+  of UpdatingStrategy.us:
+    agent.unifiedSynchronization(topics, tick)
 
 
 proc isInternalProcess(strategy: UpdatingStrategy): bool = 

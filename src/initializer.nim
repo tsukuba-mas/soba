@@ -302,6 +302,7 @@ proc initilizeSimulator*(rawOptions: CommandLineArgs): Simulator =
       values: options.values[it],
       epsilon: options.epsilon,
       delta: options.delta,
+      gamma: options.gamma,
       agentOrder: options.agentOrder,
     )
   )

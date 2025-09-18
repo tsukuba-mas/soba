@@ -125,3 +125,26 @@ proc doOfAndBaUntilStable*(agent: var Agent, topics: seq[Formulae], tick: int, t
     if haveOpinionsConverged and haveBeliefsConverged:
       break
 
+
+proc unifiedSynchronization*(agent: var Agent, topics: seq[Formulae], tick: int) =
+  var maxError = high(float)
+  var candidates: seq[Formulae] = @[]
+  for phi in allFormulae(getNumberOfAtomicProps(agent.values)):
+    if (not phi).isTautology():
+      continue
+    let newOpinions = topics.mapIt((it, getBeliefBasedOpinion(phi, agent.values, it))).toTable
+    let ratio = agent.gamma
+    let opdiff = distance(agent.opinions, newOpinions)
+    let beldiff = distance(agent.belief, phi).float
+    let diff = ratio * opdiff + (1.0 - ratio) * beldiff / ($(agent.belief)).len.toFloat
+    if diff < maxError:
+      maxError = diff
+      candidates = @[]
+    if maxError == diff:
+      candidates.add(phi)
+  
+  let new = agent.choose(candidates).get()
+  agent.belief = new
+  agent.opinions = topics.mapIt((it, getBeliefBasedOpinion(new, agent.values, it))).toTable
+
+
