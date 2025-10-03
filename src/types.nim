@@ -59,7 +59,7 @@ proc parseDecimal*(rawData: string): DecimalType =
 type UpdatingStrategy* {.pure.} = enum
   oddw = "oddw", oddg = "oddg", br = "br", `of` = "of", barc = "barc", bavm = "bavm",
   ofbarc = "ofbarc*", ofbavm = "ofbavm*",
-  us = "us"
+  us = "us", fao = "fao"
 
 type RewritingStrategy* {.pure.} = enum
   none, random, swapMaxMin

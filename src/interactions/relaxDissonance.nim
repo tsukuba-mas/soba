@@ -41,6 +41,14 @@ proc opinionFormation*(agent: var Agent, topics: seq[Formulae], tick: int) =
   )
   agent.opinions = newOpinion
 
+proc overwriteOpinionsBasedOnBeliefs*(agent: var Agent, topics: seq[Formulae], tick: int) =
+  ## Overwrite agent's opinions with its beleifs-based opinions.
+  ## This is equivalent to OF with alpha = 0.
+  let alphaBak = agent.alpha
+  agent.alpha = newDecimal(0)
+  agent.opinionFormation(topics, tick)
+  agent.alpha = alphaBak
+
 proc hamming(x, y: Formulae): int =
   ## Returns the hamming distance (i.e., the number of interpretations that are also model of `x` xor `y`) 
   ## between two formulae `x` and `y`.

@@ -32,6 +32,8 @@ proc doOnestep(
     agent.doOfAndBaUntilStable(topics, tick, threshold, UpdatingStrategy.bavm)
   of UpdatingStrategy.us:
     agent.unifiedSynchronization(topics, tick)
+  of UpdatingStrategy.fao:
+    agent.overwriteOpinionsBasedOnBeliefs(topics, tick)
 
 
 proc isInternalProcess(strategy: UpdatingStrategy): bool = 
@@ -41,7 +43,8 @@ proc isInternalProcess(strategy: UpdatingStrategy): bool =
      UpdatingStrategy.`of`,
      UpdatingStrategy.ofbarc,
      UpdatingStrategy.ofbavm,
-     UpdatingStrategy.us:
+     UpdatingStrategy.us,
+     UpdatingStrategy.fao:
     true
   else:
     false
