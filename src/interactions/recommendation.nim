@@ -23,6 +23,12 @@ proc recommendRandomly(target: Agent, agentNum: int): Option[Id] =
   let notFollowes = (0..<agentNum).toSeq.map(toId).filterIt(target.isNotFollowing(it))
   target.choose(notFollowes)
 
+proc recommendConcordantAgent(target: Agent, agentNum: int, allMessages: seq[Message]): Option[Id] =
+  ## Returns recommended agent who is concordant to `agent`.
+  let notFollowes = (0..<agentNum).toSeq.map(toId).filterIt(target.isNotFollowing(it))
+  let concordants = notFollowes.filterIt(target.isAcceptablePost(allMessages[it.int]))
+  target.choose(concordants)
+
 proc recommendUser(target: Agent, agentNum: int, allPosts: Table[Id, Message]): Option[Id] =
   ## Recommend a user to be followed.
   let allMessagesSeq = (0..<agentNum).toSeq.mapIt(allPosts[Id(it)])
@@ -37,6 +43,8 @@ proc recommendUser(target: Agent, agentNum: int, allPosts: Table[Id, Message]): 
       let differenceInfos = messageFromNonNeighbors.toDifferenceInfo(target)
       let minDistNonNeighbors = differenceInfos.argmin(target)
       target.choose(minDistNonNeighbors)
+    of RewritingStrategy.recommendation:
+      target.recommendConcordantAgent(agentNum, allMessagesSeq)
   
 proc getAuthors(posts: seq[Message]): seq[Id] =
   ## Get authors of given posts.
@@ -49,7 +57,7 @@ proc getUnfollowedAgent(agent: Agent, allMessages: Table[Id, Message], unaccepta
     let differenceInfos = messagesFromNeighbors.todifferenceInfo(agent)
     let maxDistNeighbors = differenceInfos.argmax(agent)
     agent.choose(maxDistNeighbors)
-  of RewritingStrategy.random:
+  of RewritingStrategy.random, RewritingStrategy.recommendation:
     agent.choose(unacceptables.getAuthors())
   of RewritingStrategy.none:
     none(Id)
@@ -71,7 +79,7 @@ proc canUpdateNeighbors(
       let followed = followedAgentMessage.get().toDifferenceInfo(agent)
       let cmpFunc = agent.getCmpFunc()
       cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
-  of RewritingStrategy.random:
+  of RewritingStrategy.random, RewritingStrategy.recommendation:
     return unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
 
 proc getMessagesOption(messages: Table[Id, Message], id: Option[Id]): Option[Message] =
