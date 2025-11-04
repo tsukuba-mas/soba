@@ -18,6 +18,7 @@ proc relaxDissonanceRNGinitializer*(seeds: seq[int]) =
 
 ## Table which associates opinion to beliefs which yield opinions.
 ## Here, it is assumed that all of the agents share the same cultural values.
+## (Could be better to implement with memoization; there is a library for this purpose...)
 var opinion2beliefCache = initTable[Table[Formulae, Opinion], seq[Formulae]]()
 
 iterator iterateOpinionsBeliefsPair(): (Table[Formulae, Opinion], Formulae) =
@@ -143,6 +144,11 @@ proc doOfAndBaUntilStable*(agent: var Agent, topics: seq[Formulae], tick: int, t
 proc unifiedSynchronization*(agent: var Agent, topics: seq[Formulae], tick: int) =
   var maxError = high(float)
   var candidates: seq[Formulae] = @[]
+
+  # Fill the cache
+  if opinion2beliefCache.len == 0:
+    generateOpinionToBeliefCache(topics, agent.values)
+
   for (newOpinions, phi) in iterateOpinionsBeliefsPair():
     let ratio = agent.gamma
     let opdiff = distance(agent.opinions, newOpinions)
