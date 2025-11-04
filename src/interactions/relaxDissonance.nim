@@ -20,6 +20,12 @@ proc relaxDissonanceRNGinitializer*(seeds: seq[int]) =
 ## Here, it is assumed that all of the agents share the same cultural values.
 var opinion2beliefCache = initTable[Table[Formulae, Opinion], seq[Formulae]]()
 
+iterator iterateOpinionsBeliefsPair(): (Table[Formulae, Opinion], Formulae) =
+  ## Iterate all coherent cognitive states using `opinion2beliefCache`.
+  for opinion in opinion2beliefCache.keys:
+    for belief in opinion2beliefCache[opinion]:
+      yield (opinion, belief)
+
 proc getBeliefBasedOpinion(belief: Formulae, values: CulturalValues, topic: Formulae): Opinion =
   ## Returns opinion toward `topic` based on `belief`.
   let merged = revision(belief, @[topic])
@@ -137,10 +143,7 @@ proc doOfAndBaUntilStable*(agent: var Agent, topics: seq[Formulae], tick: int, t
 proc unifiedSynchronization*(agent: var Agent, topics: seq[Formulae], tick: int) =
   var maxError = high(float)
   var candidates: seq[Formulae] = @[]
-  for phi in allFormulae(getNumberOfAtomicProps(agent.values)):
-    if (not phi).isTautology():
-      continue
-    let newOpinions = topics.mapIt((it, getBeliefBasedOpinion(phi, agent.values, it))).toTable
+  for (newOpinions, phi) in iterateOpinionsBeliefsPair():
     let ratio = agent.gamma
     let opdiff = distance(agent.opinions, newOpinions)
     let beldiff = distance(agent.belief, phi).float
