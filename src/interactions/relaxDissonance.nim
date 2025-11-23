@@ -164,4 +164,28 @@ proc unifiedSynchronization*(agent: var Agent, topics: seq[Formulae], tick: int)
   agent.belief = new
   agent.opinions = topics.mapIt((it, getBeliefBasedOpinion(new, agent.values, it))).toTable
 
+proc keepingCoherence*(agent: var Agent, topics: seq[Formulae], tick: int) =
+  # Fill the cache
+  if opinion2beliefCache.len == 0:
+    generateOpinionToBeliefCache(topics, agent.values)
 
+  assert topics.len == 1, "Multiple topics found"
+  let topic = topics[0]
+  let bbo = agent.getBeliefBasedOpinion(topic)
+  let currentOpinion = agent.opinions[topic]
+  let lb = min(agent.opinions[topic], bbo)
+  let ub = max(agent.opinions[topic], bbo)
+  var candidates = (0..<agent.values.len).toSeq.filterIt(($(topic))[it] == '1').mapIt(agent.values[it].toDecimal).toHashSet
+  candidates.excl(currentOpinion.float)
+  candidates.incl(bbo)
+  let sis = candidates.toSeq.argmin(
+    proc (candidate: Opinion): float = abs(candidate - currentOpinion)
+  )
+
+  assert sis.len == 1
+  let newOpinion = sis[0]
+  agent.opinions[topic] = newOpinion
+  let newBelief = agent.choose(opinion2beliefCache[@[(topic, newOpinion)].toTable])
+  assert newBelief.isSome()
+  agent.belief = newBelief.get()
+  
