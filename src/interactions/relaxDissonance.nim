@@ -182,8 +182,9 @@ proc keepingCoherence*(agent: var Agent, topics: seq[Formulae], tick: int) =
     proc (candidate: Opinion): float = abs(candidate - currentOpinion)
   )
 
-  assert sis.len == 1
-  let newOpinion = sis[0]
+  # With the Hamming distance, it is possible that sis.len > 1
+  assert sis.len > 0
+  let newOpinion = agent.choose(sis.toSeq).get()
   agent.opinions[topic] = newOpinion
   let newBelief = agent.choose(opinion2beliefCache[@[(topic, newOpinion)].toTable])
   assert newBelief.isSome()
