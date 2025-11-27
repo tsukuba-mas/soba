@@ -10,6 +10,7 @@ import ../distance
 import strformat
 import tables
 import algorithm
+import memo
 
 InitRNGs()
 
@@ -27,7 +28,7 @@ iterator iterateOpinionsBeliefsPair(): (Table[Formulae, Opinion], Formulae) =
     for belief in opinion2beliefCache[opinion]:
       yield (opinion, belief)
 
-proc getBeliefBasedOpinion(belief: Formulae, values: CulturalValues, topic: Formulae): Opinion =
+proc getBeliefBasedOpinion(belief: Formulae, values: CulturalValues, topic: Formulae): Opinion {.memoized.} =
   ## Returns opinion toward `topic` based on `belief`.
   let merged = revision(belief, @[topic])
   zip($merged, values).filterIt(it[0] == '1').mapIt(it[1]).mean().toDecimal
