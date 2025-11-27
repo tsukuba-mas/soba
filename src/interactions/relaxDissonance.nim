@@ -186,7 +186,13 @@ proc keepingCoherence*(agent: var Agent, topics: seq[Formulae], tick: int) =
   assert sis.len > 0
   let newOpinion = agent.choose(sis.toSeq).get()
   agent.opinions[topic] = newOpinion
-  let newBelief = agent.choose(opinion2beliefCache[@[(topic, newOpinion)].toTable])
+
+  # If the current beliefs are one of the candidates of the new beliefs, do nothing
+  let beliefsCandidates = opinion2beliefCache[@[(topic, newOpinion)].toTable]
+  if beliefsCandidates.contains(agent.belief):
+    return 
+  
+  let newBelief = agent.choose(beliefsCandidates)
   assert newBelief.isSome()
   agent.belief = newBelief.get()
   
