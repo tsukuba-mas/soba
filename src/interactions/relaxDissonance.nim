@@ -176,7 +176,7 @@ proc keepingCoherence*(agent: var Agent, topics: seq[Formulae], tick: int) =
   let currentOpinion = agent.opinions[topic]
   let lb = min(agent.opinions[topic], bbo)
   let ub = max(agent.opinions[topic], bbo)
-  var candidates = (0..<agent.values.len).toSeq.filterIt(($(topic))[it] == '1').mapIt(agent.values[it].toDecimal).toHashSet
+  var candidates = (0..<agent.values.len).toSeq.filterIt(($(topic))[it] == '1').mapIt(agent.values[it].toDecimal).filterIt(lb <= it and it <= ub).toHashSet
   candidates.excl(currentOpinion.float)
   candidates.incl(bbo)
   let sis = candidates.toSeq.argmin(
