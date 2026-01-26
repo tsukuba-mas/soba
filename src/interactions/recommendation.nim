@@ -38,7 +38,7 @@ proc recommendUser(target: Agent, agentNum: int, allPosts: Table[Id, Message]): 
       none(Id)
     of RewritingStrategy.random:
       target.recommendRandomly(agentNum)
-    of RewritingStrategy.swapMaxMin:
+    of RewritingStrategy.swapMaxMin, RewritingStrategy.swapMaxMin2:
       let messageFromNonNeighbors = allMessagesSeq.filterIt(target.isNotFollowing(it.author))
       let differenceInfos = messageFromNonNeighbors.toDifferenceInfo(target)
       let minDistNonNeighbors = differenceInfos.argmin(target)
@@ -52,7 +52,7 @@ proc getAuthors(posts: seq[Message]): seq[Id] =
 
 proc getUnfollowedAgent(agent: Agent, allMessages: Table[Id, Message], unacceptables: seq[Message]): Option[Id] =
   case agent.rewritingStrategy
-  of RewritingStrategy.swapMaxMin:
+  of RewritingStrategy.swapMaxMin, RewritingStrategy.swapMaxMin2:
     let messagesFromNeighbors = agent.neighbors.toSeq.mapIt(allMessages[it])
     let differenceInfos = messagesFromNeighbors.todifferenceInfo(agent)
     let maxDistNeighbors = differenceInfos.argmax(agent)
@@ -70,7 +70,7 @@ proc canUpdateNeighbors(
   case agent.rewritingStrategy
   of RewritingStrategy.none:
     return false
-  of RewritingStrategy.swapMaxMin:
+  of RewritingStrategy.swapMaxMin, RewritingStrategy.swapMaxMin2:
     let isSucceededInChoosingAgents = unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
     if not isSucceededInChoosingAgents:
       return false
@@ -78,7 +78,10 @@ proc canUpdateNeighbors(
       let unfollowed = unfollowedAgentMessage.get().toDifferenceInfo(agent)
       let followed = followedAgentMessage.get().toDifferenceInfo(agent)
       let cmpFunc = agent.getCmpFunc()
-      cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
+      if agent.rewritingStrategy == RewritingStrategy.swapMaxMin:
+        cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
+      else:
+        cmpFunc(unfollowed, followed) < 0  # since unfollowd < followd
   of RewritingStrategy.random, RewritingStrategy.recommendation:
     return unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
 
