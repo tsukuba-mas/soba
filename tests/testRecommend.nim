@@ -149,6 +149,25 @@ suite "Recommendation":
     # distance between 0 and 5: opinions 0.05, beliefs: 1
     # Hence (distance 0-3) > (distance 0-5) where > is the order based on belop
     check agent.canUpdateNeighbors(some(messages[3]), some(messages[5]))
+  
+  test "swapMaxMin2 (opbel)":
+    let agent = messages[0].genAgent(AgentOrder.opbel, RewritingStrategy.swapMaxMin2)
+    check agent.getUnfollowedAgent(t_messages, @[]) == some(Id(3))
+    check agent.recommendUser(n, t_messages) == some(Id(5))
+    # distance between 0 and 3: opinions 0.5, beliefs: 8
+    # distance between 0 and 5: opinions 0.05, beliefs: 1
+    # Hence (distance 0-1) > (distance 0-5) where > is the order based on opbel
+    check not agent.canUpdateNeighbors(some(messages[3]), some(messages[5]))
+
+  test "swapMaxMin2(belop)":
+    let agent = messages[0].genAgent(AgentOrder.belop, RewritingStrategy.swapMaxMin2)
+    check agent.getUnfollowedAgent(t_messages, @[]) == some(Id(3))
+    check agent.recommendUser(n, t_messages) == some(Id(5))
+    # distance between 0 and 3: opinions 0.5, beliefs: 8
+    # distance between 0 and 5: opinions 0.05, beliefs: 1
+    # Hence (distance 0-3) > (distance 0-5) where > is the order based on belop
+    # Here agent 5 is smaller than agent 3, thus no rewiring is performed
+    check not agent.canUpdateNeighbors(some(messages[3]), some(messages[5]))
 
   test "swapMinMax (opbel)":
     let agent = messages[0].genAgent(AgentOrder.opbel, RewritingStrategy.swapMinMax)
