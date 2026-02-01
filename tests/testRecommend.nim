@@ -93,7 +93,7 @@ suite "Recommendation":
 
     # Neighbors
     Message(opinions: @[(topic, "0.25".newDecimal)].toTable, belief: "11100000".toFormula, author: Id(1)),
-    Message(opinions: @[(topic, "0.75".newDecimal)].toTable, belief: "10000000".toFormula, author: Id(2)),
+    Message(opinions: @[(topic, "0.8".newDecimal)].toTable, belief: "10000000".toFormula, author: Id(2)),
     Message(opinions: @[(topic, "1.0".newDecimal)].toTable, belief: "00001111".toFormula, author: Id(3)),
 
     # Non-neighbors
@@ -150,6 +150,22 @@ suite "Recommendation":
     # Hence (distance 0-3) > (distance 0-5) where > is the order based on belop
     check agent.canUpdateNeighbors(some(messages[3]), some(messages[5]))
 
-
+  test "swapMinMax (opbel)":
+    let agent = messages[0].genAgent(AgentOrder.opbel, RewritingStrategy.swapMinMax)
+    check agent.getUnfollowedAgent(t_messages, @[]) == some(Id(1))
+    check agent.recommendUser(n, t_messages) == some(Id(6))
+    # distance between 0 and 1: opinions 0.25, beliefs: 1
+    # distance between 0 and 6: opinions 0.4, beliefs: 1
+    # Hence (distance 0-1) < (distance 0-6) where > is the order based on opbel
+    check not agent.canUpdateNeighbors(some(messages[1]), some(messages[6]))
+  
+  test "swapMinMax (belop)":
+    let agent = messages[0].genAgent(AgentOrder.belop, RewritingStrategy.swapMinMax)
+    check agent.getUnfollowedAgent(t_messages, @[]) == some(Id(1))
+    check agent.recommendUser(n, t_messages) == some(Id(6))
+    # distance between 0 and 1: opinions 0.25, beliefs: 1
+    # distance between 0 and 6: opinions 0.4, beliefs: 1
+    # Hence (distance 0-1) < (distance 0-6) where > is the order based on belop
+    check not agent.canUpdateNeighbors(some(messages[1]), some(messages[6]))
     
     

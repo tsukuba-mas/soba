@@ -43,6 +43,11 @@ proc recommendUser(target: Agent, agentNum: int, allPosts: Table[Id, Message]): 
       let differenceInfos = messageFromNonNeighbors.toDifferenceInfo(target)
       let minDistNonNeighbors = differenceInfos.argmin(target)
       target.choose(minDistNonNeighbors)
+    of RewritingStrategy.swapMinMax:
+      let messageFromNonNeighbors = allMessagesSeq.filterIt(target.isNotFollowing(it.author))
+      let differenceInfos = messageFromNonNeighbors.toDifferenceInfo(target)
+      let maxDistNonNeighbors = differenceInfos.argmax(target)
+      target.choose(maxDistNonNeighbors)
     of RewritingStrategy.recommendation:
       target.recommendConcordantAgent(agentNum, allMessagesSeq)
   
@@ -57,6 +62,11 @@ proc getUnfollowedAgent(agent: Agent, allMessages: Table[Id, Message], unaccepta
     let differenceInfos = messagesFromNeighbors.todifferenceInfo(agent)
     let maxDistNeighbors = differenceInfos.argmax(agent)
     agent.choose(maxDistNeighbors)
+  of RewritingStrategy.swapMinMax:
+    let messagesFromNeighbors = agent.neighbors.toSeq.mapIt(allMessages[it])
+    let differenceInfos = messagesFromNeighbors.todifferenceInfo(agent)
+    let minDistNeighbors = differenceInfos.argmin(agent)
+    agent.choose(minDistNeighbors)
   of RewritingStrategy.random, RewritingStrategy.recommendation:
     agent.choose(unacceptables.getAuthors())
   of RewritingStrategy.none:
@@ -70,7 +80,7 @@ proc canUpdateNeighbors(
   case agent.rewritingStrategy
   of RewritingStrategy.none:
     return false
-  of RewritingStrategy.swapMaxMin, RewritingStrategy.swapMaxMin2:
+  of RewritingStrategy.swapMaxMin, RewritingStrategy.swapMaxMin2, RewritingStrategy.swapMinMax:
     let isSucceededInChoosingAgents = unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
     if not isSucceededInChoosingAgents:
       return false
@@ -79,6 +89,8 @@ proc canUpdateNeighbors(
       let followed = followedAgentMessage.get().toDifferenceInfo(agent)
       let cmpFunc = agent.getCmpFunc()
       if agent.rewritingStrategy == RewritingStrategy.swapMaxMin:
+        cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
+      elif agent.rewritingStrategy == RewritingStrategy.swapMinMax:
         cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
       else:
         cmpFunc(unfollowed, followed) < 0  # since unfollowd < followd
