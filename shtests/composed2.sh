@@ -12,7 +12,7 @@
     --opinions """`cat jsons/opinions2.json`""" \
     --beliefs """`cat jsons/beliefs2.json`""" \
     --network """`cat jsons/network2.json`""" \
-    --nbEdges 2 --verbose
+    --nbEdges 2 --verbose  --reevaluateCatBeforeRewiring
 
 RES=`tail -1 results/grhist.csv`
 

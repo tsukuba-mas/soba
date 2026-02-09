@@ -43,6 +43,7 @@ let spec = (
   networkInitAlgo: newStringArg(@["--networkInitAlgo"], "algorithm to initialize network", defaultVal="random"),
   agentOrder: newStringArg(@["--agentOrder"], "order between agents", defaultVal="opinion"),
   forceConnectedNetwork: newFlagArg(@["--forceConnectedNetwork"], "force the initial network to be connected"),
+  reevaluateCatBeforeRewiring: newFlagArg(@["--reevaluateCatBeforeRewiring"], "Reevaluate concordant neighbors before rewiring"),
 )
 spec.parseOrQuit(prolog)
 
@@ -126,4 +127,5 @@ proc parseArguments*(): CommandLineArgs =
     maximalOpinionChange: spec.maximalOpinionChange.value.newDecimal,
     agentOrder: parseEnum[AgentOrder](spec.agentOrder.value.strip),
     forceConnectedNetwork: spec.forceConnectedNetwork.seen,
+    reevaluateBeforeRewiring: spec.reevaluateCatBeforeRewiring.seen,
   )

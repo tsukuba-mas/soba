@@ -13,7 +13,7 @@
     --opinions """`cat jsons/opinions.json`""" \
     --beliefs """`cat jsons/beliefs.json`""" \
     --network """`cat jsons/network.json`""" \
-    --nbEdges 2 --verbose
+    --nbEdges 2 --verbose --reevaluateCatBeforeRewiring
 
 RES=`tail -1 results/ophist0.csv | cut -c-9`
 

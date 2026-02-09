@@ -20,7 +20,11 @@ for time in 1..parsedOptions.tick:
   let evaluatedMessages = simulator.receiveMessages(targets)
   simulator.performInteractions(evaluatedMessages, time, parsedOptions.maximalOpinionChange)
 
-  let msgAfterCognitiveStateUpdates = simulator.receiveMessages(targets)
+  let msgAfterCognitiveStateUpdates = if parsedOptions.reevaluateBeforeRewiring:
+    simulator.receiveMessages(targets)
+  else:
+    # For backward compatible
+    evaluatedMessages
   simulator.updateNeighbors(msgAfterCognitiveStateUpdates, time)
   simulator.log(time)
 

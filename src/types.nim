@@ -156,6 +156,7 @@ type CommandLineArgs* = object
   maximalOpinionChange*: DecimalType
   agentOrder*: AgentOrder
   forceConnectedNetwork*: bool
+  reevaluateBeforeRewiring*: bool
 
 type EvaluatedMessages* = object
   acceptables*: seq[Message]
