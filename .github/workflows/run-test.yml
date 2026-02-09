@@ -29,3 +29,9 @@ jobs:
         run: ls -R
       - name: execute test programs
         run: nimble test
+      - name: compile
+        run: nimble build -d:release
+      - name: run composed1.sh
+        run: cd shtests && bash composed1.sh && cd ../
+      - name: run composed2.sh
+        run: cd shtests && bash composed2.sh && cd ../

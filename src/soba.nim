@@ -19,5 +19,7 @@ for time in 1..parsedOptions.tick:
   let targets = chooseTargets(simulator.agents)
   let evaluatedMessages = simulator.receiveMessages(targets)
   simulator.performInteractions(evaluatedMessages, time, parsedOptions.maximalOpinionChange)
-  simulator.updateNeighbors(evaluatedMessages, time)
+
+  let msgAfterCognitiveStateUpdates = simulator.receiveMessages(targets)
+  simulator.updateNeighbors(msgAfterCognitiveStateUpdates, time)
   simulator.log(time)
