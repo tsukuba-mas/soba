@@ -6,7 +6,7 @@
 ../soba --seed 42 --dir "results" --nbAgent 2 \
     --tick 1 --atoms 2 --update "oddg,of,oddg" \
     --rewrite "none" \
-    --pUnfollow 1 --pActive 1 --epsilon 0.2  \
+    --pUnfollow 1 --pActive 1 --epsilon 1  \
     --delta 4 \
     --values """`cat jsons/val-1.json`""" \
     --topics "1100" \
