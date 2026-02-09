@@ -60,7 +60,7 @@ proc graphLogger(simulator: Simulator, tick: int) =
   ## Output network structure.
   let saveTo = getGraphHistPath()
   if tick == 0:
-    grhistContent.add($tick & "," & simulator.followFrom.join(","))
+    grhistContent.add($tick & "," & simulator.followFrom.join(",") & "\n")
   var content: seq[string] = @[]
   var idx = 0
   for agent in simulator.agents:
