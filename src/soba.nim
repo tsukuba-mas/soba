@@ -23,3 +23,5 @@ for time in 1..parsedOptions.tick:
   let msgAfterCognitiveStateUpdates = simulator.receiveMessages(targets)
   simulator.updateNeighbors(msgAfterCognitiveStateUpdates, time)
   simulator.log(time)
+
+flushToFiles()
