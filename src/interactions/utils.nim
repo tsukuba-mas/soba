@@ -82,7 +82,8 @@ proc getCmpFunc*(agent: Agent): proc (d1, d2: DifferenceInfo): int =
   of AgentOrder.belop:   belopCmp
 
 proc argm(infos: seq[DifferenceInfo], agent: Agent, order: SortOrder): seq[Id] =
-  assert infos.len > 0
+  if infos.len == 0:
+    return @[]
   let cmpFunc = agent.getCmpFunc()
   let sortedInfos = infos.sorted(cmp=cmpFunc, order=order)
   var lb = 0
