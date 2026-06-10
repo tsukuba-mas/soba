@@ -96,7 +96,7 @@ proc canUpdateNeighbors(
       let unfollowed = unfollowedAgentMessage.get().toDifferenceInfo(agent)
       let followed = followedAgentMessage.get().toDifferenceInfo(agent)
       let cmpFunc = agent.getCmpFunc()
-      if agent.rewritingStrategy == RewritingStrategy.swapMaxMin, RewiringStrategy.swapMaxMinN:
+      if agent.rewritingStrategy == RewritingStrategy.swapMaxMin or agent.rewiringStrategy == RewiringStrategy.swapMaxMinN:
         cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
       elif agent.rewritingStrategy == RewritingStrategy.swapMinMax:
         cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
