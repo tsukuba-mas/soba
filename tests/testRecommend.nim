@@ -144,7 +144,7 @@ suite "Recommendation":
     # Hence (distance 0-1) > (distance 0-5) where > is the order based on opbel
     check agent.canUpdateNeighbors(some(messages[3]), some(messages[5]))
 
-  test "swapMaxMin(belop)":
+  test "swapMaxMin2 (belop)":
     let agent = messages[0].genAgent(AgentOrder.belop, RewritingStrategy.swapMaxMin)
     check agent.getUnfollowedAgent(t_messages, @[]) == some(Id(3))
     check agent.recommendUser(n, t_messages) == some(Id(5))
