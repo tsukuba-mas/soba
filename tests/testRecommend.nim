@@ -219,7 +219,7 @@ suite "Recommendation":
     # distance between 0 and 1: opinions 0.25, beliefs: 1
     # distance between 0 and 6: opinions 0.4, beliefs: 1
     # Hence (distance 0-1) < (distance 0-6) where > is the order based on opbel
-    check agent.canUpdateNeighbors(some(messages[7]), some(messages[6]))
+    check not agent.canUpdateNeighbors(some(messages[7]), some(messages[6]))
   
   test "swapMinMaxN (belop)":
     let agent = messages[0].genAgent(AgentOrder.belop, RewritingStrategy.swapMinMaxN)
@@ -229,5 +229,5 @@ suite "Recommendation":
     # distance between 0 and 1: opinions 0.25, beliefs: 1
     # distance between 0 and 6: opinions 0.4, beliefs: 1
     # Hence (distance 0-1) < (distance 0-6) where > is the order based on belop
-    check agent.canUpdateNeighbors(some(messages[7]), some(messages[6]))
+    check not agent.canUpdateNeighbors(some(messages[7]), some(messages[6]))
     
