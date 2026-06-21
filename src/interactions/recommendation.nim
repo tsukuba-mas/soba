@@ -103,7 +103,7 @@ proc canUpdateNeighbors(
       elif agent.rewritingStrategy == RewritingStrategy.swapMinMax or agent.rewritingStrategy == RewritingStrategy.swapMinMaxN:
         cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
       else:
-        echo "Warning: try to rewire if the distance to the added agent is larger than it to the removed agent"
+        echo fmt"Warning: {agent.rewritingStrategy} is trying to rewire if the distance to the added agent is larger than it to the removed agent"
         cmpFunc(unfollowed, followed) < 0  # since unfollowd < followd
   of RewritingStrategy.random, RewritingStrategy.recommendation:
     return unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
