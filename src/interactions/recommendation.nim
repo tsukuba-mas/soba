@@ -98,13 +98,12 @@ proc canUpdateNeighbors(
       let unfollowed = unfollowedAgentMessage.get().toDifferenceInfo(agent)
       let followed = followedAgentMessage.get().toDifferenceInfo(agent)
       let cmpFunc = agent.getCmpFunc()
-      if agent.rewritingStrategy == RewritingStrategy.swapMaxMin or agent.rewritingStrategy == RewritingStrategy.swapMaxMinN:
-        cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
-      elif agent.rewritingStrategy == RewritingStrategy.swapMinMax or agent.rewritingStrategy == RewritingStrategy.swapMinMaxN:
-        cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
-      else:
+      # For backward compatibility...
+      if agent.rewritingStrategy == RewritingStrategy.swapMaxMin2:
         echo fmt"Warning: {agent.rewritingStrategy} is trying to rewire if the distance to the added agent is larger than it to the removed agent"
         cmpFunc(unfollowed, followed) < 0  # since unfollowd < followd
+      else:
+        cmpFunc(unfollowed, followed) > 0  # since unfollowd > followd
   of RewritingStrategy.random, RewritingStrategy.recommendation:
     return unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
 
