@@ -36,7 +36,7 @@ proc recommendUser(target: Agent, agentNum: int, allPosts: Table[Id, Message]): 
     case target.rewritingStrategy
     of RewritingStrategy.none:
       none(Id)
-    of RewritingStrategy.random:
+    of RewritingStrategy.random, RewritingStrategy.randomWC:
       target.recommendRandomly(agentNum)
     of RewritingStrategy.swapMaxMin, RewritingStrategy.swapMaxMin2, RewritingStrategy.swapMaxMinN:
       let messageFromNonNeighbors = allMessagesSeq.filterIt(target.isNotFollowing(it.author))
@@ -75,7 +75,7 @@ proc getUnfollowedAgent(agent: Agent, allMessages: Table[Id, Message], unaccepta
     let differenceInfos = unacceptables.todifferenceInfo(agent)
     let minDistNeighbors = differenceInfos.argmin(agent)
     agent.choose(minDistNeighbors)
-  of RewritingStrategy.random, RewritingStrategy.recommendation:
+  of RewritingStrategy.random, RewritingStrategy.recommendation, RewritingStrategy.randomWC:
     agent.choose(unacceptables.getAuthors())
   of RewritingStrategy.none:
     none(Id)
@@ -88,7 +88,9 @@ proc canUpdateNeighbors(
   case agent.rewritingStrategy
   of RewritingStrategy.none:
     return false
-  of RewritingStrategy.swapMaxMin, RewritingStrategy.swapMaxMin2, RewritingStrategy.swapMinMax, RewritingStrategy.swapMaxMinN, RewritingStrategy.swapMinMaxN:
+  of RewritingStrategy.swapMaxMin, RewritingStrategy.swapMaxMin2, 
+     RewritingStrategy.swapMinMax, RewritingStrategy.swapMaxMinN, 
+     RewritingStrategy.swapMinMaxN, RewritingStrategy.randomWC:
     let isSucceededInChoosingAgents = unfollowedAgentMessage.isSome() and followedAgentMessage.isSome()
     if not isSucceededInChoosingAgents:
       return false

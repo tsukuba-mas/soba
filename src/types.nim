@@ -63,7 +63,7 @@ type UpdatingStrategy* {.pure.} = enum
 
 type RewritingStrategy* {.pure.} = enum
   none, random, swapMaxMin, recommendation, swapMaxMin2, swapMinMax,
-  swapMaxMinN, swapMinMaxN
+  swapMaxMinN, swapMinMaxN, randomWC
 
 type AgentOrder* {.pure.} = enum
   opinion, belief, opbel, belop
